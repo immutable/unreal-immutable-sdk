@@ -94,13 +94,24 @@ void UImmutablePassport::Initialize(const FString& ClientID, const FImtblPasspor
 }
 
 
-void UImmutablePassport::AttemptSilentConnect(const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::CheckStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     CallJS(
         ImmutablePassportAction::CheckStoredCredentials,
         TEXT(""),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnCheckStoredCredentialsResponse)
+    );
+}
+
+
+void UImmutablePassport::ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+    CallJS(
+        ImmutablePassportAction::CheckStoredCredentials,
+        TEXT(""),
+        ResponseDelegate,
+        FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectSilentResponse)
     );
 }
 
@@ -248,18 +259,42 @@ void UImmutablePassport::OnCheckStoredCredentialsResponse(FImtblJSResponse Respo
             if (Response.Error.IsSet())
                 Msg = Response.Error->ToString();
             ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg});
-            return;
         }
-
-        IMTBL_LOG("Stored credentials found; attemping login.");
-
-        CallJS(
-            ImmutablePassportAction::ConnectWithCredentials,
-            Credentials->ToString(),
-            ResponseDelegate.GetValue(),
-            FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectWithCredentialsResponse)
-        );
+        else
+        {
+            IMTBL_LOG("Stored credentials found.");
+            ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, Credentials->ToString()});
+        }
     }
+}
+
+
+void UImmutablePassport::OnConnectSilentResponse(FImtblJSResponse Response)
+{
+     if (auto ResponseDelegate = GetResponseDelegate(Response))
+     {
+         // Extract the credentials 
+         auto Credentials = FImmutablePassportTokenData::FromJsonObject(Response.JsonObject);
+
+         if (!Response.success || !Credentials.IsSet() || !Credentials->accessToken.Len())
+         {
+             IMTBL_LOG("No stored credentials found.");
+             FString Msg;
+             if (Response.Error.IsSet())
+                 Msg = Response.Error->ToString();
+             ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg});
+             return;
+         }
+
+         IMTBL_LOG("Stored credentials found; attemping login.");
+
+         CallJS(
+             ImmutablePassportAction::ConnectWithCredentials,
+             Credentials->ToString(),
+             ResponseDelegate.GetValue(),
+             FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectWithCredentialsResponse)
+         );
+     }
 }
 
 
@@ -270,12 +305,12 @@ void UImmutablePassport::OnConnectWithCredentialsResponse(FImtblJSResponse Respo
         FString Msg;
         if (Response.success)
         {
-            IMTBL_LOG("Stored credentials login succeeded.");
+            IMTBL_LOG("Connect with credentials succeeded.");
             bIsLoggedIn = true;
         }
         else
         {
-            IMTBL_LOG("Stored credentials login failed.");
+            IMTBL_LOG("Connect with credentials failed.");
             if (Response.Error.IsSet())
                 Msg = Response.Error->ToString();
             // Log out

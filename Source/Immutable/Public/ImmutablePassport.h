@@ -108,7 +108,8 @@ public:
     DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult)
 
     void Initialize(const FString& ClientID, const FImtblPassportResponseDelegate& ResponseDelegate);
-    void AttemptSilentConnect(const FImtblPassportResponseDelegate& ResponseDelegate);
+    void CheckStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ConfirmCode(const FString& DeviceCode, const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -136,6 +137,7 @@ private:
 
     void OnInitializeResponse(FImtblJSResponse Response);
     void OnCheckStoredCredentialsResponse(FImtblJSResponse Response);
+    void OnConnectSilentResponse(FImtblJSResponse Response);
     void OnConnectWithCredentialsResponse(FImtblJSResponse Response);
     void OnLogoutResponse(FImtblJSResponse Response);
     void OnConnectResponse(FImtblJSResponse Response);

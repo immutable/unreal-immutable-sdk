@@ -31,12 +31,8 @@ private:
     UPROPERTY(BlueprintAssignable)
     FPassportInitializationOutputPin Initialized;
     UPROPERTY(BlueprintAssignable)
-    FPassportInitializationOutputPin InitializedAndLoggedIn;
-    UPROPERTY(BlueprintAssignable)
-    FPassportInitializationOutputPin FailedToInitialize;
+    FPassportInitializationOutputPin Failed;
 
     void DoInit(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
     void OnInitialized(FImmutablePassportResult Result);
-    void OnSilentConnectResult(FImmutablePassportResult ImmutablePassportResult);
-
 };

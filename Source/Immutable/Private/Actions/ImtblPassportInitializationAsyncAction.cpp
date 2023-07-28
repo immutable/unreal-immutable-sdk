@@ -21,7 +21,7 @@ void UImtblPassportInitializationAsyncAction::Activate()
 {
     if (!WorldContextObject || !WorldContextObject->GetWorld())
     {
-        FailedToInitialize.Broadcast("Initialization failed due to missing world or world context object.");
+        Failed.Broadcast("Initialization failed due to missing world or world context object.");
         return;
     }
 
@@ -42,26 +42,12 @@ void UImtblPassportInitializationAsyncAction::OnInitialized(FImmutablePassportRe
 {
     if (Result.Success)
     {
-        // Attempt to connect with saved credentials
-        auto Passport = GetSubsystem()->GetPassport();
-        Passport->AttemptSilentConnect(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportInitializationAsyncAction::OnSilentConnectResult));
+        Initialized.Broadcast(Result.Message);
     }
     else
     {
-        FailedToInitialize.Broadcast(Result.Message);
+        Failed.Broadcast(Result.Message);
     }
 }
 
-
-void UImtblPassportInitializationAsyncAction::OnSilentConnectResult(FImmutablePassportResult Result)
-{
-    if (Result.Success)
-    {
-        InitializedAndLoggedIn.Broadcast("");
-    }
-    else
-    {
-        Initialized.Broadcast("");
-    }
-}
 
