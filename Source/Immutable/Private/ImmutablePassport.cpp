@@ -313,13 +313,8 @@ void UImmutablePassport::OnConnectWithCredentialsResponse(FImtblJSResponse Respo
             IMTBL_LOG("Connect with credentials failed.");
             if (Response.Error.IsSet())
                 Msg = Response.Error->ToString();
-            // Log out
-            CallJS(
-                ImmutablePassportAction::Logout,
-                TEXT(""),
-                ResponseDelegate.GetValue(),
-                FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnLogoutResponse)
-            );
+            // Send log out action to Passport and move on, logging and ignoring the response
+            JSConnector->CallJS(ImmutablePassportAction::Logout, TEXT(""), FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::LogAndIgnoreResponse));
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
     }
@@ -436,6 +431,19 @@ void UImmutablePassport::OnGetEmailResponse(FImtblJSResponse Response)
             Msg = Response.JsonObject->GetStringField(TEXT("result"));
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+    }
+}
+
+
+void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
+{
+    if (Response.success && !Response.Error)
+    {
+        IMTBL_LOG("Received success response from Passport for action %s", *Response.responseFor);
+    }
+    else
+    {
+        IMTBL_WARN("Received error response from Passport for action %s -- %s", *Response.responseFor, *Response.Error->ToString());
     }
 }
 

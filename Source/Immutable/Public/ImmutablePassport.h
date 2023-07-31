@@ -144,4 +144,6 @@ private:
     void OnConfirmCodeResponse(FImtblJSResponse Response);
     void OnGetAddressResponse(FImtblJSResponse Response);
     void OnGetEmailResponse(FImtblJSResponse Response);
+    
+    void LogAndIgnoreResponse(FImtblJSResponse Response);
 };
