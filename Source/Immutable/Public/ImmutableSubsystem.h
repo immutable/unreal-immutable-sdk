@@ -19,7 +19,7 @@ class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem
 
     friend class UImmutablePassport;
     friend class UImtblPassportInitializationAsyncAction;
-    friend class UImtblPassportHasCredentialsSavedAsyncAction;
+    friend class UImtblPassportHasStoredCredentialsAsyncAction;
     friend class UImtblPassportConnectSilentAsyncAction;
     friend class UImtblPassportConnectAsyncAction;
     friend class UImtblPassportConfirmCodeAsyncAction;
@@ -35,11 +35,12 @@ public:
 
     bool IsReady() const { return bIsReady; }
 
+    // FOnGameViewportTick& OnGameViewportTick() { return GameViewportTickEvent; }
+
 protected:
     // Execute a delegate when the subsystem is ready (i.e.: when the browser is running and the Immutable SDK game bridge has loaded).
-    // void WhenReady(const FImmutableSubsystemReadyDelegate::FDelegate& Delegate);
     template<class UserClass>
-    void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func, float ReadyTimeout = 0.0f);
+    void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func);
 
 private:
 	UPROPERTY()
@@ -52,8 +53,10 @@ private:
     FImmutableSubsystemReadyDelegate OnReady;
 
     FDelegateHandle StartHandle;
-    FDelegateHandle CleanupHandle;
-    FDelegateHandle TearDownHandle;
+    FDelegateHandle WorldTickHandle;
 
     void OnBridgeReady();
+    void ManageBridgeDelegateQueue();
+    void StartGameInstance(UGameInstance* GameInstance);
+    void WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds);
 };

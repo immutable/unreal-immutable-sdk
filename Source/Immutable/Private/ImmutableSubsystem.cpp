@@ -15,54 +15,9 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     IMTBL_LOG_FUNCSIG
     Super::Initialize(Collection);
 
-    StartHandle = FWorldDelegates::OnStartGameInstance.AddLambda([this](UGameInstance* GameInstance)
-    {
-        IMTBL_LOG_FUNC("OnStartGameInstance")
+    StartHandle = FWorldDelegates::OnStartGameInstance.AddUObject(this, &UImmutableSubsystem::StartGameInstance);
 
-        // Create the browser widget
-        if (!BrowserWidget)
-        {
-            BrowserWidget = CreateWidget<UImtblBrowserUserWidget>(GetWorld());
-        }
-        if (!BrowserWidget)
-        {
-            IMTBL_ERR("Failed to create up BrowserWidget")
-            return;
-        }
-        // Launch browser
-        if (!BrowserWidget->IsInViewport())
-        {
-            IMTBL_LOG("Adding BrowserWidget to viewport")
-            BrowserWidget->AddToViewport();
-        }
-        if (!BrowserWidget->GetJSConnector().IsValid())
-        {
-            IMTBL_ERR("JSConnector not available, can't set up ready event chain")
-            return;
-        }
-        // Set up ready event chain
-        if (!IsReady())
-        {
-            BrowserWidget->GetJSConnector()->WhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
-        }
-        // Prepare Passport
-        if (!Passport)
-        {
-            Passport = NewObject<UImmutablePassport>(this);
-            if (Passport)
-                Passport->Setup(BrowserWidget->GetJSConnector());
-        }
-    });
-
-    TearDownHandle = FWorldDelegates::OnWorldBeginTearDown.AddLambda([this](UWorld* World)
-    {
-        IMTBL_LOG_FUNC("OnWorldBeginTearDown")
-    });
-
-    CleanupHandle = FWorldDelegates::OnWorldCleanup.AddLambda([this](UWorld* World, bool bSessionEnded, bool bCleanupResources)
-    {
-        IMTBL_LOG_FUNC("OnWorldCleanup")
-    });
+    WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UImmutableSubsystem::WorldTickStart);
 }
 
 
@@ -73,49 +28,16 @@ void UImmutableSubsystem::Deinitialize()
     Passport = nullptr;
 
     FWorldDelegates::OnStartGameInstance.Remove(StartHandle);
-    FWorldDelegates::OnWorldBeginTearDown.Remove(TearDownHandle);
-    FWorldDelegates::OnWorldCleanup.Remove(CleanupHandle);
-
+    FWorldDelegates::OnWorldTickStart.Remove(WorldTickHandle);
+    
     Super::Deinitialize();
 }
 
 
 template <class UserClass>
-void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func, float ReadyTimeout)
+void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func)
 {
-    if (IsReady())
-    {
-        // Defer to next tick so we're not blocking the caller
-        if (GetWorld())
-        {
-            OnReady.AddUObject(Object, Func);
-            GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UImmutableSubsystem::OnBridgeReady);
-        }
-        else
-        {
-            // Can't defer to next tick, so just call the delegate now
-            FImmutableSubsystemReadyDelegate::FDelegate::CreateUObject(Object, Func).ExecuteIfBound(BrowserWidget->GetJSConnector());
-        }
-    }
-    else
-    {
-        FDelegateHandle Handle = OnReady.AddUObject(Object, Func);
-
-        // Implement timeout (if there is a world to get a timer from)
-        if (ReadyTimeout > 0.0f && GetWorld())
-        {
-            FTimerHandle TimerHandle;
-            GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Handle]()
-            {
-                if (!IsReady())
-                {
-                    IMTBL_WARN("WhenReady timed out");
-                    OnReady.Remove(Handle);
-                    // TODO: add a timeout callback
-                }
-            }, ReadyTimeout, false);
-        }
-    }
+    OnReady.AddUObject(Object, Func);
 }
 
 
@@ -124,6 +46,61 @@ void UImmutableSubsystem::OnBridgeReady()
     // When the bridge is ready our subsystem is ready to be used by game code.
     // Set the bIsReady flag and broadcast the OnReady event for any waiting delegates.
     bIsReady = true;
-    OnReady.Broadcast(BrowserWidget->GetJSConnector());
-    OnReady.Clear();
+    ManageBridgeDelegateQueue();
+}
+
+
+void UImmutableSubsystem::ManageBridgeDelegateQueue()
+{
+    if (bIsReady)
+    {
+        OnReady.Broadcast(BrowserWidget->GetJSConnector());
+        OnReady.Clear();
+    }
+}
+
+
+void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
+{
+    IMTBL_LOG_FUNC("OnStartGameInstance")
+
+    // Create the browser widget
+    if (!BrowserWidget)
+    {
+        BrowserWidget = CreateWidget<UImtblBrowserUserWidget>(GetWorld());
+    }
+    if (!BrowserWidget)
+    {
+        IMTBL_ERR("Failed to create up BrowserWidget")
+        return;
+    }
+    // Launch browser
+    if (!BrowserWidget->IsInViewport())
+    {
+        IMTBL_LOG("Adding BrowserWidget to viewport")
+        BrowserWidget->AddToViewport();
+    }
+    if (!BrowserWidget->GetJSConnector().IsValid())
+    {
+        IMTBL_ERR("JSConnector not available, can't set up subsystem-ready event chain")
+        return;
+    }
+    // Set up ready event chain
+    if (!IsReady())
+    {
+        BrowserWidget->GetJSConnector()->WhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
+    }
+    // Prepare Passport
+    if (!Passport)
+    {
+        Passport = NewObject<UImmutablePassport>(this);
+        if (Passport)
+            Passport->Setup(BrowserWidget->GetJSConnector());
+    }
+}
+
+
+void UImmutableSubsystem::WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds)
+{
+    ManageBridgeDelegateQueue();
 }
