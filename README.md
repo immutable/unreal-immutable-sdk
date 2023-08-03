@@ -19,6 +19,16 @@ See `ImmutablePassport.h` for the C++ Passport API.  Follow the same sequence of
 
 ## Plugin Maintainers' Guide
 
+### Prerequisites
+
+- Windows 10 or 11
+- git
+- Epic Games Launcher
+- Unreal Engine installed from the Epic Games Launcher; you will need every version that the plugin supports (currently 4.27, 5.0, 5.1, 5.2)
+- Visual Studio 2022 with C++ support
+
+The Jetbrains Rider IDE is recommended for working with Unreal Engine C++ code.  If not Rider, Visual Studio is fine and even better with the Resharper plugin.
+
 ### Getting Started
 
 See user docs to install the plugin, with one caveat:  If you want to open the project and plugin in an IDE you'll need to create your Unreal project as a C++ project.  If you've already accidentally created your Unreal project as BluePrint-only you can convert it to a BluePrint-and-C++ project by adding any C++ class from the `Add New C++ Class` option in the Unreal Editor's `File` menu.
