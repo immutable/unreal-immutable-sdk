@@ -57,7 +57,7 @@ struct FImtblJSRequest
     UPROPERTY()
     FString requestId;
 
-    FString ToString() const
+    FString ToJsonString() const
     {
         FString OutString;
         FJsonObjectConverter::UStructToJsonObjectString<FImtblJSRequest>(*this, OutString, 0, 0, 0, nullptr, false);

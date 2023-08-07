@@ -37,6 +37,21 @@ struct FImmutablePassportResult
 
 
 USTRUCT()
+struct FImmutablePassportInitData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString clientId;
+
+    UPROPERTY()
+    FString redirectUri;
+
+    FString ToJsonString() const;
+};
+
+
+USTRUCT()
 struct FImmutablePassportTokenData
 {
     GENERATED_BODY()
@@ -52,7 +67,7 @@ struct FImmutablePassportTokenData
     UPROPERTY()
     int64 expiresIn = 0;
 
-    FString ToString() const;
+    FString ToJsonString() const;
     static TOptional<FImmutablePassportTokenData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
 };
 
@@ -71,8 +86,8 @@ struct FImmutablePassportConnectData
     UPROPERTY()
     float interval = 0;
     
-    FString ToString() const;
-    static TOptional<FImmutablePassportConnectData> FromString(const FString& JsonObjectString);
+    FString ToJsonString() const;
+    static TOptional<FImmutablePassportConnectData> FromJsonString(const FString& JsonObjectString);
     static TOptional<FImmutablePassportConnectData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
 };
 
@@ -89,7 +104,7 @@ struct FImmutablePassportCodeConfirmRequestData
     UPROPERTY()
     float timeoutMs = 15 * 60 * 1000;
     
-    FString ToString() const;
+    FString ToJsonString() const;
 };
 
 

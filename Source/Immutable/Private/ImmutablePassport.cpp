@@ -8,7 +8,25 @@
 #include "ImtblLogging.h"
 
 
-FString FImmutablePassportTokenData::ToString() const
+FString FImmutablePassportInitData::ToJsonString() const
+{
+    FString OutString;
+    FJsonObjectWrapper Wrapper;
+    FJsonObjectConverter::UStructToJsonObject(FImmutablePassportInitData::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef());
+    if (!Wrapper.JsonObject.IsValid())
+    {
+        IMTBL_ERR("Could not convert FImmutablePassportInitData to JSON")
+        return "";
+    }
+    // Remove redirectUri field if it's empty so that the bridge doesn't try to use it
+    if (Wrapper.JsonObject->HasField("redirectUri") && Wrapper.JsonObject->GetStringField("redirectUri").IsEmpty())
+        Wrapper.JsonObject->RemoveField("redirectUri");
+    Wrapper.JsonObjectToString(OutString);
+    return OutString;
+}
+
+
+FString FImmutablePassportTokenData::ToJsonString() const
 {
     FString OutString;
     FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
@@ -34,7 +52,7 @@ TOptional<FImmutablePassportTokenData> FImmutablePassportTokenData::FromJsonObje
 }
 
 
-FString FImmutablePassportConnectData::ToString() const
+FString FImmutablePassportConnectData::ToJsonString() const
 {
     FString OutString;
     FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
@@ -42,7 +60,7 @@ FString FImmutablePassportConnectData::ToString() const
 }
 
 
-TOptional<FImmutablePassportConnectData> FImmutablePassportConnectData::FromString(const FString& JsonObjectString)
+TOptional<FImmutablePassportConnectData> FImmutablePassportConnectData::FromJsonString(const FString& JsonObjectString)
 {
     FImmutablePassportConnectData PassportConnect;
     if (!FJsonObjectConverter::JsonObjectStringToUStruct(JsonObjectString, &PassportConnect, 0, 0))
@@ -70,7 +88,7 @@ TOptional<FImmutablePassportConnectData> FImmutablePassportConnectData::FromJson
 }
 
 
-FString FImmutablePassportCodeConfirmRequestData::ToString() const
+FString FImmutablePassportCodeConfirmRequestData::ToJsonString() const
 {
     FString OutString;
     FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
@@ -86,7 +104,7 @@ void UImmutablePassport::Initialize(const FString& ClientID, const FImtblPasspor
 
     CallJS(
         ImmutablePassportAction::Initialize,
-        ClientId,
+        FImmutablePassportInitData{ClientID}.ToJsonString(),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse),
         false
@@ -144,7 +162,7 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const FImtblPass
     Data.deviceCode = DeviceCode;
     CallJS(
         ImmutablePassportAction::ConfirmCode,
-        Data.ToString(),
+        Data.ToJsonString(),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConfirmCodeResponse)
     );
@@ -263,7 +281,7 @@ void UImmutablePassport::OnCheckStoredCredentialsResponse(FImtblJSResponse Respo
         else
         {
             IMTBL_LOG("Stored credentials found.");
-            ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, Credentials->ToString()});
+            ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, Credentials->ToJsonString()});
         }
     }
 }
@@ -290,7 +308,7 @@ void UImmutablePassport::OnConnectSilentResponse(FImtblJSResponse Response)
 
          CallJS(
              ImmutablePassportAction::ConnectWithCredentials,
-             Credentials->ToString(),
+             Credentials->ToJsonString(),
              ResponseDelegate.GetValue(),
              FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectWithCredentialsResponse)
          );
@@ -359,7 +377,7 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
         }
         else
         {
-            Msg = ConnectData->ToString();
+            Msg = ConnectData->ToJsonString();
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
     }

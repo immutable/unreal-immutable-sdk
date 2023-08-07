@@ -90,7 +90,7 @@ void UImtblJSConnector::CallJS(const FImtblJSRequest& Request, FImtblJSResponseD
     RequestResponseDelegates.Add(Request.requestId, HandleResponse);
     
     // Convert the request to a string
-    FString RequestString = Request.ToString();
+    FString RequestString = Request.ToJsonString();
     RequestString.ReplaceInline(TEXT("\\"), TEXT("\\\\"));
     RequestString.ReplaceInline(TEXT("\""), TEXT("\\\""));
     const FString JS = FString::Printf(TEXT("callFunction(\"%s\");"), *RequestString);

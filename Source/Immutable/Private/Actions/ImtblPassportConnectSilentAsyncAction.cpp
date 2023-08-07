@@ -43,10 +43,12 @@ void UImtblPassportConnectSilentAsyncAction::OnConnectSilentResponse(FImmutableP
 {
     if (Result.Success)
     {
+        IMTBL_LOG("SilentConnect success")
         Connected.Broadcast(Result.Message);
     }
     else
     {
+        IMTBL_LOG("SilentConnect failed")
         Failed.Broadcast(Result.Message);
     }
 }

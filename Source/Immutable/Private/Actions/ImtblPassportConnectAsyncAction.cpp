@@ -43,7 +43,7 @@ void UImtblPassportConnectAsyncAction::OnConnectCodeReady(FImmutablePassportResu
 {
     if (Result.Success)
     {
-        if (auto Data = FImmutablePassportConnectData::FromString(Result.Message))
+        if (auto Data = FImmutablePassportConnectData::FromJsonString(Result.Message))
         {
             ConnectData = Data.GetValue();
             
