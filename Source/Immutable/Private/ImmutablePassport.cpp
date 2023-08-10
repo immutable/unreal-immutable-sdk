@@ -156,10 +156,11 @@ void UImmutablePassport::Connect(const FImtblPassportResponseDelegate& ResponseD
 }
 
 
-void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     FImmutablePassportCodeConfirmRequestData Data;
     Data.deviceCode = DeviceCode;
+    Data.interval = Interval;
     CallJS(
         ImmutablePassportAction::ConfirmCode,
         Data.ToJsonString(),
@@ -364,22 +365,28 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
 {
     if (auto ResponseDelegate = GetResponseDelegate(Response))
     {
-        auto ConnectData = FImmutablePassportConnectData::FromJsonObject(Response.JsonObject);
-        
-        FString Msg;
-        bool bSuccess = true;
+        const auto ConnectData = FImmutablePassportConnectData::FromJsonObject(Response.JsonObject);
         if (!Response.success || !ConnectData || !ConnectData->code.Len())
         {
+            FString Msg;
             IMTBL_LOG("Connect attempt failed.");
             if (Response.Error.IsSet())
+            {
                 Msg = Response.Error->ToString();
-            bSuccess = false;
+            }
+            ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg});
+            return;
         }
-        else
+        FString Err;
+        FPlatformProcess::LaunchURL(*ConnectData->url, nullptr, &Err);
+        if (!Err.Len())
         {
-            Msg = ConnectData->ToJsonString();
+            FString Msg = "Failed to connect to Browser: " + Err;
+            IMTBL_ERR("%s", *Msg);
+            ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg});
+            return;
         }
-        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+        ConfirmCode(ConnectData->deviceCode, ConnectData->interval, ResponseDelegate.GetValue());
     }
 }
 
