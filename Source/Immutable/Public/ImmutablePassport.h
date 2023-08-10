@@ -127,7 +127,6 @@ public:
     void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
-    void ConfirmCode(const FString& DeviceCode, const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
 
@@ -149,6 +148,7 @@ private:
     void CallJS(const FString& Action, const FString& Data, const FImtblPassportResponseDelegate& ClientResponseDelegate, const FImtblJSResponseDelegate& HandleJSResponse, const bool bCheckInitialized = true);
     // Pulls the ResponseDelegate from the ResponseDelegates map and returns it
     TOptional<FImtblPassportResponseDelegate> GetResponseDelegate(const FImtblJSResponse& Response);
+    void ConfirmCode(const FString& DeviceCode, const FImtblPassportResponseDelegate& ResponseDelegate);
 
     void OnInitializeResponse(FImtblJSResponse Response);
     void OnCheckStoredCredentialsResponse(FImtblJSResponse Response);

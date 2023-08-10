@@ -364,22 +364,19 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
 {
     if (auto ResponseDelegate = GetResponseDelegate(Response))
     {
-        auto ConnectData = FImmutablePassportConnectData::FromJsonObject(Response.JsonObject);
-        
-        FString Msg;
-        bool bSuccess = true;
+        const auto ConnectData = FImmutablePassportConnectData::FromJsonObject(Response.JsonObject);
         if (!Response.success || !ConnectData || !ConnectData->code.Len())
         {
+            FString Msg;
             IMTBL_LOG("Connect attempt failed.");
             if (Response.Error.IsSet())
+            {
                 Msg = Response.Error->ToString();
-            bSuccess = false;
+            }
+            ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg});
+            return;
         }
-        else
-        {
-            Msg = ConnectData->ToJsonString();
-        }
-        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+        ConfirmCode(ConnectData->code, ResponseDelegate.GetValue());
     }
 }
 
