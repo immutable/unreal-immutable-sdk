@@ -156,10 +156,11 @@ void UImmutablePassport::Connect(const FImtblPassportResponseDelegate& ResponseD
 }
 
 
-void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     FImmutablePassportCodeConfirmRequestData Data;
     Data.deviceCode = DeviceCode;
+    Data.interval = Interval;
     CallJS(
         ImmutablePassportAction::ConfirmCode,
         Data.ToJsonString(),
@@ -376,7 +377,16 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
             ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg});
             return;
         }
-        ConfirmCode(ConnectData->code, ResponseDelegate.GetValue());
+        FString Err;
+        FPlatformProcess::LaunchURL(*ConnectData->url, nullptr, &Err);
+        if (!Err.Len())
+        {
+            FString Msg = "Failed to connect to Browser: " + Err;
+            IMTBL_ERR("%s", *Msg);
+            ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg});
+            return;
+        }
+        ConfirmCode(ConnectData->deviceCode, ConnectData->interval, ResponseDelegate.GetValue());
     }
 }
 

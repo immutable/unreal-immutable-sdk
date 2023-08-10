@@ -148,7 +148,7 @@ private:
     void CallJS(const FString& Action, const FString& Data, const FImtblPassportResponseDelegate& ClientResponseDelegate, const FImtblJSResponseDelegate& HandleJSResponse, const bool bCheckInitialized = true);
     // Pulls the ResponseDelegate from the ResponseDelegates map and returns it
     TOptional<FImtblPassportResponseDelegate> GetResponseDelegate(const FImtblJSResponse& Response);
-    void ConfirmCode(const FString& DeviceCode, const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate);
 
     void OnInitializeResponse(FImtblJSResponse Response);
     void OnCheckStoredCredentialsResponse(FImtblJSResponse Response);
