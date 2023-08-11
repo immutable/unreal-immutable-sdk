@@ -380,7 +380,7 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
         }
         FString Err;
         FPlatformProcess::LaunchURL(*ConnectData->url, nullptr, &Err);
-        if (!Err.Len())
+        if (Err.Len())
         {
             FString Msg = "Failed to connect to Browser: " + Err;
             IMTBL_ERR("%s", *Msg);
