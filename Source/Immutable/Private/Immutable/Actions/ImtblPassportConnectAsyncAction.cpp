@@ -22,7 +22,7 @@ void UImtblPassportConnectAsyncAction::Activate()
     {
         FString Err = "Connect failed due to missing world or world context object.";
         IMTBL_WARN("%s", *Err)
-        Failed.Broadcast(Err, TEXT(""), TEXT(""), TEXT(""));
+        Failed.Broadcast(Err);
         return;
     }
 
@@ -35,29 +35,19 @@ void UImtblPassportConnectAsyncAction::DoConnect(TWeakObjectPtr<UImtblJSConnecto
     // Get Passport
     auto Passport = GetSubsystem()->GetPassport();
     // Run Connect
-    Passport->Connect(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportConnectAsyncAction::OnConnectCodeReady));
+    Passport->Connect(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportConnectAsyncAction::OnConnect));
 }
 
 
-void UImtblPassportConnectAsyncAction::OnConnectCodeReady(FImmutablePassportResult Result)
+void UImtblPassportConnectAsyncAction::OnConnect(FImmutablePassportResult Result)
 {
     if (Result.Success)
     {
-        if (auto Data = FImmutablePassportConnectData::FromJsonString(Result.Message))
-        {
-            ConnectData = Data.GetValue();
-            
-            CodeReady.Broadcast(TEXT(""), ConnectData.code, ConnectData.deviceCode, ConnectData.url);
-        }
-        else
-        {
-            IMTBL_WARN("Could not deserialize connect data.")
-            Failed.Broadcast(Result.Message, TEXT(""), TEXT(""), TEXT(""));
-        }
+        Success.Broadcast(TEXT(""));
     }
     else
     {
-        Failed.Broadcast(Result.Message, TEXT(""), TEXT(""), TEXT(""));
+        Failed.Broadcast(Result.Message);
     }
 }
 

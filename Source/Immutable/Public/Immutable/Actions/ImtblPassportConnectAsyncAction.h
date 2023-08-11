@@ -16,7 +16,7 @@ class IMMUTABLE_API UImtblPassportConnectAsyncAction : public UImtblBlueprintAsy
 {
     GENERATED_BODY()
 
-    DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FPassportConnectOutputPin, FString, ErrorMessage, FString, Code, FString, DeviceCode, FString, Url);
+    DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportConnectOutputPin, FString, ErrorMessage);
     
 public:
     UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
@@ -28,10 +28,10 @@ private:
     FImmutablePassportConnectData ConnectData;
     
     void DoConnect(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
-    void OnConnectCodeReady(FImmutablePassportResult Result);
+    void OnConnect(FImmutablePassportResult Result);
 
     UPROPERTY(BlueprintAssignable)
-    FPassportConnectOutputPin CodeReady;
+    FPassportConnectOutputPin Success;
     UPROPERTY(BlueprintAssignable)
     FPassportConnectOutputPin Failed;
 };
