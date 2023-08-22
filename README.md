@@ -26,32 +26,6 @@ See the included sample widgets in `All`->`Plugins`->`Immutable Content` in the 
 
 See `ImmutablePassport.h` for the C++ Passport API.  Follow the same sequence of steps as the Blueprint widget example to initialise and connect Passport and retrieve account data.
 
-
-## Plugin Maintainers' Guide
-
-### Supported Platforms
-
-- Windows 10 (64-bit)
-- MacOS
-
-### Supported Unreal Engine Versions
-
-- Unreal Engine 5.0 and above
-
-#### Note
-
-Support for Unreal Engine 4.27 work is currently underway.
-
-### Prerequisites
-
-- git
-- Epic Games Launcher
-- Unreal Engine installed from the Epic Games Launcher; you will need every version that the plugin supports (currently 4.27, 5.0, 5.1, 5.2)
-- Visual Studio 2022 with C++ support
-- Jetbrains Rider IDE (recommended for working with Unreal Engine C++ code)
-
-If not Rider, Visual Studio is fine and even better with the Resharper plugin.
-
 ### Getting Started
 
 See user docs to install the plugin, with one caveat:  If you want to open the project and plugin in an IDE you'll need to create your Unreal project as a C++ project.  If you've already accidentally created your Unreal project as BluePrint-only you can convert it to a BluePrint-and-C++ project by adding any C++ class from the `Add New C++ Class` option in the Unreal Editor's `File` menu.
@@ -76,6 +50,30 @@ We use the [Device Code Authorisation](https://auth0.com/docs/get-started/authen
 ### Log out of Passport
 
 See this Blueprint showing how to logout from passport ![Passport Logout Blueprint](PassportLogoutFlow.jpg)
+
+## Plugin Maintainers' Guide
+
+### Supported Platforms
+
+- Windows 10 (64-bit)
+- MacOS
+
+### Supported Unreal Engine Versions
+
+- Unreal Engine 5.0 and above
+
+> [!NOTE]
+> Support for Unreal Engine 4.27 work is currently underway.
+
+### Prerequisites
+
+- git
+- Epic Games Launcher
+- Unreal Engine installed from the Epic Games Launcher; you will need every version that the plugin supports (currently 4.27, 5.0, 5.1, 5.2)
+- Visual Studio 2022 with C++ support
+- Jetbrains Rider IDE (recommended for working with Unreal Engine C++ code)
+
+If not Rider, Visual Studio is fine and even better with the Resharper plugin.
 
 ### Debugging the Embedded Browser
 
