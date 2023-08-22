@@ -12,6 +12,18 @@
 
 ## User Guide
 
+### Supported Platforms
+
+- Windows 10 (64-bit)
+- MacOS
+
+### Supported Unreal Engine Versions
+
+- Unreal Engine 5.0 and above
+
+> [!NOTE]
+> Support for Unreal Engine 4.27 work is currently underway.
+
 ### Installation
 
 To install the plugin download it into your project's `Plugins` folder, e.g.: `MyGame/Plugins/unreal-immutable-sdk`.
@@ -51,19 +63,23 @@ We use the [Device Code Authorisation](https://auth0.com/docs/get-started/authen
 
 See this Blueprint showing how to logout from passport ![Passport Logout Blueprint](PassportLogoutFlow.jpg)
 
+## Supported Functionality
+
+- GetAddress
+- GetEmail
+- CheckStoredCredentials
+- Connect
+- ConnectSilent
+
+See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
+
+## Examples
+
+- **Sample Blueprints** - see the [sample blueprints](https://github.com/immutable/unreal-immutable-sdk/tree/main/Content/BlueprintSampleContent) for examples of how to use the Immutable Unity SDK.
+
+- **Sample Game** - see the [sample game](https://github.com/immutable/sample-unreal-game) for example of how to use the Immutable Unity SDK.
+
 ## Plugin Maintainers' Guide
-
-### Supported Platforms
-
-- Windows 10 (64-bit)
-- MacOS
-
-### Supported Unreal Engine Versions
-
-- Unreal Engine 5.0 and above
-
-> [!NOTE]
-> Support for Unreal Engine 4.27 work is currently underway.
 
 ### Prerequisites
 
@@ -90,24 +106,6 @@ In Unreal Engine 5.1+ the project is set up so that `console.log()` will pass al
 To set up Chromium remote debugging, edit project build/launch configurations in your IDE to add the following program command line argument to the appropriate configurations: `cefdebug=9222`
 
 Next, launch the game and then open a separate Chrome/Chromium browser and navigate to `chrome://inspect` where your app should be listed, sometimes intermittently or after a delay, under the `Remote Target #localhost` section.  Click `inspect` to launch the remote debugging session.
-
-## Supported Functionality
-
-- GetAddress
-- GetEmail
-- CheckStoredCredentials
-- Connect
-- ConnectSilent
-
-See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
-
-
-
-## Examples
-
-- **Sample Blueprints** - see the [sample blueprints](https://github.com/immutable/unreal-immutable-sdk/tree/main/Content/BlueprintSampleContent) for examples of how to use the Immutable Unity SDK.
-
-- **Sample Game** - see the [sample game](https://github.com/immutable/sample-unreal-game) for example of how to use the Immutable Unity SDK.
 
 ## Changelog Management
 
