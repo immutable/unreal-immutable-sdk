@@ -69,8 +69,6 @@ Here are the steps to login to passport:
 
 Once the gamer is connected to Passport, the SDK will store your credentials (access, ID, and refresh tokens).
 
-You may use `await passport.ConnectSilent()` to connect to Passport using the saved credentials. This is similar to `Connect()`. However, if the saved access token is no longer valid and the refresh token cannot be used, it will not fall back to the Device Code Authorisation flow.
-
 #### Note
 
 We use the [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.) flow to authenticate and authorise gamers.
