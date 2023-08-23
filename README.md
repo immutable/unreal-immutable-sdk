@@ -38,11 +38,9 @@ See the included sample widgets in `All`->`Plugins`->`Immutable Content` in the 
 
 See `ImmutablePassport.h` for the C++ Passport API.  Follow the same sequence of steps as the Blueprint widget example to initialise and connect Passport and retrieve account data.
 
-### Getting Started
+### Quick Start
 
-See user docs to install the plugin, with one caveat:  If you want to open the project and plugin in an IDE you'll need to create your Unreal project as a C++ project.  If you've already accidentally created your Unreal project as BluePrint-only you can convert it to a BluePrint-and-C++ project by adding any C++ class from the `Add New C++ Class` option in the Unreal Editor's `File` menu.
-
-### Passport Login Flow
+#### Passport Login Flow
 
 See this Blueprint showing how to login to passport ![Passport Login Blueprint](PassportLoginFlow.jpg)
 
@@ -55,21 +53,24 @@ Here are the steps to login to passport:
 
 Once the gamer is connected to Passport, the SDK will store your credentials (access, ID, and refresh tokens).
 
-#### Note
+> [!NOTE]
+> We use the [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.) flow to authenticate and authorise gamers.
 
-We use the [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.) flow to authenticate and authorise gamers.
-
-### Log out of Passport
+#### Log out of Passport
 
 See this Blueprint showing how to logout from passport ![Passport Logout Blueprint](PassportLogoutFlow.jpg)
 
 ## Supported Functionality
 
-- GetAddress
-- GetEmail
-- CheckStoredCredentials
-- Connect
-- ConnectSilent
+
+| Method	                | Description |
+|---	                    |:---|
+| GetAddress	            | Gets Wallet Address |
+| GetEmail	                | Get Email Address associated with the Wallet Address |
+| CheckStoredCredentials	| Checks if there are stored credits from previous login |
+| Connect	                | New login connection |
+| ConnectSilent	            | Attempts to login using stored credentials |
+
 
 See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
 
@@ -90,6 +91,10 @@ See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/
 - Jetbrains Rider IDE (recommended for working with Unreal Engine C++ code)
 
 If not Rider, Visual Studio is fine and even better with the Resharper plugin.
+
+### Getting Started
+
+See [user guide](#user-guide) to install the plugin, with one caveat:  If you want to open the project and plugin in an IDE you'll need to create your Unreal project as a C++ project.  If you've already accidentally created your Unreal project as BluePrint-only you can convert it to a BluePrint-and-C++ project by adding any C++ class from the `Add New C++ Class` option in the Unreal Editor's `File` menu.
 
 ### Debugging the Embedded Browser
 
@@ -177,4 +182,5 @@ You can also apply for marketing support for your project. Or, if you need help 
 [Contact support](https://support.immutable.com/hc/en-us/requests/new)
 
 ## License
+
 Immutable Unity SDK repository is distributed under the terms of the [Apache License (Version 2.0)](LICENSE).
