@@ -9,6 +9,10 @@
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Blueprint/UserWidget.h"
 
+#if USING_BLUI_CEF
+#include "BluEye.h"
+#endif
+
 
 void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -41,6 +45,19 @@ void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsys
 }
 
 
+#if USING_BLUI_CEF
+UBluEye* UImmutableSubsystem::GetBluEye()
+{
+	if (!TheBluEye)
+	{
+		IMTBL_LOG("Creating BluEye")
+		TheBluEye = NewObject<UBluEye>(this);
+	}
+	return Cast<UBluEye>(TheBluEye);
+}
+#endif
+
+
 void UImmutableSubsystem::OnBridgeReady()
 {
     // When the bridge is ready our subsystem is ready to be used by game code.
@@ -64,6 +81,28 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
 {
     IMTBL_LOG_FUNC("OnStartGameInstance")
 
+#if USING_BLUI_CEF
+    UE_LOG(LogTemp, Log, TEXT("BeginPlay()"))
+
+    UBluEye* BluEye = GetBluEye();
+	UE_LOG(LogTemp, Log, TEXT("BluEye created"))
+	
+	// BluEye->LogEventEmitter.AddUniqueDynamic(this, &AImtblUnrealSampleGameModeBase::OnLogEvent);
+	// BluEye->ScriptEventEmitter.AddUniqueDynamic(this, &AImtblUnrealSampleGameModeBase::OnScriptEvent);
+	BluEye->bEnabled = true;
+	UE_LOG(LogTemp, Log, TEXT("Events subscribed"))
+	
+	BluEye->Init();
+	UE_LOG(LogTemp, Log, TEXT("BluEye Init()ed"))
+	
+	const FString Html = "<html><head></head><body><div>Stuff IN A WEBSITE</div><script>blu_event('blah', 'BALKJSDLFKJDSLKFJDSLDSFL');</script></body></html>";
+	const FString DataUrl = "data:text/html;charset=utf-8," + Html;
+	BluEye->LoadURL(*DataUrl);
+	UE_LOG(LogTemp, Log, TEXT("DataUrl loaded"))
+	
+	// GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AImtblUnrealSampleGameModeBase::WhenBrowserReady);
+
+#else
     // Create the browser widget
     if (!BrowserWidget)
     {
@@ -90,6 +129,7 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
     {
         BrowserWidget->GetJSConnector()->WhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
     }
+	
     // Prepare Passport
     if (!Passport)
     {
@@ -97,6 +137,7 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
         if (Passport)
             Passport->Setup(BrowserWidget->GetJSConnector());
     }
+#endif
 }
 
 
@@ -104,3 +145,4 @@ void UImmutableSubsystem::WorldTickStart(UWorld* World, ELevelTick TickType, flo
 {
     ManageBridgeDelegateQueue();
 }
+

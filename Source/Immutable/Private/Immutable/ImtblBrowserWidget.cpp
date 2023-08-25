@@ -5,7 +5,9 @@
 
 #include "ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
+#if USING_BUNDLED_CEF
 #include "SWebBrowser.h"
+#endif
 #include "Immutable/Assets/ImtblSDKResource.h"
 #include "Interfaces/IPluginManager.h"
 
@@ -54,16 +56,23 @@ TWeakObjectPtr<UImtblJSConnector> UImtblBrowserWidget::GetJSConnector()
 
 bool UImtblBrowserWidget::IsPageLoaded() const
 {
+#if USING_BUNDLED_CEF
     return WebBrowserWidget.IsValid() && WebBrowserWidget->IsLoaded();
+#else	
+	// TODO
+	return false;
+#endif
 }
 
 
 void UImtblBrowserWidget::ExecuteJS(const FString& ScriptText) const
 {
+#if USING_BUNDLED_CEF
     if (WebBrowserWidget.IsValid())
     {
         WebBrowserWidget->ExecuteJavascript(ScriptText);
     }
+#endif
 }
 
 
@@ -77,6 +86,7 @@ void UImtblBrowserWidget::SetBrowserContent()
     {
         if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
         {
+#if USING_BUNDLED_CEF
             if (!WebBrowserWidget.IsValid())
             {
                 IMTBL_ERR("no browser")
@@ -84,6 +94,7 @@ void UImtblBrowserWidget::SetBrowserContent()
             }
             // IMTBL_LOG("Loaded resource: %s", *Resource->GetName())
             WebBrowserWidget->LoadString(Resource->Data, TEXT("file://immutable/index.html"));
+#endif
         }
     }
 }
@@ -91,6 +102,7 @@ void UImtblBrowserWidget::SetBrowserContent()
 
 bool UImtblBrowserWidget::BindUObject(const FString& Name, UObject* Object, const bool bIsPermanent) const
 {
+#if USING_BUNDLED_CEF
     if (!WebBrowserWidget)
     {
         IMTBL_WARN_FUNC("Could not bind UObject '%s' to browser, WebBrowserWidget is null", *Object->GetName())
@@ -98,6 +110,7 @@ bool UImtblBrowserWidget::BindUObject(const FString& Name, UObject* Object, cons
     }
 
     WebBrowserWidget->BindUObject(Name, Object, bIsPermanent);
+#endif
     return true;
 }
 
@@ -105,8 +118,9 @@ bool UImtblBrowserWidget::BindUObject(const FString& Name, UObject* Object, cons
 void UImtblBrowserWidget::ReleaseSlateResources(bool bReleaseChildren)
 {
 	Super::ReleaseSlateResources(bReleaseChildren);
-
+#if USING_BUNDLED_CEF
 	WebBrowserWidget.Reset();
+#endif
 }
 
 
@@ -124,6 +138,7 @@ TSharedRef<SWidget> UImtblBrowserWidget::RebuildWidget()
 	}
 	else
 	{
+#if USING_BUNDLED_CEF
 		WebBrowserWidget = SNew(SWebBrowser)
 			.InitialURL(InitialURL)
 			.ShowControls(false)
@@ -135,6 +150,15 @@ TSharedRef<SWidget> UImtblBrowserWidget::RebuildWidget()
 	    ;
 
 		return WebBrowserWidget.ToSharedRef();
+#else
+		return SNew(SBox)
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			[
+				SNew(STextBlock)
+				.Text(NSLOCTEXT("Immutable", "Immutable Web Browser", "Immutable Web Browser"))
+			];
+#endif
 	}
 }
 

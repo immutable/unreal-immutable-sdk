@@ -113,6 +113,14 @@ void UImtblJSConnector::HandleInitResponse(FImtblJSResponse Response)
 }
 
 
+// if UE4
+// void UImtblJSConnector::BluEvent(FString Event, FString Message)
+// {
+//     SendToGame(Message):
+// }
+//
+
+
 void UImtblJSConnector::SendToGame(FString Message)
 {
     IMTBL_LOG_FUNC("Received message from JS: %s", *Message);

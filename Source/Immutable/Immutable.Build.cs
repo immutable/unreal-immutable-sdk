@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System;
 using UnrealBuildTool;
 
 public class Immutable : ModuleRules
@@ -28,7 +29,6 @@ public class Immutable : ModuleRules
 			new string[]
 			{
 				"Core",
-				"WebBrowserWidget",
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);
@@ -43,13 +43,22 @@ public class Immutable : ModuleRules
 				"SlateCore",
 				"Json",
 				"JsonUtilities",
-				"WebBrowser",
 				"UMG",
-				"Projects",
+				"Projects", 
 				// ... add private dependencies that you statically link with here ...
 			}
 		);
-
+		
+		#if UE_5_0_OR_LATER
+			PublicDependencyModuleNames.Add("WebBrowserWidget");
+			PrivateDependencyModuleNames.Add("WebBrowser");
+			PublicDefinitions.Add("USING_BUNDLED_CEF=1");
+			PublicDefinitions.Add("USING_BLUI_CEF=0");
+		#else 
+			PrivateDependencyModuleNames.Add("Blu");
+			PublicDefinitions.Add("USING_BUNDLED_CEF=0");
+			PublicDefinitions.Add("USING_BLUI_CEF=1");
+		#endif
 
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]

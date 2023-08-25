@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#if USING_BUNDLED_CEF
 #include "IWebBrowserWindow.h"
+#endif
 #include "Components/Widget.h"
 #include "ImtblBrowserWidget.generated.h"
 
@@ -31,8 +33,10 @@ protected:
 private:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnConsoleMessage, const FString&, Message, const FString&, Source, int32, Line);
     FOnConsoleMessage OnConsoleMessage;
-    
+
+#if USING_BUNDLED_CEF
 	TSharedPtr<class SWebBrowser> WebBrowserWidget;
+#endif
 	/** URL that the browser will initially navigate to. The URL should include the protocol, eg http:// */
 	FString InitialURL;
 	/** Should the browser window support transparency. */

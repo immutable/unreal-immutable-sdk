@@ -53,8 +53,15 @@ private:
 
     FDelegateHandle StartHandle;
     FDelegateHandle WorldTickHandle;
+	
+	UPROPERTY()
+	UObject* TheBluEye;
+	
+#if USING_BLUI_CEF
+	class UBluEye* GetBluEye();
+#endif
 
-    void OnBridgeReady();
+	void OnBridgeReady();
     void ManageBridgeDelegateQueue();
     void StartGameInstance(UGameInstance* GameInstance);
     void WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds);

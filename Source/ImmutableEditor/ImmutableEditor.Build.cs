@@ -28,7 +28,6 @@ public class ImmutableEditor : ModuleRules
 			new string[]
 			{
 				"Core",
-				"WebBrowserWidget",
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);
@@ -43,7 +42,6 @@ public class ImmutableEditor : ModuleRules
 				"SlateCore",
 				"Json",
 				"JsonUtilities",
-				"WebBrowser",
 				"UMG",
 				"Projects",
 				"Settings",
