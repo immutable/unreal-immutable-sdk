@@ -74,8 +74,6 @@ void UImtblBlui::Init()
 
 	// Todo: convert the index.html file to be loaded as an .uasset.
 
-	//BluEye->LoadURL(FString::Printf(TEXT("%s%s"), TEXT("file://"), *FPaths::Combine(FPaths::ProjectContentDir(), TEXT("html"), TEXT("index.html"))));
-
 	const FString LocalHtmlFile = "blui://" + FString("Content/html/index.html");
 	BluEye->LoadURL(LocalHtmlFile);
 	UE_LOG(LogTemp, Log, TEXT("Game Bridge Loaded"));
