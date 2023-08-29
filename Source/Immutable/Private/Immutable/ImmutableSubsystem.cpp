@@ -128,7 +128,7 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
     // Set up ready event chain
     if (!IsReady())
     {
-        BrowserWidget->GetJSConnector()->WhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
+        BrowserWidget->GetJSConnector()->AddCallbackWhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
     }
 	
     // Prepare Passport

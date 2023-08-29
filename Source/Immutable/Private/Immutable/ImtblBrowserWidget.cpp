@@ -59,10 +59,8 @@ bool UImtblBrowserWidget::IsPageLoaded() const
 {
 #if USING_BUNDLED_CEF
     return WebBrowserWidget.IsValid() && WebBrowserWidget->IsLoaded();
-#else	
-	// TODO
-	return false;
 #endif
+	return false;
 }
 
 
@@ -79,7 +77,8 @@ void UImtblBrowserWidget::ExecuteJS(const FString& ScriptText) const
 
 void UImtblBrowserWidget::SetBrowserContent()
 {
-    FStringAssetReference AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
+#if USING_BUNDLED_CEF
+	FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
     // if (UObject* LoadedAsset = AssetRef.TryLoad())
     // {
     //     if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
@@ -87,7 +86,6 @@ void UImtblBrowserWidget::SetBrowserContent()
     {
         if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
         {
-#if USING_BUNDLED_CEF
             if (!WebBrowserWidget.IsValid())
             {
                 IMTBL_ERR("no browser")
@@ -95,9 +93,9 @@ void UImtblBrowserWidget::SetBrowserContent()
             }
             // IMTBL_LOG("Loaded resource: %s", *Resource->GetName())
             WebBrowserWidget->LoadString(Resource->Data, TEXT("file://immutable/index.html"));
-#endif
         }
     }
+#endif
 }
 
 

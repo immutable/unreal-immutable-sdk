@@ -2,11 +2,12 @@
 
 
 #include "ImtblBlui.h"
-
-#include "BluEye.h"
 #include "ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
+#if USING_BLUI_CEF
+#include "BluEye.h"
+#endif
 
 UImtblBlui::UImtblBlui()
 {
