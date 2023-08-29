@@ -11,7 +11,6 @@
 #include "Tests/AutomationEditorCommon.h"
 #endif
 
-#include "Immutable/ImtblJSMessages.h"
 #include "UObject/UObjectGlobals.h"
 
 
@@ -31,12 +30,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FImtblMessagesTest, "Immutable.JSMessages",
 bool FImtblMessagesTest::RunTest(const FString& Parameters)
 {
     const FString ClientId = "MyExampleClientId";
-    const FString RedirectUri = "https://example.com";
-    
+	
 	// an FImmutablePassportInitData should convert into an appropriate json string
 	{
-        const FImmutablePassportInitData InitData{ClientId, RedirectUri};
-        const FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"redirectUri\":\"https://example.com\"}";
+    	const FString RedirectUri = "https://example.com";
+        const FImmutablePassportInitData InitData{ClientId, RedirectUri, ImmutablePassportAction::EnvSandbox};
+        const FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"redirectUri\":\"https://example.com\",\"environment\":\"sandbox\"}";
         const FString Result = InitData.ToJsonString();
         
 		TestEqual("toJsonString() on FPassportInitData with clientId and redirectUri should produce valid JSON output", Result, ExpectedJson);
@@ -44,8 +43,8 @@ bool FImtblMessagesTest::RunTest(const FString& Parameters)
 
     // an FImmutablePassportInitData with an empty redirectUri should leave the redirectUri field out of the json string when converted
     {
-        const FImmutablePassportInitData InitData{ClientId, ""};
-        const FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\"}";
+        const FImmutablePassportInitData InitData{ClientId, "", ImmutablePassportAction::EnvSandbox};
+        const FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"environment\":\"sandbox\"}";
         const FString Result = InitData.ToJsonString();
         
 		TestEqual("toJsonString() on FPassportInitData with an empty redirectUri should produce a valid JSON string with no redirectUri field", Result, ExpectedJson);

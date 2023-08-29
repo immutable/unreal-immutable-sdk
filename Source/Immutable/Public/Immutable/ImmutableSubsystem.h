@@ -55,12 +55,8 @@ private:
     FDelegateHandle WorldTickHandle;
 	
 	UPROPERTY()
-	UObject* TheBluEye;
+	class UImtblBlui* ImtblBluiPtr;
 	
-#if USING_BLUI_CEF
-	class UBluEye* GetBluEye();
-#endif
-
 	void OnBridgeReady();
     void ManageBridgeDelegateQueue();
     void StartGameInstance(UGameInstance* GameInstance);

@@ -8,10 +8,12 @@
 #include "Immutable/Misc/ImtblLogging.h"
 
 
-UImtblPassportInitializationAsyncAction* UImtblPassportInitializationAsyncAction::InitializePassport(UObject* WorldContextObject, const FString& ClientID)
+UImtblPassportInitializationAsyncAction* UImtblPassportInitializationAsyncAction::InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& Environment)
 {
     UImtblPassportInitializationAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportInitializationAsyncAction>();
     PassportInitBlueprintNode->ClientId = ClientID;
+    PassportInitBlueprintNode->RedirectUri = RedirectUri;
+    PassportInitBlueprintNode->Environment = Environment;
     PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
     return PassportInitBlueprintNode;
 }
@@ -28,13 +30,12 @@ void UImtblPassportInitializationAsyncAction::Activate()
     GetSubsystem()->WhenReady(this, &UImtblPassportInitializationAsyncAction::DoInit);//, /* timoutSec */ 15.0f);
 }
 
-
 void UImtblPassportInitializationAsyncAction::DoInit(TWeakObjectPtr<UImtblJSConnector> JSConnector)
 {
     // Get Passport
     auto Passport = GetSubsystem()->GetPassport();
     // Run Initialize
-    Passport->Initialize(ClientId, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportInitializationAsyncAction::OnInitialized));
+    Passport->Initialize(FImmutablePassportInitData{ClientId, RedirectUri, Environment}, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportInitializationAsyncAction::OnInitialized));
 }
 
 

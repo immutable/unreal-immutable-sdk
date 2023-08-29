@@ -8,6 +8,7 @@
 #if USING_BUNDLED_CEF
 #include "SWebBrowser.h"
 #endif
+#include "Immutable/ImmutableSubsystem.h"
 #include "Immutable/Assets/ImtblSDKResource.h"
 #include "Interfaces/IPluginManager.h"
 
@@ -16,18 +17,20 @@ UImtblBrowserWidget::UImtblBrowserWidget()
 {
 	IMTBL_LOG_FUNCSIG
 
+	JSConnector = NewObject<UImtblJSConnector>(this, "JSConnector");
+	JSConnector->ExecuteJs = UImtblJSConnector::FOnExecuteJsDelegate::CreateUObject(this, &UImtblBrowserWidget::ExecuteJS);
+
 	// WebBrowserWidget->LoadString("<html><head><title>Test</title></head><body><h1>Test</h1></body></html>", TEXT("http://www.google.com"));
 	// InitialURL = TEXT("http://www.google.com");
 	// InitialURL = TEXT("chrome://version");
-    // IPluginManager& PluginManager = IPluginManager::Get();
-    // if (const TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin("Immutable"))
-    // {
-    //     InitialURL = FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(Plugin->GetContentDir(), TEXT("index.html"))));
-    //     IMTBL_LOG("Loading initial url: %s", *InitialURL)
-    // }
-    InitialURL = TEXT("about:blank");
+	// IPluginManager& PluginManager = IPluginManager::Get();
+	// if (const TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin("Immutable"))
+	// {
+	//     InitialURL = FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(Plugin->GetContentDir(), TEXT("index.html"))));
+	//     IMTBL_LOG("Loading initial url: %s", *InitialURL)
+	// }
+	InitialURL = TEXT("about:blank");
 }
-
 
 void UImtblBrowserWidget::BindConnector()
 {
@@ -36,20 +39,18 @@ void UImtblBrowserWidget::BindConnector()
 
     IMTBL_LOG("Setting up %s...", *UImtblJSConnector::StaticClass()->GetName())
 
-    GetJSConnector();
-
     if (JSConnector)
     {
-        if (BindUObject(UImtblJSConnector::JSObjectName(), JSConnector))
-            JSConnector->SetBound();
+	    if (BindUObject(UImtblJSConnector::JSObjectName(), JSConnector))
+	    {
+		    JSConnector->Init(IsPageLoaded());
+	    }
     }
 }
 
 
-TWeakObjectPtr<UImtblJSConnector> UImtblBrowserWidget::GetJSConnector()
+TWeakObjectPtr<UImtblJSConnector> UImtblBrowserWidget::GetJSConnector() const
 {
-    if (!JSConnector)
-        JSConnector = NewObject<UImtblJSConnector>(this);
     return JSConnector;
 }
 
@@ -179,3 +180,4 @@ void UImtblBrowserWidget::HandleOnConsoleMessage(const FString& Message, const F
 	OnConsoleMessage.Broadcast(Message, Source, Line);
 }
 #endif
+

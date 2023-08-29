@@ -23,7 +23,7 @@ public:
 	UImtblBrowserWidget();
 
     // Get a pointer to the JSConnector
-    TWeakObjectPtr<class UImtblJSConnector> GetJSConnector();
+    TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
 
     bool IsPageLoaded() const;
 

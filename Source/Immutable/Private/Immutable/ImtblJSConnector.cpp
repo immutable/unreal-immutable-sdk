@@ -11,8 +11,11 @@
 UImtblJSConnector::UImtblJSConnector()
 {
     IMTBL_LOG_FUNCSIG
-    // Test if the browser had already finished loading before the JSConnector was created
-    if (GetBrowserWidget() && GetBrowserWidget()->IsPageLoaded())
+}
+
+void UImtblJSConnector::Init(bool bPageLoaded)
+{
+    if (bPageLoaded)
     {
         IMTBL_LOG("Browser finished loading the bridge document before the Immutable JSConnector was created & bound")
         FImtblJSResponse InitResponse {};
@@ -28,7 +31,6 @@ UImtblJSConnector::UImtblJSConnector()
     }
 }
 
-
 void UImtblJSConnector::PostInitProperties()
 {
     UObject::PostInitProperties();
@@ -41,19 +43,12 @@ bool UImtblJSConnector::IsBound() const
 }
 
 
-void UImtblJSConnector::SetBound()
-{
-    bIsBound = true;
-}
-
-
 bool UImtblJSConnector::IsBridgeReady() const
 {
     return bIsBridgeReady;
 }
 
-
-void UImtblJSConnector::WhenBridgeReady(const FOnBridgeReadyDelegate::FDelegate& Delegate)
+void UImtblJSConnector::AddCallbackWhenBridgeReady(const FOnBridgeReadyDelegate::FDelegate& Delegate)
 {
     if (IsBridgeReady())
     {
@@ -73,13 +68,12 @@ FString UImtblJSConnector::CallJS(const FString& Function, const FString& Data, 
     return Guid;
 }
 
-
 void UImtblJSConnector::CallJS(const FImtblJSRequest& Request, FImtblJSResponseDelegate HandleResponse, float ResponseTimeout)
 {
     if (!IsBridgeReady())
     {
         // IMTBL_WARN("Attempt to call Immutable JS bridge before bridge ready")
-        WhenBridgeReady(FOnBridgeReadyDelegate::FDelegate::CreateLambda([Request, HandleResponse, ResponseTimeout, this]()
+        AddCallbackWhenBridgeReady(FOnBridgeReadyDelegate::FDelegate::CreateLambda([Request, HandleResponse, ResponseTimeout, this]()
         {
             CallJS(Request, HandleResponse, ResponseTimeout);
         }));
@@ -88,7 +82,7 @@ void UImtblJSConnector::CallJS(const FImtblJSRequest& Request, FImtblJSResponseD
 
     // First, add response callback to map
     RequestResponseDelegates.Add(Request.requestId, HandleResponse);
-    
+
     // Convert the request to a string
     FString RequestString = Request.ToJsonString();
     RequestString.ReplaceInline(TEXT("\\"), TEXT("\\\\"));
@@ -98,8 +92,12 @@ void UImtblJSConnector::CallJS(const FImtblJSRequest& Request, FImtblJSResponseD
 
     // Execute
     IMTBL_LOG("Executing JS: %s", *JS)
-    GetBrowserWidget()->ExecuteJS(JS);
-    
+    const bool Result = ExecuteJs.ExecuteIfBound(JS);
+    if (!Result)
+    {
+        IMTBL_WARN("ExecuteJS delegate was not called");
+    }
+
     // TODO: add timeout callback
 }
 
@@ -113,20 +111,12 @@ void UImtblJSConnector::HandleInitResponse(FImtblJSResponse Response)
 }
 
 
-// if UE4
-// void UImtblJSConnector::BluEvent(FString Event, FString Message)
-// {
-//     SendToGame(Message):
-// }
-//
-
-
 void UImtblJSConnector::SendToGame(FString Message)
 {
     IMTBL_LOG_FUNC("Received message from JS: %s", *Message);
 
     // Parse response
-    
+
     const TOptional<FImtblJSResponse> Response = FImtblJSResponse::FromJsonString(Message);
     if (!Response.IsSet())
     {
@@ -135,7 +125,7 @@ void UImtblJSConnector::SendToGame(FString Message)
     }
 
     // Handle response
-    
+
     if (!RequestResponseDelegates.Contains(Response->requestId))
     {
         IMTBL_WARN("No delegate found for response with id %s", *Response->requestId);
@@ -150,10 +140,5 @@ void UImtblJSConnector::SendToGame(FString Message)
     RequestResponseDelegates.Remove(Response->requestId);
 }
 
-
-UImtblBrowserWidget* UImtblJSConnector::GetBrowserWidget() const
-{
-    return Cast<UImtblBrowserWidget>(GetOuter());
-}
 
 

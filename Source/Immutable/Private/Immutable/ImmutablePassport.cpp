@@ -96,16 +96,16 @@ FString FImmutablePassportCodeConfirmRequestData::ToJsonString() const
     return OutString;
 }
 
-
-void UImmutablePassport::Initialize(const FString& ClientID, const FImtblPassportResponseDelegate& ResponseDelegate)
+// @param Environment can be one of ImmutablePassportAction::EnvSandbox or ImmutablePassportAction::EnvProduction
+void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     check(JSConnector.IsValid());
 
-    ClientId = ClientID;
+    InitData = Data;
 
     CallJS(
         ImmutablePassportAction::Initialize,
-        FImmutablePassportInitData{ClientID}.ToJsonString(),
+        InitData.ToJsonString(),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse),
         false
