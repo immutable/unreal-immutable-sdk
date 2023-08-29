@@ -27,6 +27,8 @@ class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem
     friend class UImtblPassportGetEmailAsyncAction;
 
 public:
+    UImmutableSubsystem();
+
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
@@ -44,21 +46,23 @@ protected:
 private:
 	UPROPERTY()
 	class UImtblBrowserUserWidget* BrowserWidget = nullptr;
-
+    
+	UPROPERTY()
+	class UImtblBlui* ImtblBlui = nullptr;
+    
     UPROPERTY()
     class UImmutablePassport* Passport = nullptr;
 
+    bool bHasSetupGameBridge = false;
     bool bIsReady = false;
     FImmutableSubsystemReadyDelegate OnReady;
 
-    FDelegateHandle StartHandle;
     FDelegateHandle WorldTickHandle;
+    FDelegateHandle ViewportCreatedHandle;
 	
-	UPROPERTY()
-	class UImtblBlui* ImtblBluiPtr;
-	
+    void SetupGameBridge();
 	void OnBridgeReady();
     void ManageBridgeDelegateQueue();
-    void StartGameInstance(UGameInstance* GameInstance);
+    void OnViewportCreated();
     void WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds);
 };

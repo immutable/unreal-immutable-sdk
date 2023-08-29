@@ -3,16 +3,18 @@
 
 #include "Immutable/ImmutableSubsystem.h"
 
-#include "ImtblBlui.h"
 #include "Immutable/ImmutablePassport.h"
 #include "ImtblBrowserUserWidget.h"
 #include "ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Blueprint/UserWidget.h"
+#include "ImtblBlui.h"
 
-#if USING_BLUI_CEF
-#include "BluEye.h"
-#endif
+
+UImmutableSubsystem::UImmutableSubsystem()
+{
+    IMTBL_LOG_FUNCSIG
+}
 
 
 void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -20,7 +22,7 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     IMTBL_LOG_FUNCSIG
     Super::Initialize(Collection);
 
-    StartHandle = FWorldDelegates::OnStartGameInstance.AddUObject(this, &UImmutableSubsystem::StartGameInstance);
+	ViewportCreatedHandle = UGameViewportClient::OnViewportCreated().AddUObject(this, &UImmutableSubsystem::OnViewportCreated);
     WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UImmutableSubsystem::WorldTickStart);
 }
 
@@ -29,9 +31,10 @@ void UImmutableSubsystem::Deinitialize()
 {
     IMTBL_LOG_FUNCSIG
     BrowserWidget = nullptr;
+    ImtblBlui = nullptr;
     Passport = nullptr;
 
-    FWorldDelegates::OnStartGameInstance.Remove(StartHandle);
+    UGameViewportClient::OnViewportCreated().Remove(ViewportCreatedHandle);
     FWorldDelegates::OnWorldTickStart.Remove(WorldTickHandle);
     
     Super::Deinitialize();
@@ -43,6 +46,7 @@ void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsys
 {
     OnReady.AddUObject(Object, Func);
 }
+
 
 void UImmutableSubsystem::OnBridgeReady()
 {
@@ -58,7 +62,7 @@ void UImmutableSubsystem::ManageBridgeDelegateQueue()
     if (bIsReady)
     {
 #if USING_BLUI_CEF
-        OnReady.Broadcast(ImtblBluiPtr->GetJSConnector());
+        OnReady.Broadcast(ImtblBlui->GetJSConnector());
 #else
         OnReady.Broadcast(BrowserWidget->GetJSConnector());
 #endif
@@ -67,24 +71,26 @@ void UImmutableSubsystem::ManageBridgeDelegateQueue()
 }
 
 
-void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
+void UImmutableSubsystem::SetupGameBridge()
 {
-    IMTBL_LOG_FUNC("OnStartGameInstance")
-
+    if (bHasSetupGameBridge)
+        return;
+    bHasSetupGameBridge = true;
+    
 #if USING_BLUI_CEF
     // Create the Blui
-    if (!ImtblBluiPtr)
+    if (!ImtblBlui)
     {
-        ImtblBluiPtr = NewObject<UImtblBlui>();
-        ImtblBluiPtr->Init();    
+        ImtblBlui = NewObject<UImtblBlui>();
+        ImtblBlui->Init();    
     }
     
-    if (!ImtblBluiPtr)
+    if (!ImtblBlui)
     {
         IMTBL_ERR("Failed to create UImtblBlui")
         return;
     }
-    if (!ImtblBluiPtr->GetJSConnector().IsValid())
+    if (!ImtblBlui->GetJSConnector().IsValid())
     {
         IMTBL_ERR("JSConnector not available, can't set up subsystem-ready event chain")
         return;
@@ -92,7 +98,7 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
     // Set up ready event chain
     if (!IsReady())
     {
-        ImtblBluiPtr->GetJSConnector()->AddCallbackWhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
+        ImtblBlui->GetJSConnector()->AddCallbackWhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
     }
     
     // Prepare Passport
@@ -100,7 +106,7 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
     {
         Passport = NewObject<UImmutablePassport>(this);
         if (Passport)
-            Passport->Setup(ImtblBluiPtr->GetJSConnector());
+            Passport->Setup(ImtblBlui->GetJSConnector());
     }
     
 #else
@@ -139,6 +145,13 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
             Passport->Setup(BrowserWidget->GetJSConnector());
     }
 #endif
+}
+
+
+void UImmutableSubsystem::OnViewportCreated()
+{
+    IMTBL_LOG_FUNCSIG
+    SetupGameBridge();
 }
 
 
