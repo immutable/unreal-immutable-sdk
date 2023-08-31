@@ -33,7 +33,7 @@ UObject* UImtblSDKResourceAssetFactory::FactoryCreateBinary(UClass* InClass, UOb
         return nullptr;
     }
 
-    FFileHelper::LoadFileToString(Resource->Data, *CurrentFilename);
+    FFileHelper::LoadFileToString(Resource->Data, *CurrentFilename, FFileHelper::EHashOptions::EnableVerify, FILEREAD_NoFail);
 
     return Resource;
 }
