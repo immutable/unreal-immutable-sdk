@@ -79,9 +79,6 @@ void UImtblBrowserWidget::SetBrowserContent()
 {
 #if USING_BUNDLED_CEF
 	FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
-    // if (UObject* LoadedAsset = AssetRef.TryLoad())
-    // {
-    //     if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
     if (UObject* LoadedAsset = AssetRef.TryLoad())
     {
         if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))

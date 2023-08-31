@@ -58,7 +58,7 @@ void UImtblBlui::ExecuteJS(const FString& ScriptText) const
 
 void UImtblBlui::Init()
 {
-	UE_LOG(LogTemp, Log, TEXT("UImtblBlui::Init()"));
+	IMTBL_LOG_FUNCSIG
 
 #if USING_BLUI_CEF
 	// Todo: Add comment here why GetBluEye
@@ -68,16 +68,26 @@ void UImtblBlui::Init()
 	BluEye->ScriptEventEmitter.AddUniqueDynamic(this, &UImtblBlui::OnScriptEvent);
 
 	BluEye->bEnabled = true;
-	UE_LOG(LogTemp, Log, TEXT("Events subscribed"))
+	IMTBL_LOG("Events subscribed")
 
 	BluEye->Init();
-	UE_LOG(LogTemp, Log, TEXT("BluEye Initialised"))
+	IMTBL_LOG("BluEye Initialised")
 
-	// Todo: convert the index.html file to be loaded as an .uasset.
+	FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
+    if (UObject* LoadedAsset = AssetRef.TryLoad())
+    {
+        if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
+        {
+			// const FString Html = "<html><head></head><body><div>Stuff IN A WEBSITE</div><script>blu_event('blah', 'BALKJSDLFKJDSLKFJDSLDSFL');</script></body></html>";
+			const FString DataUrl = "data:text/html;charset=utf-8," + Resource->Data;
+			BluEye->LoadURL(*DataUrl);
+			IMTBL_LOG("DataUrl loaded")
+		}
+	}
 
-	const FString LocalHtmlFile = "blui://" + FString("Content/html/index.html");
-	BluEye->LoadURL(LocalHtmlFile);
-	UE_LOG(LogTemp, Log, TEXT("Game Bridge Loaded"));
+	// const FString LocalHtmlFile = "blui://" + FString("Content/html/index.html");
+	// BluEye->LoadURL(LocalHtmlFile);
+	// UE_LOG(LogTemp, Log, TEXT("Game Bridge Loaded"));
 
 	// Do this after the the page is given to the browser and being loaded...
 	JSConnector->Init(!BluEye->IsBrowserLoading());
