@@ -93,7 +93,7 @@ void UImtblBrowserWidget::SetBrowserContent()
             }
             // IMTBL_LOG("Loaded resource: %s", *Resource->GetName())
             WebBrowserWidget->LoadString(Resource->Data, TEXT("file://immutable/index.html"));
-            //WebBrowserWidget->LoadURL(FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("html"), TEXT("index.html")))));
+            // WebBrowserWidget->LoadURL(FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("html"), TEXT("index.html")))));
         }
     }
 #endif
