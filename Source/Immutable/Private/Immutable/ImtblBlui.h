@@ -23,6 +23,7 @@ public:
 	
 	UFUNCTION()
 	void OnLogEvent(const FString& LogText);
+	void WorldTickStart(UWorld* World, ELevelTick LevelTick, float X);
 	void Init();
 
 private:
@@ -32,6 +33,7 @@ private:
 
 	UPROPERTY()
 	class UImtblJSConnector* JSConnector = nullptr;
+	FDelegateHandle WorldTickHandle;
 
 	void ExecuteJS(const FString& ScriptText) const;
 	
