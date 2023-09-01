@@ -15,6 +15,7 @@ UImtblJSConnector::UImtblJSConnector()
 
 void UImtblJSConnector::Init(bool bPageLoaded)
 {
+    IMTBL_LOG("JSConnect::Init called, bPageloaded %d", bPageLoaded);
     if (bPageLoaded)
     {
         IMTBL_LOG("Browser finished loading the bridge document before the Immutable JSConnector was created & bound")

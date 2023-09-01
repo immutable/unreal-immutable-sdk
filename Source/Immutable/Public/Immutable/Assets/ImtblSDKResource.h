@@ -15,7 +15,10 @@ class IMMUTABLE_API UImtblSDKResource : public UObject
 
 public:
     UPROPERTY()
-    FString Data;
+    FString Html;
+
+	UPROPERTY()
+	FString Js;
     
 private:
 };
