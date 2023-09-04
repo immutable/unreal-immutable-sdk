@@ -43,9 +43,9 @@ void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 	{
 		IMTBL_LOG("Waiting for Browser to load...");
 	}
-	else if (!bLodedIndexJS)
+	else if (!bLoadedIndexJS)
 	{
-		bLodedIndexJS = true;
+		bLoadedIndexJS = true;
 		const FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
 		if (UObject* LoadedAsset = AssetRef.TryLoad())
 		{
