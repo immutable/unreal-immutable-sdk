@@ -19,7 +19,7 @@ UImtblSDKResourceAssetFactory::UImtblSDKResourceAssetFactory()
 
 bool UImtblSDKResourceAssetFactory::FactoryCanImport(const FString& Filename)
 {
-    return FPaths::GetCleanFilename(Filename) == TEXT("index.html");
+    return FPaths::GetCleanFilename(Filename) == TEXT("index.js");
 }
 
 
@@ -29,21 +29,11 @@ UObject* UImtblSDKResourceAssetFactory::FactoryCreateBinary(UClass* InClass, UOb
 
     if (CurrentFilename.IsEmpty() || !FPaths::FileExists(CurrentFilename))
     {
-        IMTBL_LOG("Invalid input html file: %s", *CurrentFilename)
+        IMTBL_LOG("Invalid input js file: %s", *CurrentFilename)
         return nullptr;
     }
 
-    FFileHelper::LoadFileToString(Resource->Html, *CurrentFilename, FFileHelper::EHashOptions::EnableVerify, FILEREAD_NoFail);
+    FFileHelper::LoadFileToString(Resource->Js, *CurrentFilename, FFileHelper::EHashOptions::EnableVerify, FILEREAD_NoFail);
 
-    const FString CompiledIndexJSFile = FPaths::Combine(FPaths::GetPath(CurrentFilename), TEXT("index.js"));
-
-    if (CompiledIndexJSFile.IsEmpty() || !FPaths::FileExists(CompiledIndexJSFile))
-    {
-        IMTBL_LOG("Invalid input js file: %s", *CompiledIndexJSFile)
-        return nullptr;
-    }
-    
-    FFileHelper::LoadFileToString(Resource->Js, *CompiledIndexJSFile, FFileHelper::EHashOptions::EnableVerify, FILEREAD_NoFail);
-    
     return Resource;
 }

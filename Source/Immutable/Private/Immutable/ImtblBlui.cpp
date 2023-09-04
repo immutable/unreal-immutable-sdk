@@ -127,7 +127,7 @@ void UImtblBlui::Init()
         	// PostData
 			CefRefPtr<CefPostData> PostData = CefPostData::Create();
         	CefRefPtr<CefPostDataElement> Element = CefPostDataElement::Create();
-        	FTCHARToUTF8 UTF8String(*Resource->Html);
+        	FTCHARToUTF8 UTF8String(TEXT("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>GameSDK Bridge</title></head><body><h1>Bridge Running</h1></body></html>"));
         	Element->SetToBytes(UTF8String.Length(), UTF8String.Get());
         	PostData->AddElement(Element);
 
