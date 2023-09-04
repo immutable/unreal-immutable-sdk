@@ -39,14 +39,13 @@ void UImtblBlui::OnLogEvent(const FString& LogText)
 
 void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 {
-	static bool bFirstTime = false;
 	if (GetBluEye()->IsBrowserLoading())
 	{
-		IMTBL_LOG("Waiting for Browser to load");
+		IMTBL_LOG("Waiting for Browser to load...");
 	}
-	else if (!bFirstTime)
+	else if (!bLodedIndexJS)
 	{
-		bFirstTime = true;
+		bLodedIndexJS = true;
 		const FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
 		if (UObject* LoadedAsset = AssetRef.TryLoad())
 		{
@@ -54,10 +53,29 @@ void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 			{
 				GetBluEye()->ExecuteJS("console.log('loading js');");
 				GetBluEye()->ExecuteJS(Resource->Js);
-				IMTBL_LOG("Loaded index.js")
+				IMTBL_VERBOSE("Loaded index.js")
+			}
+			else
+			{
+				IMTBL_ERR("Error in loading index.js")
 			}
 		}
+		else
+		{
+			IMTBL_ERR("Error in loading index.js")
+		}
 	}
+}
+
+void UImtblBlui::BeginDestroy()
+{
+	IMTBL_LOG_FUNCSIG
+	if (GetBluEye())
+	{
+		GetBluEye()->CloseBrowser();
+	}
+	BluEyePtr = nullptr;
+	Super::BeginDestroy();
 }
 
 void UImtblBlui::OnScriptEvent(const FString& EventName, const FString& EventMessage)
@@ -105,7 +123,7 @@ void UImtblBlui::Init()
         {
 			// const FString Html = "<html><head></head><body><div>Stuff IN A WEBSITE</div><script>blu_event('blah', 'BALKJSDLFKJDSLKFJDSLDSFL');</script></body></html>";
 			//const FString DataUrl = "data:text/html;charset=utf-8," + Resource->Html;
-        	//const FString InitialURL = TEXT("about:blank");
+        	//const FString InitialURL = TEXT("file://Immutable/index.html");
 			//BluEye->LoadURL(*InitialURL);
 			//IMTBL_LOG("InitialURL loaded")
 
@@ -115,7 +133,7 @@ void UImtblBlui::Init()
         	FTCHARToUTF8 UTF8String(*Resource->Html);
         	Element->SetToBytes(UTF8String.Length(), UTF8String.Get());
         	PostData->AddElement(Element);
-				
+
         	CefRequest::HeaderMap HeaderMap;
         	HeaderMap.insert(std::pair<CefString, CefString>(TCHAR_TO_WCHAR(TEXT("Content-Type")), "html"));
 
@@ -123,12 +141,12 @@ void UImtblBlui::Init()
 
         	const auto Request = CefRequest::Create();
         	Request->Set("file://Immutable/index.html", *CustomContentMethod, PostData, HeaderMap);
-				
+
         	GetBluEye()->Browser->GetMainFrame()->LoadRequest(Request);
-        	IMTBL_LOG("Loaded index.js")
-        	
+        	IMTBL_VERBOSE("LoadRequest'ed for Index.html")
+
         	WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UImtblBlui::WorldTickStart);
-        	
+
         	//BluEye->ExecuteJS("console.log('loading js');");
         	//BluEye->ExecuteJS(Resource->Js);
         	//IMTBL_LOG("Loaded index.js")
@@ -142,6 +160,6 @@ void UImtblBlui::Init()
 	// Do this after the the page is given to the browser and being loaded...
 	JSConnector->Init(!BluEye->IsBrowserLoading());
 
-	
+
 #endif
 }
