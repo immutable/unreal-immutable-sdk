@@ -10,7 +10,7 @@
 
 UImtblSDKResourceAssetFactory::UImtblSDKResourceAssetFactory()
 {
-    Formats.Add(FString(TEXT("html; Immutable SDK Resource")));
+    Formats.Add(FString(TEXT("js; Immutable SDK Resource")));
     SupportedClass = UImtblSDKResource::StaticClass();
     bCreateNew = false;
     bEditorImport = true;
