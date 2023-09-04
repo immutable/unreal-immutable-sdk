@@ -121,12 +121,6 @@ void UImtblBlui::Init()
     {
         if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
         {
-			// const FString Html = "<html><head></head><body><div>Stuff IN A WEBSITE</div><script>blu_event('blah', 'BALKJSDLFKJDSLKFJDSLDSFL');</script></body></html>";
-			//const FString DataUrl = "data:text/html;charset=utf-8," + Resource->Html;
-        	//const FString InitialURL = TEXT("file://Immutable/index.html");
-			//BluEye->LoadURL(*InitialURL);
-			//IMTBL_LOG("InitialURL loaded")
-
         	// PostData
 			CefRefPtr<CefPostData> PostData = CefPostData::Create();
         	CefRefPtr<CefPostDataElement> Element = CefPostDataElement::Create();
@@ -146,20 +140,10 @@ void UImtblBlui::Init()
         	IMTBL_VERBOSE("LoadRequest'ed for Index.html")
 
         	WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UImtblBlui::WorldTickStart);
-
-        	//BluEye->ExecuteJS("console.log('loading js');");
-        	//BluEye->ExecuteJS(Resource->Js);
-        	//IMTBL_LOG("Loaded index.js")
 		}
 	}
 
-	// const FString LocalHtmlFile = "blui://" + FString("Content/html/index.html");
-	// BluEye->LoadURL(LocalHtmlFile);
-	// UE_LOG(LogTemp, Log, TEXT("Game Bridge Loaded"));
-
 	// Do this after the the page is given to the browser and being loaded...
 	JSConnector->Init(!BluEye->IsBrowserLoading());
-
-
 #endif
 }
