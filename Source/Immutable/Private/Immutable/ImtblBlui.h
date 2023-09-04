@@ -23,7 +23,6 @@ public:
 
 	UFUNCTION()
 	void OnLogEvent(const FString& LogText);
-	void WorldTickStart(UWorld* World, ELevelTick LevelTick, float X);
 
 	virtual void BeginDestroy() override;
 	void Init();
@@ -34,6 +33,7 @@ private:
 	UObject* BluEyePtr = nullptr;
 
 	bool bLoadedIndexJS = false;
+	void WorldTickStart(UWorld* World, ELevelTick LevelTick, float X);
 
 	UPROPERTY()
 	class UImtblJSConnector* JSConnector = nullptr;

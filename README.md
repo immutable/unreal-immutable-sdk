@@ -20,13 +20,14 @@
 ### Supported Unreal Engine Versions
 
 - Unreal Engine 5.0 and above
-
-> [!NOTE]
-> Support for Unreal Engine 4.27 work is currently underway.
+- Unreal Engine 4.26 and above
 
 ### Installation
 
 To install the plugin download it into your project's `Plugins` folder, e.g.: `MyGame/Plugins/unreal-immutable-sdk`.
+
+> [!NOTE]
+> For Unreal Engine 4.26 and above we use Blui as a browser instead of inbuilt browser. Please update `immutable.uplugin->Plugins->WebBrowserWidget` to false and restart your UE4 editor.
 
 ### Setup
 

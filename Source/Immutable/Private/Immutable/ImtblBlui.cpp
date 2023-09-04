@@ -39,6 +39,7 @@ void UImtblBlui::OnLogEvent(const FString& LogText)
 
 void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 {
+#if USING_BLUI_CEF
 	if (GetBluEye()->IsBrowserLoading())
 	{
 		IMTBL_LOG("Waiting for Browser to load...");
@@ -51,7 +52,6 @@ void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 		{
 			if (const auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
 			{
-				GetBluEye()->ExecuteJS("console.log('loading js');");
 				GetBluEye()->ExecuteJS(Resource->Js);
 				IMTBL_VERBOSE("Loaded index.js")
 			}
@@ -65,16 +65,19 @@ void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 			IMTBL_ERR("Error in loading index.js")
 		}
 	}
+#endif
 }
 
 void UImtblBlui::BeginDestroy()
 {
 	IMTBL_LOG_FUNCSIG
+#if USING_BLUI_CEF
 	if (GetBluEye())
 	{
 		GetBluEye()->CloseBrowser();
 	}
 	BluEyePtr = nullptr;
+#endif
 	Super::BeginDestroy();
 }
 
