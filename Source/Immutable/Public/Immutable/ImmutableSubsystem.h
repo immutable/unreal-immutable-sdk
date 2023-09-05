@@ -41,7 +41,7 @@ public:
 protected:
     // Execute a delegate when the subsystem is ready (i.e.: when the browser is running and the Immutable SDK game bridge has loaded).
     template<class UserClass>
-    void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func);
+    void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func);
 
 private:
 	UPROPERTY()
