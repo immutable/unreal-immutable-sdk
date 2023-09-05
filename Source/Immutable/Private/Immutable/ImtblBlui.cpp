@@ -124,6 +124,12 @@ void UImtblBlui::Init()
     {
         if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
         {
+            // We're attempting to replicate the process that Unreal's WebBrowser widget uses to load a page from a string.
+            // Unfortunately this doesn't work correctly, but it still solves our issue. LocalStorage can't be accessed
+            // from about:blank or data URIs, so we still need to load a page.  Despite this failing to load our custom
+            // html, this approach still allows us to access LocalStorage and use the game bridge.  If there was more
+            // time in the future it would probably be worth investigating the issues here.
+            
         	// PostData
 			CefRefPtr<CefPostData> PostData = CefPostData::Create();
         	CefRefPtr<CefPostDataElement> Element = CefPostDataElement::Create();
