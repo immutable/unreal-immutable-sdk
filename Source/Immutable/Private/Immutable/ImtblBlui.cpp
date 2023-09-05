@@ -3,6 +3,7 @@
 
 #include "ImtblBlui.h"
 #include "ImtblJSConnector.h"
+#include "Immutable/Assets/ImtblSDKResource.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
 #if USING_BLUI_CEF
@@ -11,6 +12,7 @@
 
 UImtblBlui::UImtblBlui()
 {
+	IMTBL_LOG_FUNCSIG
 #if USING_BLUI_CEF
 	if (!BluEyePtr)
 	{
@@ -33,6 +35,50 @@ UBluEye* UImtblBlui::GetBluEye() const
 void UImtblBlui::OnLogEvent(const FString& LogText)
 {
 	IMTBL_LOG_FUNC("LogEvent: %s",*LogText);
+}
+
+void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
+{
+#if USING_BLUI_CEF
+	if (GetBluEye()->IsBrowserLoading())
+	{
+		IMTBL_LOG("Waiting for Browser to load...");
+	}
+	else if (!bLoadedIndexJS)
+	{
+		bLoadedIndexJS = true;
+		const FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
+		if (UObject* LoadedAsset = AssetRef.TryLoad())
+		{
+			if (const auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
+			{
+				GetBluEye()->ExecuteJS(Resource->Js);
+				IMTBL_VERBOSE("Loaded index.js")
+			}
+			else
+			{
+				IMTBL_ERR("Error in loading index.js")
+			}
+		}
+		else
+		{
+			IMTBL_ERR("Error in loading index.js")
+		}
+	}
+#endif
+}
+
+void UImtblBlui::BeginDestroy()
+{
+	IMTBL_LOG_FUNCSIG
+#if USING_BLUI_CEF
+	if (GetBluEye())
+	{
+		GetBluEye()->CloseBrowser();
+	}
+	BluEyePtr = nullptr;
+#endif
+	Super::BeginDestroy();
 }
 
 void UImtblBlui::OnScriptEvent(const FString& EventName, const FString& EventMessage)
@@ -58,7 +104,7 @@ void UImtblBlui::ExecuteJS(const FString& ScriptText) const
 
 void UImtblBlui::Init()
 {
-	UE_LOG(LogTemp, Log, TEXT("UImtblBlui::Init()"));
+	IMTBL_LOG_FUNCSIG
 
 #if USING_BLUI_CEF
 	// Todo: Add comment here why GetBluEye
@@ -68,16 +114,43 @@ void UImtblBlui::Init()
 	BluEye->ScriptEventEmitter.AddUniqueDynamic(this, &UImtblBlui::OnScriptEvent);
 
 	BluEye->bEnabled = true;
-	UE_LOG(LogTemp, Log, TEXT("Events subscribed"))
+	IMTBL_LOG("Events subscribed")
 
 	BluEye->Init();
-	UE_LOG(LogTemp, Log, TEXT("BluEye Initialised"))
+	IMTBL_LOG("BluEye Initialised")
 
-	// Todo: convert the index.html file to be loaded as an .uasset.
+	FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
+    if (UObject* LoadedAsset = AssetRef.TryLoad())
+    {
+        if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
+        {
+            // We're attempting to replicate the process that Unreal's WebBrowser widget uses to load a page from a string.
+            // Unfortunately this doesn't work correctly, but it still solves our issue. LocalStorage can't be accessed
+            // from about:blank or data URIs, so we still need to load a page.  Despite this failing to load our custom
+            // html, this approach still allows us to access LocalStorage and use the game bridge.  If there was more
+            // time in the future it would probably be worth investigating the issues here.
+            
+        	// PostData
+			CefRefPtr<CefPostData> PostData = CefPostData::Create();
+        	CefRefPtr<CefPostDataElement> Element = CefPostDataElement::Create();
+        	FTCHARToUTF8 UTF8String(TEXT("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>GameSDK Bridge</title></head><body><h1>Bridge Running</h1></body></html>"));
+        	Element->SetToBytes(UTF8String.Length(), UTF8String.Get());
+        	PostData->AddElement(Element);
 
-	const FString LocalHtmlFile = "blui://" + FString("Content/html/index.html");
-	BluEye->LoadURL(LocalHtmlFile);
-	UE_LOG(LogTemp, Log, TEXT("Game Bridge Loaded"));
+        	CefRequest::HeaderMap HeaderMap;
+        	HeaderMap.insert(std::pair<CefString, CefString>(TCHAR_TO_WCHAR(TEXT("Content-Type")), "html"));
+
+        	const FString CustomContentMethod(TEXT("X-GET-CUSTOM-CONTENT"));
+
+        	const auto Request = CefRequest::Create();
+        	Request->Set("file://Immutable/index.html", *CustomContentMethod, PostData, HeaderMap);
+
+        	GetBluEye()->Browser->GetMainFrame()->LoadRequest(Request);
+        	IMTBL_VERBOSE("LoadRequest'ed for Index.html")
+
+        	WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UImtblBlui::WorldTickStart);
+		}
+	}
 
 	// Do this after the the page is given to the browser and being loaded...
 	JSConnector->Init(!BluEye->IsBrowserLoading());

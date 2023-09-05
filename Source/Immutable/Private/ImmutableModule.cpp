@@ -12,17 +12,12 @@ void FImmutableModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
-#if USING_BUNDLED_CEF
-    if (!IPluginManager::Get().FindPlugin("WebBrowserWidget")->IsEnabled())
+#if USING_BLUI_CEF
+    if (IPluginManager::Get().FindPlugin("WebBrowserWidget")->IsEnabled())
     {
-        IMTBL_LOG("Enabling WebBrowserWidget plugin...")
-        if (!IPluginManager::Get().MountExplicitlyLoadedPlugin("WebBrowserWidget"))
-        {
-            IMTBL_ERR("Could not mount WebBrowserWidget plugin!")
-        }
+        IMTBL_ERR("Cannot enable both BLUI and WebBrowserWidget plugin at the same time as it crashes.  In Immutable.uplugin file, 'Plugins->WebBrowserWidget->Enabled' to 'false' and ensure the WebBrowserWidget is disabled in your project to use BLUI.")
     }
 #endif
-    
 }
 
 

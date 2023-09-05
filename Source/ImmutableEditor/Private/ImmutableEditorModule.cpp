@@ -21,4 +21,4 @@ void FImmutableEditorModule::ShutdownModule()
 #undef LOCTEXT_NAMESPACE
 
 
-IMPLEMENT_MODULE(FImmutableEditorModule, Immutable)
+IMPLEMENT_MODULE(FImmutableEditorModule, ImmutableEditor)
