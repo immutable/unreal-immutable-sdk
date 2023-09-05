@@ -121,7 +121,10 @@ For UE4 we are using Blui as the in built browser does not work.
 2. Download the CEF 90 Browser from https://github.com/getnamo/BLUI-Unreal/releases/tag/v4.6.0 (`BluBrowserCEF....7z`)
 3. Delete the Thirdparty/cef/Win folder from the BLUI plugin
 4. Place the Win folder from the `BluBrowserCEF...7z` into Thirdparty/cef
-5. Disable cefdebug settings in Blu.cpp
+5. Disable cefdebug settings in `Blu.cpp`, following line
+    ```
+    // BluManager::Settings.remote_debugging_port = 7777;
+    ```
 
 ## Changelog Management
 
