@@ -10,7 +10,7 @@
 
 UImtblSDKResourceAssetFactory::UImtblSDKResourceAssetFactory()
 {
-    Formats.Add(FString(TEXT("html; Immutable SDK Resource")));
+    Formats.Add(FString(TEXT("js; Immutable SDK Resource")));
     SupportedClass = UImtblSDKResource::StaticClass();
     bCreateNew = false;
     bEditorImport = true;
@@ -19,7 +19,7 @@ UImtblSDKResourceAssetFactory::UImtblSDKResourceAssetFactory()
 
 bool UImtblSDKResourceAssetFactory::FactoryCanImport(const FString& Filename)
 {
-    return FPaths::GetCleanFilename(Filename) == TEXT("index.html");
+    return FPaths::GetCleanFilename(Filename) == TEXT("index.js");
 }
 
 
@@ -29,11 +29,11 @@ UObject* UImtblSDKResourceAssetFactory::FactoryCreateBinary(UClass* InClass, UOb
 
     if (CurrentFilename.IsEmpty() || !FPaths::FileExists(CurrentFilename))
     {
-        IMTBL_LOG("Invalid input file: %s", *CurrentFilename)
+        IMTBL_LOG("Invalid input js file: %s", *CurrentFilename)
         return nullptr;
     }
 
-    FFileHelper::LoadFileToString(Resource->Data, *CurrentFilename, FFileHelper::EHashOptions::EnableVerify, FILEREAD_NoFail);
+    FFileHelper::LoadFileToString(Resource->Js, *CurrentFilename, FFileHelper::EHashOptions::EnableVerify, FILEREAD_NoFail);
 
     return Resource;
 }

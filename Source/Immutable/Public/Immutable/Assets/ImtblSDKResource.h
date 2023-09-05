@@ -6,16 +6,14 @@
 #include "ImtblSDKResource.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class IMMUTABLE_API UImtblSDKResource : public UObject
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    UPROPERTY()
-    FString Data;
-    
-private:
+	UPROPERTY()
+	FString Js;
 };

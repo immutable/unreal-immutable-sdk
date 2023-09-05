@@ -79,9 +79,6 @@ void UImtblBrowserWidget::SetBrowserContent()
 {
 #if USING_BUNDLED_CEF
 	FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
-    // if (UObject* LoadedAsset = AssetRef.TryLoad())
-    // {
-    //     if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
     if (UObject* LoadedAsset = AssetRef.TryLoad())
     {
         if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
@@ -91,8 +88,13 @@ void UImtblBrowserWidget::SetBrowserContent()
                 IMTBL_ERR("no browser")
                 return;
             }
+
+        	const FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>GameSDK Bridge</title><script>")
+        								+ Resource->Js
+        								+ FString("</script></head><body><h1>Bridge Running</h1></body></html>");
+        	
             // IMTBL_LOG("Loaded resource: %s", *Resource->GetName())
-            WebBrowserWidget->LoadString(Resource->Data, TEXT("file://immutable/index.html"));
+            WebBrowserWidget->LoadString(IndexHtml, TEXT("file://immutable/index.html"));
             // WebBrowserWidget->LoadURL(FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("html"), TEXT("index.html")))));
         }
     }

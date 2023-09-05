@@ -15,7 +15,7 @@ void FImmutableModule::StartupModule()
 #if USING_BLUI_CEF
     if (IPluginManager::Get().FindPlugin("WebBrowserWidget")->IsEnabled())
     {
-        IMTBL_WARN("Can not enable both Blui and WebBrowserWidget plugin at the same time as it crashes. In Immutable.uplugin file, 'Plugins->WebBrowserWidget->Enabled' to false to use Blui")
+        IMTBL_ERR("Cannot enable both BLUI and WebBrowserWidget plugin at the same time as it crashes.  In Immutable.uplugin file, 'Plugins->WebBrowserWidget->Enabled' to 'false' and ensure the WebBrowserWidget is disabled in your project to use BLUI.")
     }
 #endif
 }
