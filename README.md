@@ -125,7 +125,7 @@ For UE4 we are using Blui as the in built browser does not work.
     ```
     // BluManager::Settings.remote_debugging_port = 7777;
     ```
-## Adding Game Bridge Asset to Packaged Resources
+## How to Add Game Bridge Asset to Packaged Resources
 
 1. Open Unreal Editor in the lowest supported version i.e, 4.26 for this Plugin.
 2. Open Content Drawer
