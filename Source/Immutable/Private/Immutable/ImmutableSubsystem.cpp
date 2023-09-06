@@ -8,6 +8,13 @@
 #include "ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Blueprint/UserWidget.h"
+#include "ImtblBlui.h"
+
+
+UImmutableSubsystem::UImmutableSubsystem()
+{
+    IMTBL_LOG_FUNCSIG
+}
 
 
 void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -15,8 +22,7 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     IMTBL_LOG_FUNCSIG
     Super::Initialize(Collection);
 
-    StartHandle = FWorldDelegates::OnStartGameInstance.AddUObject(this, &UImmutableSubsystem::StartGameInstance);
-
+	ViewportCreatedHandle = UGameViewportClient::OnViewportCreated().AddUObject(this, &UImmutableSubsystem::OnViewportCreated);
     WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UImmutableSubsystem::WorldTickStart);
 }
 
@@ -25,9 +31,10 @@ void UImmutableSubsystem::Deinitialize()
 {
     IMTBL_LOG_FUNCSIG
     BrowserWidget = nullptr;
+    ImtblBlui = nullptr;
     Passport = nullptr;
 
-    FWorldDelegates::OnStartGameInstance.Remove(StartHandle);
+    UGameViewportClient::OnViewportCreated().Remove(ViewportCreatedHandle);
     FWorldDelegates::OnWorldTickStart.Remove(WorldTickHandle);
     
     Super::Deinitialize();
@@ -35,7 +42,7 @@ void UImmutableSubsystem::Deinitialize()
 
 
 template <class UserClass>
-void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func)
+void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func)
 {
     OnReady.AddUObject(Object, Func);
 }
@@ -54,16 +61,55 @@ void UImmutableSubsystem::ManageBridgeDelegateQueue()
 {
     if (bIsReady)
     {
+#if USING_BLUI_CEF
+        OnReady.Broadcast(ImtblBlui->GetJSConnector());
+#else
         OnReady.Broadcast(BrowserWidget->GetJSConnector());
+#endif
         OnReady.Clear();
     }
 }
 
 
-void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
+void UImmutableSubsystem::SetupGameBridge()
 {
-    IMTBL_LOG_FUNC("OnStartGameInstance")
-
+    if (bHasSetupGameBridge)
+        return;
+    bHasSetupGameBridge = true;
+    
+#if USING_BLUI_CEF
+    // Create the Blui
+    if (!ImtblBlui)
+    {
+        ImtblBlui = NewObject<UImtblBlui>();
+        ImtblBlui->Init();    
+    }
+    
+    if (!ImtblBlui)
+    {
+        IMTBL_ERR("Failed to create UImtblBlui")
+        return;
+    }
+    if (!ImtblBlui->GetJSConnector().IsValid())
+    {
+        IMTBL_ERR("JSConnector not available, can't set up subsystem-ready event chain")
+        return;
+    }
+    // Set up ready event chain
+    if (!IsReady())
+    {
+        ImtblBlui->GetJSConnector()->AddCallbackWhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
+    }
+    
+    // Prepare Passport
+    if (!Passport)
+    {
+        Passport = NewObject<UImmutablePassport>(this);
+        if (Passport)
+            Passport->Setup(ImtblBlui->GetJSConnector());
+    }
+    
+#else
     // Create the browser widget
     if (!BrowserWidget)
     {
@@ -88,8 +134,9 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
     // Set up ready event chain
     if (!IsReady())
     {
-        BrowserWidget->GetJSConnector()->WhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
+        BrowserWidget->GetJSConnector()->AddCallbackWhenBridgeReady(UImtblJSConnector::FOnBridgeReadyDelegate::FDelegate::CreateUObject(this, &UImmutableSubsystem::OnBridgeReady));
     }
+	
     // Prepare Passport
     if (!Passport)
     {
@@ -97,6 +144,14 @@ void UImmutableSubsystem::StartGameInstance(UGameInstance* GameInstance)
         if (Passport)
             Passport->Setup(BrowserWidget->GetJSConnector());
     }
+#endif
+}
+
+
+void UImmutableSubsystem::OnViewportCreated()
+{
+    IMTBL_LOG_FUNCSIG
+    SetupGameBridge();
 }
 
 
@@ -104,3 +159,4 @@ void UImmutableSubsystem::WorldTickStart(UWorld* World, ELevelTick TickType, flo
 {
     ManageBridgeDelegateQueue();
 }
+

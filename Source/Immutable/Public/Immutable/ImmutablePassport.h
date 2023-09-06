@@ -21,6 +21,8 @@ namespace ImmutablePassportAction
     const FString ConfirmCode = TEXT("confirmCode");
     const FString GetAddress = TEXT("getAddress");
     const FString GetEmail = TEXT("getEmail");
+    const FString EnvSandbox = TEXT("sandbox");
+    const FString EnvProduction = TEXT("production");
 }
 
 
@@ -35,7 +37,6 @@ struct FImmutablePassportResult
     FString Message;
 };
 
-
 USTRUCT()
 struct FImmutablePassportInitData
 {
@@ -46,6 +47,9 @@ struct FImmutablePassportInitData
 
     UPROPERTY()
     FString redirectUri;
+
+    UPROPERTY()
+    FString environment = ImmutablePassportAction::EnvSandbox;
 
     FString ToJsonString() const;
 };
@@ -122,7 +126,7 @@ public:
     
     DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult)
 
-    void Initialize(const FString& ClientID, const FImtblPassportResponseDelegate& ResponseDelegate);
+    void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
     void CheckStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -138,7 +142,7 @@ private:
     bool bIsLoggedIn = false;
     
     TWeakObjectPtr<UImtblJSConnector> JSConnector;
-    FString ClientId;
+    FImmutablePassportInitData InitData;
     FDelegateHandle BridgeReadyHandle;
     TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
 

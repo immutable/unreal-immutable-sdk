@@ -7,8 +7,6 @@
 #include "ImtblBlueprintAsyncAction.h"
 #include "ImtblPassportInitializationAsyncAction.generated.h"
 
-
-
 /**
  * 
  */
@@ -21,12 +19,14 @@ class IMMUTABLE_API UImtblPassportInitializationAsyncAction : public UImtblBluep
     
 public:
     UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-    static UImtblPassportInitializationAsyncAction* InitializePassport(UObject* WorldContextObject, const FString& ClientID);
+    static UImtblPassportInitializationAsyncAction* InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& Environment);
 
     virtual void Activate() override;
 
 private:
     FString ClientId;
+    FString RedirectUri;
+    FString Environment;
     
     UPROPERTY(BlueprintAssignable)
     FPassportInitializationOutputPin Initialized;

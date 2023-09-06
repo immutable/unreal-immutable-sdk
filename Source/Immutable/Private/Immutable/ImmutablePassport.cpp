@@ -11,9 +11,11 @@
 FString FImmutablePassportInitData::ToJsonString() const
 {
     FString OutString;
+    
     FJsonObjectWrapper Wrapper;
     Wrapper.JsonObject = MakeShared<FJsonObject>();
-    FJsonObjectConverter::UStructToJsonObject(FImmutablePassportInitData::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef());
+    FJsonObjectConverter::UStructToJsonObject(FImmutablePassportInitData::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+    
     if (!Wrapper.JsonObject.IsValid())
     {
         IMTBL_ERR("Could not convert FImmutablePassportInitData to JSON")
@@ -23,6 +25,7 @@ FString FImmutablePassportInitData::ToJsonString() const
     if (Wrapper.JsonObject->HasField("redirectUri") && Wrapper.JsonObject->GetStringField("redirectUri").IsEmpty())
         Wrapper.JsonObject->RemoveField("redirectUri");
     Wrapper.JsonObjectToString(OutString);
+
     return OutString;
 }
 
@@ -97,15 +100,16 @@ FString FImmutablePassportCodeConfirmRequestData::ToJsonString() const
 }
 
 
-void UImmutablePassport::Initialize(const FString& ClientID, const FImtblPassportResponseDelegate& ResponseDelegate)
+// @param Environment can be one of ImmutablePassportAction::EnvSandbox or ImmutablePassportAction::EnvProduction
+void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     check(JSConnector.IsValid());
 
-    ClientId = ClientID;
+    InitData = Data;
 
     CallJS(
         ImmutablePassportAction::Initialize,
-        FImmutablePassportInitData{ClientID}.ToJsonString(),
+        InitData.ToJsonString(),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse),
         false

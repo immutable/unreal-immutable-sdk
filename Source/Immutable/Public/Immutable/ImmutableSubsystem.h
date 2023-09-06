@@ -27,6 +27,8 @@ class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem
     friend class UImtblPassportGetEmailAsyncAction;
 
 public:
+    UImmutableSubsystem();
+
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
@@ -39,23 +41,28 @@ public:
 protected:
     // Execute a delegate when the subsystem is ready (i.e.: when the browser is running and the Immutable SDK game bridge has loaded).
     template<class UserClass>
-    void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func);
+    void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func);
 
 private:
 	UPROPERTY()
 	class UImtblBrowserUserWidget* BrowserWidget = nullptr;
-
+    
+	UPROPERTY()
+	class UImtblBlui* ImtblBlui = nullptr;
+    
     UPROPERTY()
     class UImmutablePassport* Passport = nullptr;
 
+    bool bHasSetupGameBridge = false;
     bool bIsReady = false;
     FImmutableSubsystemReadyDelegate OnReady;
 
-    FDelegateHandle StartHandle;
     FDelegateHandle WorldTickHandle;
-
-    void OnBridgeReady();
+    FDelegateHandle ViewportCreatedHandle;
+	
+    void SetupGameBridge();
+	void OnBridgeReady();
     void ManageBridgeDelegateQueue();
-    void StartGameInstance(UGameInstance* GameInstance);
+    void OnViewportCreated();
     void WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds);
 };
