@@ -125,6 +125,15 @@ For UE4 we are using Blui as the in built browser does not work.
     ```
     // BluManager::Settings.remote_debugging_port = 7777;
     ```
+## Adding Game Bridge Asset to Packaged Resources
+
+1. Open Unreal Editor in the lowest supported version i.e, 4.26 for this Plugin.
+2. Open Content Drawer
+3. Navigate to Plugins -> Immutable Content -> Packages Resources
+4. Delete the existing imported asset if you wish to replace with new one
+5. Right Click and Import the `index.js` file
+    ![Import Asset](Docs/ImportAsset.png)
+
 
 ## Changelog Management
 
