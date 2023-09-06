@@ -113,6 +113,28 @@ To set up Chromium remote debugging, edit project build/launch configurations in
 
 Next, launch the game and then open a separate Chrome/Chromium browser and navigate to `chrome://inspect` where your app should be listed, sometimes intermittently or after a delay, under the `Remote Target #localhost` section.  Click `inspect` to launch the remote debugging session.
 
+## Release Blui Plugin for UE4
+
+For UE4 we are using Blui as the in built browser does not work.
+
+1. Download this release supporting UE 4.27 and 4.26 https://github.com/getnamo/BLUI-Unreal/releases/tag/4.2.0 ()
+2. Download the CEF 90 Browser from https://github.com/getnamo/BLUI-Unreal/releases/tag/v4.6.0 (`BluBrowserCEF....7z`)
+3. Delete the Thirdparty/cef/Win folder from the BLUI plugin
+4. Place the Win folder from the `BluBrowserCEF...7z` into Thirdparty/cef
+5. Disable cefdebug settings in `Blu.cpp`, following line
+    ```
+    // BluManager::Settings.remote_debugging_port = 7777;
+    ```
+## How to Add Game Bridge Asset to Packaged Resources
+
+1. Open Unreal Editor in the lowest supported version i.e, 4.26 for this Plugin.
+2. Open Content Drawer
+3. Navigate to Plugins -> Immutable Content -> Packages Resources
+4. Delete the existing imported asset if you wish to replace with new one
+5. Right Click and Import the `index.js` file
+    ![Import Asset](Docs/ImportAsset.png)
+
+
 ## Changelog Management
 
 The following headings should be used as appropriate.
