@@ -27,7 +27,12 @@
 To install the plugin download it into your project's `Plugins` folder, e.g.: `MyGame/Plugins/unreal-immutable-sdk`.
 
 > [!NOTE]
-> For Unreal Engine 4.26 and above we use Blui as a browser instead of inbuilt browser. Please update `immutable.uplugin->Plugins->WebBrowserWidget` to false and restart your UE4 editor.
+> For Unreal Engine 4.26 and above we use Blui as a browser instead of inbuilt browser.
+> Install Blui Plugin only for UE4.
+> Please update `immutable.uplugin->Plugins->WebBrowserWidget` to false and restart your UE4 editor.
+> For Unreal Engine 5.0 and above we use inbuilt browser.
+
+
 
 ### Setup
 
@@ -112,6 +117,34 @@ In Unreal Engine 5.1+ the project is set up so that `console.log()` will pass al
 To set up Chromium remote debugging, edit project build/launch configurations in your IDE to add the following program command line argument to the appropriate configurations: `cefdebug=9222`
 
 Next, launch the game and then open a separate Chrome/Chromium browser and navigate to `chrome://inspect` where your app should be listed, sometimes intermittently or after a delay, under the `Remote Target #localhost` section.  Click `inspect` to launch the remote debugging session.
+
+## Release Unreal Immutable SDK Plugin
+
+1. Release the plugin using github releases. See https://github.com/immutable/unreal-immutable-sdk/releases
+
+## Release Blui Plugin for UE4
+
+For UE4 we are using Blui as the in built browser does not work.
+
+1. Download this release supporting UE 4.27 and 4.26 https://github.com/getnamo/BLUI-Unreal/releases/tag/4.2.0
+2. Download the CEF 90 Browser from https://github.com/getnamo/BLUI-Unreal/releases/tag/v4.6.0 (`BluBrowserCEF....7z`)
+3. Delete the Thirdparty/cef/Win folder from the BLUI plugin
+4. Place the Win folder from the `BluBrowserCEF...7z` into Thirdparty/cef
+5. Disable cefdebug settings in `Blu.cpp`, following line
+    ```
+    // BluManager::Settings.remote_debugging_port = 7777;
+    ```
+6. Zip the Blui plugin folder and upload to the github release.
+
+## How to Add Game Bridge Asset to Packaged Resources
+
+1. Open Unreal Editor in the lowest supported version i.e, 4.26 for this Plugin.
+2. Open Content Drawer
+3. Navigate to Plugins -> Immutable Content -> Packages Resources
+4. Delete the existing imported asset if you wish to replace with new one
+5. Right Click and Import the `index.js` file
+    ![Import Asset](Docs/ImportAsset.png)
+
 
 ## Changelog Management
 
