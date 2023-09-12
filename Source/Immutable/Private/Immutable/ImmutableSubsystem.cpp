@@ -42,7 +42,7 @@ void UImmutableSubsystem::Deinitialize()
 
 
 template <class UserClass>
-void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func)
+void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func)
 {
     OnReady.AddUObject(Object, Func);
 }
