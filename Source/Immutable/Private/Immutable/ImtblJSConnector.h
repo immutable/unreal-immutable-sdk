@@ -51,6 +51,10 @@ public:
     // Bind the func to be called for executing JS. Typically by the BrowserWidget (UE5) or Blui for UE4
     FOnExecuteJsDelegate ExecuteJs;
 
+#if PLATFORM_ANDROID
+    void SetAndroidBridgeReady();
+#endif
+
 protected:
 
     // Call a JavaScript function in the connected browser
