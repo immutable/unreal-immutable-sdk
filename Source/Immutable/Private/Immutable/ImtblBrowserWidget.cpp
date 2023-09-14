@@ -146,6 +146,9 @@ TSharedRef<SWidget> UImtblBrowserWidget::RebuildWidget()
 			.ShowControls(false)
 			.SupportsTransparency(bSupportsTransparency)
 	        .ShowInitialThrobber(bShowInitialThrobber)
+#if PLATFORM_ANDROID
+	        .OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
+#endif
 #if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 1
 	        .OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage))
 #endif
@@ -163,6 +166,17 @@ TSharedRef<SWidget> UImtblBrowserWidget::RebuildWidget()
 #endif
 	}
 }
+
+
+#if PLATFORM_ANDROID
+void UImtblBrowserWidget::HandleOnLoadCompleted()
+{
+	if (WebBrowserWidget->GetUrl() == "file://immutable/index.html")
+	{
+		JSConnector->SetAndroidBridgeReady();
+	}
+}
+#endif
 
 
 void UImtblBrowserWidget::OnWidgetRebuilt()

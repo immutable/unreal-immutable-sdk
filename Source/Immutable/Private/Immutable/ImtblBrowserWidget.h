@@ -51,6 +51,10 @@ private:
     bool BindUObject(const FString& Name, UObject* Object, bool bIsPermanent = true) const;
     // Bind the JSConnector to the browser window
     void BindConnector();
+
+#if PLATFORM_ANDROID
+    void HandleOnLoadCompleted();
+#endif
     
 #if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 1
     void HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);

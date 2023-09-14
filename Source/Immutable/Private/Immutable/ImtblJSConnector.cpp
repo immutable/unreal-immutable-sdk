@@ -142,4 +142,12 @@ void UImtblJSConnector::SendToGame(FString Message)
 }
 
 
-
+#if PLATFORM_ANDROID
+void UImtblJSConnector::SetAndroidBridgeReady()
+{
+        IMTBL_LOG_FUNCSIG
+        bIsBridgeReady = true;
+        OnBridgeReady.Broadcast();
+        OnBridgeReady.Clear();
+}
+#endif

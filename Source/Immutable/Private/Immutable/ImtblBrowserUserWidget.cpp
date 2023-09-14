@@ -41,8 +41,15 @@ TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 			ScaleBox->AddChild(Browser);
             if (UCanvasPanelSlot* RootWidgetSlot = Cast<UCanvasPanelSlot>(ScaleBox->Slot))
 			{
+#if PLATFORM_ANDROID
+                // Android webview needs to be at least 1px to 1px big to work
+                // but it can be off screen
+                RootWidgetSlot->SetAnchors(FAnchors(0, 0, 0, 0));
+                RootWidgetSlot->SetOffsets(FMargin(-1, -1, 1, 1));
+#else
 				RootWidgetSlot->SetAnchors(FAnchors(0, 0, 1, 1));
 				RootWidgetSlot->SetOffsets(DefaultOffsets);
+#endif
 			}
             if (UScaleBoxSlot* ScaleBoxSlot = Cast<UScaleBoxSlot>(Browser->Slot))
 			{
@@ -64,6 +71,7 @@ void UImtblBrowserUserWidget::BeginDestroy()
 
 void UImtblBrowserUserWidget::RemoveFromParent()
 {
+#if !PLATFORM_ANDROID
     // This is all that is needed to persist the widget state outside throughout level/world changes.
 	// Super::RemoveFromParent();
 
@@ -71,12 +79,17 @@ void UImtblBrowserUserWidget::RemoveFromParent()
 	{
 		CurrentParent->RemoveChild(this);
 	}
+#endif
 }
 
 
 void UImtblBrowserUserWidget::OnWidgetRebuilt()
 {
+#if PLATFORM_ANDROID
+    // Android webview needs to be visible to work
+#else
     SetVisibility(ESlateVisibility::Collapsed);
+#endif
     Super::OnWidgetRebuilt();
 }
 

@@ -22,7 +22,14 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     IMTBL_LOG_FUNCSIG
     Super::Initialize(Collection);
 
-	ViewportCreatedHandle = UGameViewportClient::OnViewportCreated().AddUObject(this, &UImmutableSubsystem::OnViewportCreated);
+#if PLATFORM_ANDROID
+    // Enable DOM storage so we can use localStorage in the Android webview
+    GConfig->SetBool(TEXT("/Script/AndroidRuntimeSettings.AndroidRuntimeSettings"), TEXT("bEnableDomStorage"), true, GEngineIni);
+
+    EngineInitCompleteHandle = FCoreDelegates::OnFEngineLoopInitComplete.AddUObject(this, &UImmutableSubsystem::OnViewportCreated);
+#else
+    ViewportCreatedHandle = UGameViewportClient::OnViewportCreated().AddUObject(this, &UImmutableSubsystem::OnViewportCreated);
+#endif
     WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UImmutableSubsystem::WorldTickStart);
 }
 

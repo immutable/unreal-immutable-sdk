@@ -59,6 +59,9 @@ private:
 
     FDelegateHandle WorldTickHandle;
     FDelegateHandle ViewportCreatedHandle;
+#if PLATFORM_ANDROID
+    FDelegateHandle EngineInitCompleteHandle;
+#endif
 	
     void SetupGameBridge();
 	void OnBridgeReady();
