@@ -126,6 +126,23 @@ TOptional<FImmutablePassportZkEvmRequestAccountsData> FImmutablePassportZkEvmReq
     return RequestAccounts;
 }
 
+FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
+{
+    FString OutString;
+    
+    FJsonObjectWrapper Wrapper;
+    Wrapper.JsonObject = MakeShared<FJsonObject>();
+    FJsonObjectConverter::UStructToJsonObject(FImmutablePassportZkEvmGetBalanceData::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+    
+    if (!Wrapper.JsonObject.IsValid())
+    {
+        IMTBL_ERR("Could not convert FImmutablePassportZkEvmGetBalanceData to JSON")
+        return "";
+    }
+    Wrapper.JsonObjectToString(OutString);
+
+    return OutString;
+}
 
 FString FImmutablePassportCodeConfirmRequestData::ToJsonString() const
 {
@@ -212,6 +229,16 @@ void UImmutablePassport::ZkEvmRequestAccounts(const FImtblPassportResponseDelega
         TEXT(""),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmRequestAccountsResponse)
+    );
+}
+
+void UImmutablePassport::ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+    CallJS(
+        ImmutablePassportAction::ZkEvmGetBalance,
+        Data.ToJsonString(),
+        ResponseDelegate,
+        FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmGetBalanceResponse)
     );
 }
 
@@ -493,6 +520,27 @@ void UImmutablePassport::OnZkEvmRequestAccountsResponse(FImtblJSResponse Respons
                     Msg += TEXT(",");
                 }
             }
+        }
+        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+    }
+}
+
+void UImmutablePassport::OnZkEvmGetBalanceResponse(FImtblJSResponse Response)
+{
+    if (auto ResponseDelegate = GetResponseDelegate(Response))
+    {
+        FString Msg;
+        bool bSuccess = true;
+        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
+        {
+            IMTBL_LOG("Could not fetch address from Passport.");
+            if (Response.Error.IsSet())
+                Msg = Response.Error->ToString();
+            bSuccess = false;
+        }
+        else
+        {
+            Msg = Response.JsonObject->GetStringField(TEXT("result"));
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
     }

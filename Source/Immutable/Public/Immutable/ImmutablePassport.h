@@ -20,6 +20,7 @@ namespace ImmutablePassportAction
     const FString Connect = TEXT("connect");
     const FString ConnectEvm = TEXT("connectEvm");
     const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
+    const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
     const FString ConfirmCode = TEXT("confirmCode");
     const FString GetAddress = TEXT("getAddress");
     const FString GetEmail = TEXT("getEmail");
@@ -110,6 +111,20 @@ struct FImmutablePassportZkEvmRequestAccountsData
     static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
 };
 
+USTRUCT()
+struct FImmutablePassportZkEvmGetBalanceData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString address;
+
+    UPROPERTY()
+    FString blockNumberOrTag = "latest";
+
+    FString ToJsonString() const;
+};
+
 
 USTRUCT()
 struct FImmutablePassportCodeConfirmRequestData
@@ -148,6 +163,7 @@ public:
     void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
 
@@ -179,6 +195,7 @@ private:
     void OnConnectResponse(FImtblJSResponse Response);
     void OnConnectEvmResponse(FImtblJSResponse Response);
     void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
+    void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
     void OnConfirmCodeResponse(FImtblJSResponse Response);
     void OnGetAddressResponse(FImtblJSResponse Response);
     void OnGetEmailResponse(FImtblJSResponse Response);
