@@ -15,21 +15,21 @@
 
 UImtblBrowserWidget::UImtblBrowserWidget()
 {
-	IMTBL_LOG_FUNCSIG
+    IMTBL_LOG_FUNCSIG
 
-	JSConnector = NewObject<UImtblJSConnector>(this, "JSConnector");
-	JSConnector->ExecuteJs = UImtblJSConnector::FOnExecuteJsDelegate::CreateUObject(this, &UImtblBrowserWidget::ExecuteJS);
+    JSConnector = NewObject<UImtblJSConnector>(this, "JSConnector");
+    JSConnector->ExecuteJs = UImtblJSConnector::FOnExecuteJsDelegate::CreateUObject(this, &UImtblBrowserWidget::ExecuteJS);
 
-	// WebBrowserWidget->LoadString("<html><head><title>Test</title></head><body><h1>Test</h1></body></html>", TEXT("http://www.google.com"));
-	// InitialURL = TEXT("http://www.google.com");
-	// InitialURL = TEXT("chrome://version");
-	// IPluginManager& PluginManager = IPluginManager::Get();
-	// if (const TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin("Immutable"))
-	// {
-	//     InitialURL = FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(Plugin->GetContentDir(), TEXT("index.html"))));
-	//     IMTBL_LOG("Loading initial url: %s", *InitialURL)
-	// }
-	InitialURL = TEXT("about:blank");
+    // WebBrowserWidget->LoadString("<html><head><title>Test</title></head><body><h1>Test</h1></body></html>", TEXT("http://www.google.com"));
+    // InitialURL = TEXT("http://www.google.com");
+    // InitialURL = TEXT("chrome://version");
+    // IPluginManager& PluginManager = IPluginManager::Get();
+    // if (const TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin("Immutable"))
+    // {
+    //     InitialURL = FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(Plugin->GetContentDir(), TEXT("index.html"))));
+    //     IMTBL_LOG("Loading initial url: %s", *InitialURL)
+    // }
+    InitialURL = TEXT("about:blank");
 }
 
 void UImtblBrowserWidget::BindConnector()
@@ -41,10 +41,10 @@ void UImtblBrowserWidget::BindConnector()
 
     if (JSConnector)
     {
-	    if (BindUObject(UImtblJSConnector::JSObjectName(), JSConnector))
-	    {
-		    JSConnector->Init(IsPageLoaded());
-	    }
+        if (BindUObject(UImtblJSConnector::JSObjectName(), JSConnector))
+        {
+            JSConnector->Init(IsPageLoaded());
+        }
     }
 }
 
@@ -60,7 +60,7 @@ bool UImtblBrowserWidget::IsPageLoaded() const
 #if USING_BUNDLED_CEF
     return WebBrowserWidget.IsValid() && WebBrowserWidget->IsLoaded();
 #endif
-	return false;
+    return false;
 }
 
 
@@ -78,7 +78,7 @@ void UImtblBrowserWidget::ExecuteJS(const FString& ScriptText) const
 void UImtblBrowserWidget::SetBrowserContent()
 {
 #if USING_BUNDLED_CEF
-	FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
+    FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/index.index'"));
     if (UObject* LoadedAsset = AssetRef.TryLoad())
     {
         if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
@@ -89,10 +89,10 @@ void UImtblBrowserWidget::SetBrowserContent()
                 return;
             }
 
-        	const FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>GameSDK Bridge</title><script>")
-        								+ Resource->Js
-        								+ FString("</script></head><body><h1>Bridge Running</h1></body></html>");
-        	
+            const FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>GameSDK Bridge</title><script>")
+                                        + Resource->Js
+                                        + FString("</script></head><body><h1>Bridge Running</h1></body></html>");
+            
             // IMTBL_LOG("Loaded resource: %s", *Resource->GetName())
             WebBrowserWidget->LoadString(IndexHtml, TEXT("file://immutable/index.html"));
             // WebBrowserWidget->LoadURL(FString::Printf(TEXT("%s%s"), TEXT("file:///"), *FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("html"), TEXT("index.html")))));
@@ -119,62 +119,68 @@ bool UImtblBrowserWidget::BindUObject(const FString& Name, UObject* Object, cons
 
 void UImtblBrowserWidget::ReleaseSlateResources(bool bReleaseChildren)
 {
-	Super::ReleaseSlateResources(bReleaseChildren);
+    Super::ReleaseSlateResources(bReleaseChildren);
 #if USING_BUNDLED_CEF
-	WebBrowserWidget.Reset();
+    WebBrowserWidget.Reset();
 #endif
 }
 
 
 TSharedRef<SWidget> UImtblBrowserWidget::RebuildWidget()
 {
-	if (IsDesignTime())
-	{
-		return SNew(SBox)
-			.HAlign(HAlign_Center)
-			.VAlign(VAlign_Center)
-			[
-				SNew(STextBlock)
-				.Text(NSLOCTEXT("Immutable", "Immutable Web Browser", "Immutable Web Browser"))
-			];
-	}
-	else
-	{
+    if (IsDesignTime())
+    {
+        return SNew(SBox)
+            .HAlign(HAlign_Center)
+            .VAlign(VAlign_Center)
+            [
+                SNew(STextBlock)
+                .Text(NSLOCTEXT("Immutable", "Immutable Web Browser", "Immutable Web Browser"))
+            ];
+    }
+    else
+    {
 #if USING_BUNDLED_CEF
-		WebBrowserWidget = SNew(SWebBrowser)
-			.InitialURL(InitialURL)
-			.ShowControls(false)
-			.SupportsTransparency(bSupportsTransparency)
-	        .ShowInitialThrobber(bShowInitialThrobber)
-#if PLATFORM_ANDROID
-	        .OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
+        WebBrowserWidget = SNew(SWebBrowser)
+            .InitialURL(InitialURL)
+            .ShowControls(false)
+            .SupportsTransparency(bSupportsTransparency)
+            .ShowInitialThrobber(bShowInitialThrobber)
+#if PLATFORM_ANDROID | PLATFORM_IOS
+            .OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
 #endif
 #if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 1
-	        .OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage))
+            .OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage))
 #endif
-	    ;
+        ;
 
-		return WebBrowserWidget.ToSharedRef();
+        return WebBrowserWidget.ToSharedRef();
 #else
-		return SNew(SBox)
-			.HAlign(HAlign_Center)
-			.VAlign(VAlign_Center)
-			[
-				SNew(STextBlock)
-				.Text(NSLOCTEXT("Immutable", "Immutable Web Browser", "Immutable Web Browser"))
-			];
+        return SNew(SBox)
+            .HAlign(HAlign_Center)
+            .VAlign(VAlign_Center)
+            [
+                SNew(STextBlock)
+                .Text(NSLOCTEXT("Immutable", "Immutable Web Browser", "Immutable Web Browser"))
+            ];
 #endif
-	}
+    }
 }
 
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
 void UImtblBrowserWidget::HandleOnLoadCompleted()
 {
-	if (WebBrowserWidget->GetUrl() == "file://immutable/index.html")
-	{
-		JSConnector->SetAndroidBridgeReady();
-	}
+#if PLATFORM_ANDROID
+    FString indexUrl =  "file://immutable/index.html";
+#else
+    FString indexUrl =  "file:///index.html";
+#endif
+    
+    if (WebBrowserWidget->GetUrl() == indexUrl)
+    {
+        JSConnector->SetMobileBridgeReady();
+    }
 }
 #endif
 
@@ -192,7 +198,7 @@ void UImtblBrowserWidget::HandleOnConsoleMessage(const FString& Message, const F
 {
     // TODO: add severity to log and callback
     IMTBL_LOG("Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
-	OnConsoleMessage.Broadcast(Message, Source, Line);
+    OnConsoleMessage.Broadcast(Message, Source, Line);
 }
 #endif
 

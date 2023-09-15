@@ -52,7 +52,7 @@ private:
     // Bind the JSConnector to the browser window
     void BindConnector();
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     void HandleOnLoadCompleted();
 #endif
     

@@ -25,7 +25,9 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 #if PLATFORM_ANDROID
     // Enable DOM storage so we can use localStorage in the Android webview
     GConfig->SetBool(TEXT("/Script/AndroidRuntimeSettings.AndroidRuntimeSettings"), TEXT("bEnableDomStorage"), true, GEngineIni);
+#endif
 
+#if PLATFORM_ANDROID | PLATFORM_IOS
     EngineInitCompleteHandle = FCoreDelegates::OnFEngineLoopInitComplete.AddUObject(this, &UImmutableSubsystem::OnViewportCreated);
 #else
     ViewportCreatedHandle = UGameViewportClient::OnViewportCreated().AddUObject(this, &UImmutableSubsystem::OnViewportCreated);
@@ -40,8 +42,11 @@ void UImmutableSubsystem::Deinitialize()
     BrowserWidget = nullptr;
     ImtblBlui = nullptr;
     Passport = nullptr;
-
+#if PLATFORM_ANDROID | PLATFORM_IOS
+    UGameViewportClient::OnViewportCreated().Remove(EngineInitCompleteHandle);
+#else
     UGameViewportClient::OnViewportCreated().Remove(ViewportCreatedHandle);
+#endif
     FWorldDelegates::OnWorldTickStart.Remove(WorldTickHandle);
     
     Super::Deinitialize();

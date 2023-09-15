@@ -41,7 +41,7 @@ TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 			ScaleBox->AddChild(Browser);
             if (UCanvasPanelSlot* RootWidgetSlot = Cast<UCanvasPanelSlot>(ScaleBox->Slot))
 			{
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
                 // Android webview needs to be at least 1px to 1px big to work
                 // but it can be off screen
                 RootWidgetSlot->SetAnchors(FAnchors(0, 0, 0, 0));
@@ -85,8 +85,8 @@ void UImtblBrowserUserWidget::RemoveFromParent()
 
 void UImtblBrowserUserWidget::OnWidgetRebuilt()
 {
-#if PLATFORM_ANDROID
-    // Android webview needs to be visible to work
+#if PLATFORM_ANDROID | PLATFORM_IOS
+    // Mobile webview needs to be visible to work
 #else
     SetVisibility(ESlateVisibility::Collapsed);
 #endif
