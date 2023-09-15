@@ -59,7 +59,7 @@ private:
 
     FDelegateHandle WorldTickHandle;
     FDelegateHandle ViewportCreatedHandle;
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     FDelegateHandle EngineInitCompleteHandle;
 #endif
 	

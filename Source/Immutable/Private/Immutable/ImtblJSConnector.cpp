@@ -142,8 +142,8 @@ void UImtblJSConnector::SendToGame(FString Message)
 }
 
 
-#if PLATFORM_ANDROID
-void UImtblJSConnector::SetAndroidBridgeReady()
+#if PLATFORM_ANDROID | PLATFORM_IOS
+void UImtblJSConnector::SetMobileBridgeReady()
 {
         IMTBL_LOG_FUNCSIG
         bIsBridgeReady = true;
