@@ -28,7 +28,7 @@ void UImtblPassportZkEvmGetBalanceAsyncAction::Activate()
 		return;
 	}
 
-	GetSubsystem()->WhenReady(this, &UImtblPassportZkEvmGetBalanceAsyncAction::DoZkEvmGetBalance);//, /* timoutSec */ 15.0f);
+	GetSubsystem()->WhenReady(this, &UImtblPassportZkEvmGetBalanceAsyncAction::DoZkEvmGetBalance);
 }
 
 

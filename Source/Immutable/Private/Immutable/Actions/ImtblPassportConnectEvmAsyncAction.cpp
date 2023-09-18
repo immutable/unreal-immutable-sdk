@@ -26,7 +26,7 @@ void UImtblPassportConnectEvmAsyncAction::Activate()
         return;
     }
 
-    GetSubsystem()->WhenReady(this, &UImtblPassportConnectEvmAsyncAction::DoConnectEvm);//, /* timoutSec */ 15.0f);
+    GetSubsystem()->WhenReady(this, &UImtblPassportConnectEvmAsyncAction::DoConnectEvm);
 }
 
 

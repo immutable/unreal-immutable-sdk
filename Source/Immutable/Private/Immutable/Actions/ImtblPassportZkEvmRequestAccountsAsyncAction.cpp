@@ -27,7 +27,7 @@ void UImtblPassportZkEvmRequestAccountsAsyncAction::Activate()
 		return;
 	}
 
-	GetSubsystem()->WhenReady(this, &UImtblPassportZkEvmRequestAccountsAsyncAction::DoRequestAccounts);//, /* timoutSec */ 15.0f);
+	GetSubsystem()->WhenReady(this, &UImtblPassportZkEvmRequestAccountsAsyncAction::DoRequestAccounts);
 }
 
 
