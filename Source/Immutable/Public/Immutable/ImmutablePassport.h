@@ -18,6 +18,9 @@ namespace ImmutablePassportAction
     const FString ConnectWithCredentials = TEXT("connectWithCredentials");
     const FString Logout = TEXT("logout");
     const FString Connect = TEXT("connect");
+    const FString ConnectEvm = TEXT("connectEvm");
+    const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
+    const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
     const FString ConfirmCode = TEXT("confirmCode");
     const FString GetAddress = TEXT("getAddress");
     const FString GetEmail = TEXT("getEmail");
@@ -95,6 +98,33 @@ struct FImmutablePassportConnectData
     static TOptional<FImmutablePassportConnectData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
 };
 
+USTRUCT()
+struct FImmutablePassportZkEvmRequestAccountsData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    TArray<FString> accounts;
+    
+    FString ToJsonString() const;
+    static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonString(const FString& JsonObjectString);
+    static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
+};
+
+USTRUCT()
+struct FImmutablePassportZkEvmGetBalanceData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString address;
+
+    UPROPERTY()
+    FString blockNumberOrTag = "latest";
+
+    FString ToJsonString() const;
+};
+
 
 USTRUCT()
 struct FImmutablePassportCodeConfirmRequestData
@@ -131,6 +161,9 @@ public:
     void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
 
@@ -160,6 +193,9 @@ private:
     void OnConnectWithCredentialsResponse(FImtblJSResponse Response);
     void OnLogoutResponse(FImtblJSResponse Response);
     void OnConnectResponse(FImtblJSResponse Response);
+    void OnConnectEvmResponse(FImtblJSResponse Response);
+    void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
+    void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
     void OnConfirmCodeResponse(FImtblJSResponse Response);
     void OnGetAddressResponse(FImtblJSResponse Response);
     void OnGetEmailResponse(FImtblJSResponse Response);

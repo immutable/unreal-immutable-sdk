@@ -91,6 +91,58 @@ TOptional<FImmutablePassportConnectData> FImmutablePassportConnectData::FromJson
     return PassportConnect;
 }
 
+FString FImmutablePassportZkEvmRequestAccountsData::ToJsonString() const
+{
+    FString OutString;
+    FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
+    return OutString;
+}
+
+
+TOptional<FImmutablePassportZkEvmRequestAccountsData> FImmutablePassportZkEvmRequestAccountsData::FromJsonString(const FString& JsonObjectString)
+{
+    FImmutablePassportZkEvmRequestAccountsData RequestAccounts;
+    if (!FJsonObjectConverter::JsonObjectStringToUStruct(JsonObjectString, &RequestAccounts, 0, 0))
+    {
+        IMTBL_WARN("Could not parse response from JavaScript into the expected Passport ZkEvm request accounts format")
+        return TOptional<FImmutablePassportZkEvmRequestAccountsData>();
+    }
+    return RequestAccounts;
+}
+
+
+TOptional<FImmutablePassportZkEvmRequestAccountsData> FImmutablePassportZkEvmRequestAccountsData::FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject)
+{
+    if (!JsonObject.IsValid())
+        return TOptional<FImmutablePassportZkEvmRequestAccountsData>();
+
+    // Parse the JSON
+    FImmutablePassportZkEvmRequestAccountsData RequestAccounts;
+    if (!FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &RequestAccounts, 0, 0))
+    {
+        IMTBL_ERR("Could not parse response from JavaScript into the expected Passport ZkEvm request accounts format")
+        return TOptional<FImmutablePassportZkEvmRequestAccountsData>();
+    }
+    return RequestAccounts;
+}
+
+FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
+{
+    FString OutString;
+    
+    FJsonObjectWrapper Wrapper;
+    Wrapper.JsonObject = MakeShared<FJsonObject>();
+    FJsonObjectConverter::UStructToJsonObject(FImmutablePassportZkEvmGetBalanceData::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+    
+    if (!Wrapper.JsonObject.IsValid())
+    {
+        IMTBL_ERR("Could not convert FImmutablePassportZkEvmGetBalanceData to JSON")
+        return "";
+    }
+    Wrapper.JsonObjectToString(OutString);
+
+    return OutString;
+}
 
 FString FImmutablePassportCodeConfirmRequestData::ToJsonString() const
 {
@@ -160,6 +212,35 @@ void UImmutablePassport::Connect(const FImtblPassportResponseDelegate& ResponseD
     );
 }
 
+void UImmutablePassport::ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+    CallJS(
+        ImmutablePassportAction::ConnectEvm,
+        TEXT(""),
+        ResponseDelegate,
+        FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectEvmResponse)
+    );
+}
+
+void UImmutablePassport::ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+    CallJS(
+        ImmutablePassportAction::ZkEvmRequestAccounts,
+        TEXT(""),
+        ResponseDelegate,
+        FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmRequestAccountsResponse)
+    );
+}
+
+void UImmutablePassport::ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+    CallJS(
+        ImmutablePassportAction::ZkEvmGetBalance,
+        Data.ToJsonString(),
+        ResponseDelegate,
+        FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmGetBalanceResponse)
+    );
+}
 
 void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
@@ -395,6 +476,75 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
     }
 }
 
+void UImmutablePassport::OnConnectEvmResponse(FImtblJSResponse Response)
+{
+    if (auto ResponseDelegate = GetResponseDelegate(Response))
+    {
+        FString Msg;
+        if (Response.success)
+        {
+            IMTBL_LOG("Connected to Evm.")
+        }
+        else
+        {
+            IMTBL_LOG("Error connecting to Evm.")
+            if (Response.Error.IsSet())
+                Msg = Response.Error->ToString();
+        }
+        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
+    }
+}
+
+void UImmutablePassport::OnZkEvmRequestAccountsResponse(FImtblJSResponse Response)
+{
+    if (auto ResponseDelegate = GetResponseDelegate(Response))
+    {
+        const auto RequestAccountstData = FImmutablePassportZkEvmRequestAccountsData::FromJsonObject(Response.JsonObject);
+        FString Msg;
+        bool bSuccess = true;
+        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::Array>(TEXT("accounts")))
+        {
+            IMTBL_LOG("Error requesting zkevm accounts.")
+            if (Response.Error.IsSet())
+                Msg = Response.Error->ToString();
+            bSuccess = false;
+        }
+        else
+        {
+            const auto size = RequestAccountstData->accounts.Num();
+            for (int32 Index = 0; Index != size; ++Index)
+            {
+                Msg += RequestAccountstData->accounts[Index];
+                if (Index < size - 1)
+                {
+                    Msg += TEXT(",");
+                }
+            }
+        }
+        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+    }
+}
+
+void UImmutablePassport::OnZkEvmGetBalanceResponse(FImtblJSResponse Response)
+{
+    if (auto ResponseDelegate = GetResponseDelegate(Response))
+    {
+        FString Msg;
+        bool bSuccess = true;
+        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
+        {
+            IMTBL_LOG("Could not fetch address from Passport.");
+            if (Response.Error.IsSet())
+                Msg = Response.Error->ToString();
+            bSuccess = false;
+        }
+        else
+        {
+            Msg = Response.JsonObject->GetStringField(TEXT("result"));
+        }
+        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+    }
+}
 
 void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
 {
