@@ -17,18 +17,6 @@ class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
-    friend class UImmutablePassport;
-    friend class UImtblPassportInitializationAsyncAction;
-    friend class UImtblPassportHasStoredCredentialsAsyncAction;
-    friend class UImtblPassportConnectSilentAsyncAction;
-    friend class UImtblPassportConnectAsyncAction;
-    friend class UImtblPassportConnectEvmAsyncAction;
-    friend class UImtblPassportZkEvmRequestAccountsAsyncAction;
-    friend class UImtblPassportZkEvmGetBalanceAsyncAction;
-    friend class UImtblPassportLogoutAsyncAction;
-    friend class UImtblPassportGetAddressAsyncAction;
-    friend class UImtblPassportGetEmailAsyncAction;
-
 public:
     UImmutableSubsystem();
 
@@ -41,7 +29,6 @@ public:
 
     // FOnGameViewportTick& OnGameViewportTick() { return GameViewportTickEvent; }
 
-protected:
     // Execute a delegate when the subsystem is ready (i.e.: when the browser is running and the Immutable SDK game bridge has loaded).
     template<class UserClass>
     void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func);
@@ -49,10 +36,10 @@ protected:
 private:
 	UPROPERTY()
 	class UImtblBrowserUserWidget* BrowserWidget = nullptr;
-    
+
 	UPROPERTY()
 	class UImtblBlui* ImtblBlui = nullptr;
-    
+
     UPROPERTY()
     class UImmutablePassport* Passport = nullptr;
 
@@ -65,7 +52,7 @@ private:
 #if PLATFORM_ANDROID | PLATFORM_IOS
     FDelegateHandle EngineInitCompleteHandle;
 #endif
-	
+
     void SetupGameBridge();
 	void OnBridgeReady();
     void ManageBridgeDelegateQueue();

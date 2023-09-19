@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "Immutable/ImtblJSConnector.h"
 #include "UObject/Object.h"
+#include "JsonObjectConverter.h"
 #include "ImmutablePassport.generated.h"
 
 
 struct FImtblJSResponse;
-
 
 namespace ImmutablePassportAction
 {
@@ -24,10 +24,37 @@ namespace ImmutablePassportAction
     const FString ConfirmCode = TEXT("confirmCode");
     const FString GetAddress = TEXT("getAddress");
     const FString GetEmail = TEXT("getEmail");
+    const FString Transfer = TEXT("imxTransfer");
+    const FString BatchNftTransfer = TEXT("imxBatchNftTransfer");
     const FString EnvSandbox = TEXT("sandbox");
     const FString EnvProduction = TEXT("production");
 }
 
+template<typename UStructType>
+FString UStructToJsonString(const UStructType& InStruct)
+{
+    FString OutString;
+    FJsonObjectConverter::UStructToJsonObjectString(InStruct, OutString, 0, 0, 0, nullptr, false);
+    return OutString;
+}
+
+template<typename UStructType>
+TOptional<UStructType> JsonObjectToUStruct(const TSharedPtr<FJsonObject>& JsonObject)
+{
+    if (!JsonObject.IsValid())
+    {
+        return TOptional<UStructType>();
+    }
+
+    // Parse the JSON
+    UStructType StructInstance;
+    if (!FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &StructInstance, 0, 0))
+    {
+        IMTBL_ERR("Could not parse response from JavaScript into the expected Ustruct")
+        return TOptional<UStructType>();
+    }
+    return StructInstance;
+}
 
 USTRUCT()
 struct FImmutablePassportResult
@@ -38,6 +65,8 @@ struct FImmutablePassportResult
     bool Success = false;
     UPROPERTY()
     FString Message;
+
+    FImtblJSResponse Response;
 };
 
 USTRUCT()
@@ -74,8 +103,6 @@ struct FImmutablePassportTokenData
     UPROPERTY()
     int64 expiresIn = 0;
 
-    FString ToJsonString() const;
-    static TOptional<FImmutablePassportTokenData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
 };
 
 
@@ -92,10 +119,8 @@ struct FImmutablePassportConnectData
     FString url;
     UPROPERTY()
     float interval = 0;
-    
-    FString ToJsonString() const;
+
     static TOptional<FImmutablePassportConnectData> FromJsonString(const FString& JsonObjectString);
-    static TOptional<FImmutablePassportConnectData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
 };
 
 USTRUCT()
@@ -105,7 +130,7 @@ struct FImmutablePassportZkEvmRequestAccountsData
 
     UPROPERTY()
     TArray<FString> accounts;
-    
+
     FString ToJsonString() const;
     static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonString(const FString& JsonObjectString);
     static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
@@ -137,13 +162,86 @@ struct FImmutablePassportCodeConfirmRequestData
     float interval = 5;
     UPROPERTY()
     float timeoutMs = 15 * 60 * 1000;
-    
+};
+
+USTRUCT()
+struct FImxTransferRequest
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString receiver;
+
+    UPROPERTY()
+    FString type;
+
+    UPROPERTY()
+    FString amount;
+
+    UPROPERTY()
+    FString tokenId;
+
+    UPROPERTY()
+    FString tokenAddress;
+
     FString ToJsonString() const;
 };
 
+USTRUCT()
+struct FImxTransferResponse
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString sentSignature;
+
+    UPROPERTY()
+    FString status;
+
+    UPROPERTY()
+    float time;
+
+    UPROPERTY()
+    unsigned transferId;
+};
+
+USTRUCT(BlueprintType)
+struct FNftTransferDetails
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite)
+    FString receiver;
+
+    UPROPERTY(BlueprintReadWrite)
+    FString tokenId;
+
+    UPROPERTY(BlueprintReadWrite)
+    FString tokenAddress;
+};
+
+USTRUCT()
+struct FImxBatchNftTransferRequest
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    TArray<FNftTransferDetails> nftTransferDetails;
+
+    FString ToJsonString() const;
+};
+
+USTRUCT()
+struct FImxBatchNftTransferResponse
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    TArray<int> transferIds;
+};
 
 /**
- * 
+ *
  */
 UCLASS()
 class IMMUTABLE_API UImmutablePassport : public UObject
@@ -153,7 +251,7 @@ class IMMUTABLE_API UImmutablePassport : public UObject
 
 public:
     DECLARE_MULTICAST_DELEGATE(FOnPassportReadyDelegate)
-    
+
     DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult)
 
     void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -167,13 +265,27 @@ public:
     void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
 
+    /**
+    * Create a new transfer request.
+    * @param RequestData The transfer details structure of type FImxTransferRequest
+    * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+    */
+    void Transfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
+
+    /**
+    * Creates a new batch nft transfer request with the given transfer details.
+    * @param RequestData The transfer details structure of type FImxBatchNftTransferRequest
+    * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+    */
+    void BatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
+
 protected:
     void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
-    
+
 private:
     bool bIsInitialized = false;
     bool bIsLoggedIn = false;
-    
+
     TWeakObjectPtr<UImtblJSConnector> JSConnector;
     FImmutablePassportInitData InitData;
     FDelegateHandle BridgeReadyHandle;
@@ -199,6 +311,8 @@ private:
     void OnConfirmCodeResponse(FImtblJSResponse Response);
     void OnGetAddressResponse(FImtblJSResponse Response);
     void OnGetEmailResponse(FImtblJSResponse Response);
-    
+    void OnTransferResponse(FImtblJSResponse Response);
+    void OnBatchNftTransferResponse(FImtblJSResponse Response);
+
     void LogAndIgnoreResponse(FImtblJSResponse Response);
 };
