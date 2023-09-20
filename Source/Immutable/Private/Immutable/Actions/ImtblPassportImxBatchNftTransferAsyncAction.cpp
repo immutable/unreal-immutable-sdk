@@ -22,14 +22,14 @@ void UImmutablePassportImxBatchNftTransferAsyncAction::Activate()
 {
 	if (!WorldContextObject || !WorldContextObject->GetWorld())
 	{
-		const FString Err = "GetEmail failed due to missing world or world context object.";
+		const FString Err = "BatchNftTransfer failed due to missing world or world context object.";
 		IMTBL_WARN("Error: %s", *Err)
 		TArray<FString> TransferIds;
 		Failed.Broadcast(Err, TransferIds);
 		return;
 	}
 
-	GetSubsystem()->WhenReady(this, &UImmutablePassportImxBatchNftTransferAsyncAction::DoTransfer);//, /* timoutSec */ 15.0f);
+	GetSubsystem()->WhenReady(this, &UImmutablePassportImxBatchNftTransferAsyncAction::DoTransfer);
 }
 
 
@@ -38,7 +38,7 @@ void UImmutablePassportImxBatchNftTransferAsyncAction::DoTransfer(TWeakObjectPtr
 	// Get Passport
 	FImxBatchNftTransferRequest Request;
 	Request.nftTransferDetails = NftTransferDetails;
-	
+
 	// Run Transfer
 	GetSubsystem()->GetPassport()->BatchNftTransfer(Request, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImmutablePassportImxBatchNftTransferAsyncAction::OnTransferResponse));
 }
@@ -53,7 +53,7 @@ void UImmutablePassportImxBatchNftTransferAsyncAction::OnTransferResponse(FImmut
 		{
 			for (auto Id : BatchNftTransferResponse->transferIds)
 			{
-				TransferIds.Add(FString::Printf(TEXT("%u,"), Id));	
+				TransferIds.Add(FString::Printf(TEXT("%u,"), Id));
 			}
 		}
 		Success.Broadcast(TEXT(""), TransferIds);

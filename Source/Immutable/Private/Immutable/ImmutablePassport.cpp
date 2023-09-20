@@ -598,7 +598,7 @@ void UImmutablePassport::OnTransferResponse(FImtblJSResponse Response)
 {
     if (auto ResponseDelegate = GetResponseDelegate(Response))
     {
-        auto TrasferResponse = JsonObjectToUStruct<FImxTransferResponse>(Response.JsonObject);
+        auto TransferResponse = JsonObjectToUStruct<FImxTransferResponse>(Response.JsonObject);
 
         FString Msg;
         bool bSuccess = true;

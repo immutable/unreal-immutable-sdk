@@ -27,13 +27,13 @@ void UImmutablePassportImxTransferAsyncAction::Activate()
 {
 	if (!WorldContextObject || !WorldContextObject->GetWorld())
 	{
-		const FString Err = "GetEmail failed due to missing world or world context object.";
+		const FString Err = "Transfer failed due to missing world or world context object.";
 		IMTBL_WARN("Error: %s", *Err)
 		Failed.Broadcast(Err, TEXT(""));
 		return;
 	}
 
-	GetSubsystem()->WhenReady(this, &UImmutablePassportImxTransferAsyncAction::DoTransfer);//, /* timoutSec */ 15.0f);
+	GetSubsystem()->WhenReady(this, &UImmutablePassportImxTransferAsyncAction::DoTransfer);
 }
 
 
