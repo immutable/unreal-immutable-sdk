@@ -144,6 +144,34 @@ FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
     return OutString;
 }
 
+FString FImtblTransactionRequest::ToJsonString() const
+{
+    FString OutString;
+    
+    FJsonObjectWrapper Wrapper;
+    Wrapper.JsonObject = MakeShared<FJsonObject>();
+    FJsonObjectConverter::UStructToJsonObject(FImtblTransactionRequest::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+    
+    if (!Wrapper.JsonObject.IsValid())
+    {
+        IMTBL_ERR("Could not convert FImtblTransactionRequest to JSON")
+        return "";
+    }
+
+    // Replace Blueprint JSON with API expected contract { key : value }
+    TArray<TSharedPtr<FJsonValue>> CustomDataArray;
+    for (FImtblCustomData CustomData : customData)
+    {
+        CustomDataArray.Add(MakeShared<FJsonValueObject>(FJsonValueObject(CustomData.ToJsonObject())));
+    }
+    Wrapper.JsonObject->SetArrayField("customData", CustomDataArray);
+    
+    Wrapper.JsonObjectToString(OutString);
+
+    
+    return OutString;
+}
+
 FString FImmutablePassportCodeConfirmRequestData::ToJsonString() const
 {
     FString OutString;
@@ -239,6 +267,16 @@ void UImmutablePassport::ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalance
         Data.ToJsonString(),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmGetBalanceResponse)
+    );
+}
+
+void UImmutablePassport::ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate)
+{   
+    CallJS(
+        ImmutablePassportAction::ZkEvmSendTransaction,
+        Request.ToJsonString(),
+        ResponseDelegate,
+        FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmSendTransactionResponse)
     );
 }
 
@@ -533,7 +571,28 @@ void UImmutablePassport::OnZkEvmGetBalanceResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
         {
-            IMTBL_LOG("Could not fetch address from Passport.");
+            IMTBL_LOG("Could not get balance.");
+            if (Response.Error.IsSet())
+                Msg = Response.Error->ToString();
+            bSuccess = false;
+        }
+        else
+        {
+            Msg = Response.JsonObject->GetStringField(TEXT("result"));
+        }
+        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+    }
+}
+
+void UImmutablePassport::OnZkEvmSendTransactionResponse(FImtblJSResponse Response)
+{
+    if (auto ResponseDelegate = GetResponseDelegate(Response))
+    {
+        FString Msg;
+        bool bSuccess = true;
+        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
+        {
+            IMTBL_LOG("Could not fetch send transaction.");
             if (Response.Error.IsSet())
                 Msg = Response.Error->ToString();
             bSuccess = false;

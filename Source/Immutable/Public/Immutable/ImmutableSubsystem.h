@@ -25,6 +25,7 @@ class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem
     friend class UImtblPassportConnectEvmAsyncAction;
     friend class UImtblPassportZkEvmRequestAccountsAsyncAction;
     friend class UImtblPassportZkEvmGetBalanceAsyncAction;
+    friend class UImtblPassportZkEvmSendTransactionAsyncAction;
     friend class UImtblPassportLogoutAsyncAction;
     friend class UImtblPassportGetAddressAsyncAction;
     friend class UImtblPassportGetEmailAsyncAction;
