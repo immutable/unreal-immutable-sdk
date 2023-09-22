@@ -87,6 +87,14 @@ FString FImmutablePassportZkEvmRequestAccountsData::ToJsonString() const
 }
 
 
+FString FImmutablePassportConnectPKCEData::ToJsonString() const
+{
+    FString OutString;
+    FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
+    return OutString;
+}
+
+
 TOptional<FImmutablePassportZkEvmRequestAccountsData> FImmutablePassportZkEvmRequestAccountsData::FromJsonString(const FString& JsonObjectString)
 {
     FImmutablePassportZkEvmRequestAccountsData RequestAccounts;
