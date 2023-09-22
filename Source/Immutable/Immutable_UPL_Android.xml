@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <gameActivityImportAdditions>
+        <insert>
+        </insert>
+    </gameActivityImportAdditions>
+    <gameActivityOnCreateAdditions>
+        <insert>
+            Uri uri = getIntent().getData();
+            if (uri != null) {
+            String deeplink = uri.toString();
+            handleDeepLink(uri.toString());
+            }
+        </insert>
+    </gameActivityOnCreateAdditions>
+    <gameActivityOnResumeAdditions>
+        <insert>
+            Uri uri = getIntent().getData();
+            if (uri != null) {
+            String deeplink = uri.toString();
+            handleDeepLink(deeplink);
+            }
+        </insert>
+    </gameActivityOnResumeAdditions>
+    <gameActivityClassAdditions>
+        <insert>
+            public native void handleDeepLink(String Deeplink);
+        </insert>
+    </gameActivityClassAdditions>
+</root>

@@ -7,6 +7,20 @@
 #include "ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
+#if PLATFORM_ANDROID
+#include "GenericPlatform/GenericPlatformHttp.h"
+#include "Android/ImmutableAndroidJNI.h"
+#endif
+
+#if PLATFORM_ANDROID
+static void HandleDeepLink(FString DeepLink)
+{
+    if (OnHandleDeepLink.ExecuteIfBound(DeepLink))
+    {
+        IMTBL_WARN("OnHandleDeepLink delegate was not called");
+    }
+}
+#endif
 
 FString FImmutablePassportInitData::ToJsonString() const
 {
@@ -66,6 +80,14 @@ TOptional<FImmutablePassportConnectData> FImmutablePassportConnectData::FromJson
 
 
 FString FImmutablePassportZkEvmRequestAccountsData::ToJsonString() const
+{
+    FString OutString;
+    FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
+    return OutString;
+}
+
+
+FString FImmutablePassportConnectPKCEData::ToJsonString() const
 {
     FString OutString;
     FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
@@ -216,6 +238,21 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConfirmCodeResponse)
     );
 }
+
+
+#if PLATFORM_ANDROID
+void UImmutablePassport::ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+    PKCEResponseDelegate = ResponseDelegate;
+    CallJS(
+        ImmutablePassportAction::GetPKCEAuthUrl,
+        TEXT(""),
+        PKCEResponseDelegate,
+        FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetPKCEAuthUrlResponse)
+    );
+}
+#endif
+
 
 void UImmutablePassport::GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
@@ -475,6 +512,97 @@ void UImmutablePassport::OnConnectEvmResponse(FImtblJSResponse Response)
     }
 }
 
+#if PLATFORM_ANDROID
+void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
+{
+    if (PKCEResponseDelegate.IsBound())
+    {
+        FString Msg;
+        bool bSuccess = true;
+        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
+        {
+            IMTBL_LOG("Could not get PKCE auth URL from Passport.");
+        }
+        else
+        {
+            // Handle deeplink calls
+            SetDeeplinkCallbackMethod(HandleDeepLink);
+            OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
+
+            FString Err;
+            Msg = Response.JsonObject->GetStringField(TEXT("result"));
+            FPlatformProcess::LaunchURL(*Msg, nullptr, &Err);
+            if (Err.Len())
+            {
+                Msg = "Failed to connect to Browser: " + Err;
+                IMTBL_ERR("%s", *Msg);
+                bSuccess = false;
+            }
+            else
+            {
+                return;
+            }
+        }
+        PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+        PKCEResponseDelegate = nullptr;
+    }
+    else
+    {
+        IMTBL_ERR("Unable to return a response for Connect PKCE");
+    }
+}
+
+void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
+{
+    if (PKCEResponseDelegate.IsBound())
+    {
+        FString Msg;
+        if (Response.success)
+        {
+            IMTBL_LOG("Successfully connected via PKCE")
+            bIsLoggedIn = true;
+        }
+        else
+        {
+            IMTBL_LOG("Connect PKCE attempt failed.");
+            if (Response.Error.IsSet())
+                Msg = Response.Error->ToString();
+        }
+        PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
+        PKCEResponseDelegate = nullptr;
+    }
+    else
+    {
+        IMTBL_ERR("Unable to return a response for Connect PKCE");
+    }
+}
+#endif
+
+
+void UImmutablePassport::OnGetAddressResponse(FImtblJSResponse Response)
+{
+    if (auto ResponseDelegate = GetResponseDelegate(Response))
+    {
+        auto ConnectData = JsonObjectToUStruct<FImmutablePassportConnectData>(Response.JsonObject);
+
+        FString Msg;
+        bool bSuccess = true;
+        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
+        {
+            IMTBL_LOG("Could not fetch address from Passport.");
+            if (Response.Error.IsSet())
+                Msg = Response.Error->ToString();
+            bSuccess = false;
+        }
+        else
+        {
+            Msg = Response.JsonObject->GetStringField(TEXT("result"));
+        }
+        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
+    }
+}
+
+
 void UImmutablePassport::OnZkEvmRequestAccountsResponse(FImtblJSResponse Response)
 {
     if (auto ResponseDelegate = GetResponseDelegate(Response))
@@ -504,6 +632,7 @@ void UImmutablePassport::OnZkEvmRequestAccountsResponse(FImtblJSResponse Respons
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
     }
 }
+
 
 void UImmutablePassport::OnZkEvmGetBalanceResponse(FImtblJSResponse Response)
 {
@@ -543,30 +672,6 @@ void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
                 Msg = Response.Error->ToString();
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
-    }
-}
-
-
-void UImmutablePassport::OnGetAddressResponse(FImtblJSResponse Response)
-{
-    if (auto ResponseDelegate = GetResponseDelegate(Response))
-    {
-        auto ConnectData = JsonObjectToUStruct<FImmutablePassportConnectData>(Response.JsonObject);
-
-        FString Msg;
-        bool bSuccess = true;
-        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
-        {
-            IMTBL_LOG("Could not fetch address from Passport.");
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
-            bSuccess = false;
-        }
-        else
-        {
-            Msg = Response.JsonObject->GetStringField(TEXT("result"));
-        }
-        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
     }
 }
 
@@ -656,6 +761,44 @@ void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
         IMTBL_WARN("Received error response from Passport for action %s -- %s", *Response.responseFor, *Response.Error->ToString());
     }
 }
+
+
+#if PLATFORM_ANDROID
+void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
+{
+    if (DeepLink.StartsWith(InitData.redirectUri))
+    {
+        CompletePKCEFlow(DeepLink);
+    }
+}
+
+
+void UImmutablePassport::CompletePKCEFlow(FString Url)
+{
+    TOptional<FString> Code = FGenericPlatformHttp::GetUrlParameter(Url, TEXT("code"));
+    IMTBL_LOG("CompletePKCEFlow code: %s", *(Code.GetValue()));
+    TOptional<FString> State = FGenericPlatformHttp::GetUrlParameter(Url, TEXT("state"));
+    IMTBL_LOG("CompletePKCEFlow State: %s", *(State.GetValue()));
+
+    if (!Code.IsSet() || !State.IsSet())
+    {
+        const FString ErrorMsg = "Uri was missing state and/or code. Please call ConnectPKCE() again";
+        IMTBL_ERR("%s", *ErrorMsg);
+        PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, ErrorMsg});
+        PKCEResponseDelegate = nullptr;
+    }
+    else
+    {
+        FImmutablePassportConnectPKCEData Data = FImmutablePassportConnectPKCEData{Code.GetValue(), State.GetValue()};
+        CallJS(
+            ImmutablePassportAction::ConnectPKCE,
+            Data.ToJsonString(),
+            PKCEResponseDelegate,
+            FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse)
+        );
+    }
+}
+#endif
 
 
 // void UImmutablePassport::OnReady(const FOnPassportReadyDelegate::FDelegate& Delegate)
