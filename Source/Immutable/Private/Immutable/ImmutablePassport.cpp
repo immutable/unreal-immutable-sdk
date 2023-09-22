@@ -560,7 +560,7 @@ void UImmutablePassport::OnZkEvmGetBalanceResponse(FImtblJSResponse Response)
         {
             Msg = Response.JsonObject->GetStringField(TEXT("result"));
         }
-        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+        ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
     }
 }
 

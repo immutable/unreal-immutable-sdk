@@ -161,13 +161,6 @@ struct FImtblAccessListItem
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     TArray<FString> storageKeys;
-
-    FString ToJsonString() const
-    {
-        FString OutString;
-        FJsonObjectConverter::UStructToJsonObjectString<FImtblAccessListItem>(*this, OutString, 0, 0, 0, nullptr, false);
-        return OutString;
-    }
 };
 
 /**

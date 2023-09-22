@@ -10,10 +10,10 @@
 
 UImtblPassportZkEvmSendTransactionAsyncAction* UImtblPassportZkEvmSendTransactionAsyncAction::ZkEvmSendTransaction(UObject* WorldContextObject, const FImtblTransactionRequest& Request)
 {
-	UImtblPassportZkEvmSendTransactionAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportZkEvmSendTransactionAsyncAction>();
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	PassportInitBlueprintNode->TransactionRequest = Request;
-	return PassportInitBlueprintNode;
+	UImtblPassportZkEvmSendTransactionAsyncAction* PassportZkEvmSendTransactionBlueprintNode = NewObject<UImtblPassportZkEvmSendTransactionAsyncAction>();
+	PassportZkEvmSendTransactionBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportZkEvmSendTransactionBlueprintNode->TransactionRequest = Request;
+	return PassportZkEvmSendTransactionBlueprintNode;
 }
 
 
