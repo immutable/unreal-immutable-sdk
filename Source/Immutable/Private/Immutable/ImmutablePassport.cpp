@@ -699,13 +699,14 @@ void UImmutablePassport::OnTransferResponse(FImtblJSResponse Response)
 
         FString Msg;
         bool bSuccess = true;
-        if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
+        if (!Response.success)
         {
             IMTBL_LOG("Transfer failed.");
             if (Response.Error.IsSet())
             {
                 Msg = Response.Error->ToString();
             }
+
             bSuccess = false;
         }
         else
