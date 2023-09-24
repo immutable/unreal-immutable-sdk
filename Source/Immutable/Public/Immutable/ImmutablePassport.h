@@ -23,6 +23,10 @@ namespace ImmutablePassportAction
     const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
     const FString ZkEvmSendTransaction = TEXT("zkEvmSendTransaction");
     const FString ConfirmCode = TEXT("confirmCode");
+#if PLATFORM_ANDROID
+    const FString GetPKCEAuthUrl = TEXT("getPKCEAuthUrl");
+    const FString ConnectPKCE = TEXT("connectPKCE");
+#endif
     const FString GetAddress = TEXT("getAddress");
     const FString GetEmail = TEXT("getEmail");
     const FString Transfer = TEXT("imxTransfer");
@@ -403,6 +407,24 @@ struct FImxBatchNftTransferResponse
     TArray<int> transferIds;
 };
 
+USTRUCT()
+struct FImmutablePassportConnectPKCEData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString authorizationCode;
+
+    UPROPERTY()
+    FString state;
+};
+
+
+#if PLATFORM_ANDROID
+DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
+FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
+#endif
+
 /**
  *
  */
@@ -413,15 +435,20 @@ class IMMUTABLE_API UImmutablePassport : public UObject
     friend class UImmutableSubsystem;
 
 public:
-    DECLARE_MULTICAST_DELEGATE(FOnPassportReadyDelegate)
-
-    DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult)
+    DECLARE_MULTICAST_DELEGATE(FOnPassportReadyDelegate);
+    
+    DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult);
 
     void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
     void CheckStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
+
+#if PLATFORM_ANDROID
+    void ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate);
+#endif
+
     void ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -454,6 +481,10 @@ private:
     FImmutablePassportInitData InitData;
     FDelegateHandle BridgeReadyHandle;
     TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
+#if PLATFORM_ANDROID
+    // Since the second part of PKCE is triggered by deep links, saving the response delegate here so it's easier to get
+    FImtblPassportResponseDelegate PKCEResponseDelegate;
+#endif
 
     // Ensures that Passport has been initialized before calling JS
     bool CheckIsInitialized(const FString& Action, const FImtblPassportResponseDelegate& ResponseDelegate) const;
@@ -474,10 +505,19 @@ private:
     void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
     void OnZkEvmSendTransactionResponse(FImtblJSResponse Response);
     void OnConfirmCodeResponse(FImtblJSResponse Response);
+#if PLATFORM_ANDROID
+    void OnGetPKCEAuthUrlResponse(FImtblJSResponse Response);
+    void OnConnectPKCEResponse(FImtblJSResponse Response);
+#endif
     void OnGetAddressResponse(FImtblJSResponse Response);
     void OnGetEmailResponse(FImtblJSResponse Response);
     void OnTransferResponse(FImtblJSResponse Response);
     void OnBatchNftTransferResponse(FImtblJSResponse Response);
 
     void LogAndIgnoreResponse(FImtblJSResponse Response);
+
+#if PLATFORM_ANDROID
+    void OnDeepLinkActivated(FString DeepLink);
+    void CompletePKCEFlow(FString Url);
+#endif
 };

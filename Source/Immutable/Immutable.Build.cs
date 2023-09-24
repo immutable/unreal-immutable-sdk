@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using System;
+using System.IO;
 using UnrealBuildTool;
 
 public class Immutable : ModuleRules
@@ -70,5 +71,13 @@ public class Immutable : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 		);
+
+		if (Target.Platform == UnrealTargetPlatform.Android)
+		{
+			PrivateDependencyModuleNames.AddRange(new string[] { "Launch", });
+			
+			string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
+			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(PluginPath, "Immutable_UPL_Android.xml"));
+		}
 	}
 }
