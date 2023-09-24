@@ -87,14 +87,6 @@ FString FImmutablePassportZkEvmRequestAccountsData::ToJsonString() const
 }
 
 
-FString FImmutablePassportConnectPKCEData::ToJsonString() const
-{
-    FString OutString;
-    FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
-    return OutString;
-}
-
-
 TOptional<FImmutablePassportZkEvmRequestAccountsData> FImmutablePassportZkEvmRequestAccountsData::FromJsonString(const FString& JsonObjectString)
 {
     FImmutablePassportZkEvmRequestAccountsData RequestAccounts;
@@ -792,7 +784,7 @@ void UImmutablePassport::CompletePKCEFlow(FString Url)
         FImmutablePassportConnectPKCEData Data = FImmutablePassportConnectPKCEData{Code.GetValue(), State.GetValue()};
         CallJS(
             ImmutablePassportAction::ConnectPKCE,
-            Data.ToJsonString(),
+            UStructToJsonString(Data),
             PKCEResponseDelegate,
             FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse)
         );

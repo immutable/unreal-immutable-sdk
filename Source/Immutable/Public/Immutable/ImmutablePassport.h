@@ -254,8 +254,6 @@ struct FImmutablePassportConnectPKCEData
 
     UPROPERTY()
     FString state;
-
-    FString ToJsonString() const;
 };
 
 
