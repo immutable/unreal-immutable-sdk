@@ -60,9 +60,17 @@ public class Immutable : ModuleRules
 			PublicDefinitions.Add("USING_BUNDLED_CEF=1");
 			PublicDefinitions.Add("USING_BLUI_CEF=0");
 		#else 
-			PrivateDependencyModuleNames.Add("Blu");
+			if (Target.Platform == UnrealTargetPlatform.Win64)
+			{
+				PrivateDependencyModuleNames.Add("Blu");
+				PublicDefinitions.Add("USING_BLUI_CEF=1");
+			}
+			else
+			{
+				PublicDefinitions.Add("USING_BLUI_CEF=0");
+			}
+
 			PublicDefinitions.Add("USING_BUNDLED_CEF=0");
-			PublicDefinitions.Add("USING_BLUI_CEF=1");
 		#endif
 
 		DynamicallyLoadedModuleNames.AddRange(

@@ -21,6 +21,7 @@ namespace ImmutablePassportAction
     const FString ConnectEvm = TEXT("connectEvm");
     const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
     const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
+    const FString ZkEvmSendTransaction = TEXT("zkEvmSendTransaction");
     const FString ConfirmCode = TEXT("confirmCode");
 #if PLATFORM_ANDROID
     const FString GetPKCEAuthUrl = TEXT("getPKCEAuthUrl");
@@ -154,6 +155,168 @@ struct FImmutablePassportZkEvmGetBalanceData
     FString ToJsonString() const;
 };
 
+USTRUCT(BlueprintType)
+struct FImtblAccessListItem
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString address;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TArray<FString> storageKeys;
+};
+
+/**
+ * Key Value wrappers for converting to JSON
+ */
+USTRUCT()
+struct FStringCustomData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString key;
+
+    UPROPERTY()
+    FString value;
+};
+
+USTRUCT()
+struct FInt64CustomData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString key;
+
+    UPROPERTY()
+    int64 value;
+};
+
+USTRUCT()
+struct FFloatCustomData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString key;
+
+    UPROPERTY()
+    float value;
+};
+
+USTRUCT()
+struct FBoolCustomData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString key;
+
+    UPROPERTY()
+    bool value;
+};
+
+UENUM(BlueprintType)
+enum EImtblCustomDataType { String, Int64, Float, Bool };
+
+/**
+ * Blueprint doesn't support any sort of generics or polymorphism. To workaround this select the primitive type for
+ * this custom data item and set the corresponding value. This will later be mapped to the proper API structure.
+ */
+USTRUCT(BlueprintType)
+struct FImtblCustomData
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString key;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString stringValue;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    int64 intValue;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    float floatValue;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool boolValue;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TEnumAsByte<EImtblCustomDataType> type;
+
+    /**
+     * Convert from blueprint structure to the expected API data structure
+     */
+    TSharedPtr<FJsonObject> ToJsonObject() const
+    {
+        switch (type)  {
+        case String:
+            return FJsonObjectConverter::UStructToJsonObject<FStringCustomData>({ key, stringValue });
+        case Int64:
+            return FJsonObjectConverter::UStructToJsonObject<FInt64CustomData>({ key, intValue });
+        case Float:
+            return FJsonObjectConverter::UStructToJsonObject<FFloatCustomData>({ key, floatValue });
+        case Bool:
+            return FJsonObjectConverter::UStructToJsonObject<FBoolCustomData>({ key, boolValue });
+        default:;
+        }
+        return {};
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FImtblTransactionRequest
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString to;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString from;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString nonce;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString gasLimit;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString gasPrice;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString data = "0x";
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString value;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    int64 chainId;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    int64 type;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TArray<FImtblAccessListItem> accessList;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString maxPriorityFeePerGas;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FString maxFeePerGas;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    TArray<FImtblCustomData> customData;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool ccipReadEnabled;
+
+    FString ToJsonString() const;
+};
 
 USTRUCT()
 struct FImmutablePassportCodeConfirmRequestData
@@ -289,7 +452,7 @@ public:
     void ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate);
-
+    void ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
 
@@ -340,6 +503,7 @@ private:
     void OnConnectEvmResponse(FImtblJSResponse Response);
     void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
     void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
+    void OnZkEvmSendTransactionResponse(FImtblJSResponse Response);
     void OnConfirmCodeResponse(FImtblJSResponse Response);
 #if PLATFORM_ANDROID
     void OnGetPKCEAuthUrlResponse(FImtblJSResponse Response);
