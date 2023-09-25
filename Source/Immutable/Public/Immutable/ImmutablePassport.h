@@ -22,7 +22,7 @@ namespace ImmutablePassportAction
     const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
     const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
     const FString ConfirmCode = TEXT("confirmCode");
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     const FString GetPKCEAuthUrl = TEXT("getPKCEAuthUrl");
     const FString ConnectPKCE = TEXT("connectPKCE");
 #endif
@@ -257,7 +257,7 @@ struct FImmutablePassportConnectPKCEData
 };
 
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
 DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
 FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
 #endif
@@ -276,13 +276,17 @@ public:
     
     DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult);
 
+#if PLATFORM_IOS
+    static void HandleDeepLink(NSString* sDeepLink);
+#endif
+
     void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
     void CheckStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
     void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
     void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     void ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate);
 #endif
 
@@ -318,7 +322,7 @@ private:
     FImmutablePassportInitData InitData;
     FDelegateHandle BridgeReadyHandle;
     TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     // Since the second part of PKCE is triggered by deep links, saving the response delegate here so it's easier to get
     FImtblPassportResponseDelegate PKCEResponseDelegate;
 #endif
@@ -341,7 +345,7 @@ private:
     void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
     void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
     void OnConfirmCodeResponse(FImtblJSResponse Response);
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     void OnGetPKCEAuthUrlResponse(FImtblJSResponse Response);
     void OnConnectPKCEResponse(FImtblJSResponse Response);
 #endif
@@ -352,7 +356,7 @@ private:
 
     void LogAndIgnoreResponse(FImtblJSResponse Response);
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     void OnDeepLinkActivated(FString DeepLink);
     void CompletePKCEFlow(FString Url);
 #endif
