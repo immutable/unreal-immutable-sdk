@@ -42,9 +42,9 @@ The name you wish to use to identify your application.
 Native clients don't make use of Logout URLs, you might set your own website or https://localhost:3000 as this is a required field.
 
 #### Callback URLs
-On Android, iOS and macOS clients, you should set your application's deep link scheme (e.g. `mygame://callback`) if you wish to make use of [PKCE login](#android-ios-and-macos-pkce-login), otherwise set the same as [Logout URLs](#logout-urls).
+On Android, iOS and macOS clients, you should set your application's deep link scheme (e.g. `mygame://callback`) if you wish to make use of [PKCE login](#android-and-ios-pkce-login-unreal-engine-50-only), otherwise set the same as [Logout URLs](#logout-urls).
 
-[PKCE login](#android-ios-and-macos-pkce-login) is not supported on Windows clients. Hence, they do not use Callback URLs. You may set Callback URLs to be the same as [Logout URLs](#logout-urls), as it is a required field.
+[PKCE login](#android-and-ios-pkce-login-unreal-engine-50-only) is not supported on Windows clients. Hence, they do not use Callback URLs. You may set Callback URLs to be the same as [Logout URLs](#logout-urls), as it is a required field.
 
 #### Web Origins URLs
 Optional field. The URLs that are allowed to request authorisation. This field is available when you select the Native application type.
