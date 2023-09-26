@@ -94,6 +94,19 @@ Once the gamer is connected to Passport, the SDK will store your credentials (ac
 
 See this Blueprint showing how to logout from passport ![Passport Logout Blueprint](PassportLogoutFlow.jpg)
 
+#### Imx Transfer
+
+> Note: The transfers feature require pre-approval from Immutable. Please [contact us](https://docs.immutable.com/docs/x/contact/) before making use of it.
+
+To transfer tokens of type ETH, ERC20 or ERC721 use UImmutablePassport::ImxTransfer method. See this Blueprint example showing how to use Imx Transfer
+
+![Imx Transfer](ImxTransferFlow.png)
+
+To transfer multiple NFTs in a single transaction use UImmutablePassport::ImxBatchNftTransfer method. See this Blueprint example showing how to use Imx Batch Nft Transfer
+
+![Imx Batch Nft Transfer](ImxBatchNftTransfer.png)
+
+
 ### Android and iOS PKCE login (Unreal Engine 5.0+ only)
 
 For Android and iOS, you can use the [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) login flow instead of [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.). This means the gamer has one less step to complete and will be redirected back to the game after successfully authenticating.
@@ -108,7 +121,7 @@ To use this flow you will need to:
 
 #### Unreal Editor Android setup
 
-1. In Unreal Editor go to **Project Settings** -> **Android** -> **Advanced APK Packaging** 
+1. In Unreal Editor go to **Project Settings** -> **Android** -> **Advanced APK Packaging**
 2. Add the following code inside the **Extra Settings for \<activity> section (\n to separate lines)** field:
 
 ```XML
@@ -119,7 +132,7 @@ The application will now open when the device processes any link that starts wit
 
 #### Unreal Editor iOS setup
 
-1. In Unreal Editor go to **Project Settings** -> **iOS** -> **Extra PList Data** 
+1. In Unreal Editor go to **Project Settings** -> **iOS** -> **Extra PList Data**
 2. Add the following code inside the **Additional Plist Data** field:
 
 ```
@@ -135,12 +148,15 @@ See the [sample game](https://github.com/immutable/sample-unreal-game) for an ex
 
 | Method	                | Description |
 |---	                    |:---|
-| GetAddress	            | Gets Wallet Address |
-| GetEmail	                | Get Email Address associated with the Wallet Address |
-| CheckStoredCredentials	| Checks if there are stored credits from previous login |
 | Connect	                | Log into Passport using [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.)  |
 | ConnectSilent	            | Attempts to login using stored credentials |
 | ConnectPKCE	            | (Android and iOS on Unreal Engine 5.0+ only) Log into Passport using [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) |
+| CheckStoredCredentials	| Checks if there are stored credits from previous login |
+| GetAddress	            | Gets Wallet Address |
+| GetEmail	              | Get Email Address associated with the Wallet Address |
+| ImxTransfer    	        | ImxTransfer used to send tokens of type ETH, ERC20, ERC721 to reciever's address|
+| ImxBatchNftTransfer    	| ImxBatchNftTransfer used to send multiple Nft tokens in a single transaction to reciever's address|
+
 
 
 See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
