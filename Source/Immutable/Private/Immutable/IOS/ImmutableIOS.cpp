@@ -29,7 +29,8 @@ ASWebAuthenticationSession *_authSession;
 	NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 
 	ASWebAuthenticationSession* authSession = [[ASWebAuthenticationSession alloc] initWithURL:URL callbackURLScheme:bundleIdentifier completionHandler:^(NSURL * _Nullable callbackURL, NSError * _Nullable error) {
-        
+
+		_authSession = nil;
 		if (callbackURL) {
 			UImmutablePassport::HandleDeepLink(callbackURL.absoluteString);
 		} else {
@@ -38,9 +39,7 @@ ASWebAuthenticationSession *_authSession;
 	}];
     
 	_authSession = authSession;
-	if (@available(iOS 13, *)) {
-		_authSession.presentationContextProvider = (id) self;
-	}
+	_authSession.presentationContextProvider = (id) self;
 
 	[_authSession start];
 }
