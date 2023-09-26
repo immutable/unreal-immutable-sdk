@@ -29,8 +29,8 @@ namespace ImmutablePassportAction
 #endif
     const FString GetAddress = TEXT("getAddress");
     const FString GetEmail = TEXT("getEmail");
-    const FString Transfer = TEXT("imxTransfer");
-    const FString BatchNftTransfer = TEXT("imxBatchNftTransfer");
+    const FString ImxTransfer = TEXT("imxTransfer");
+    const FString ImxBatchNftTransfer = TEXT("imxBatchNftTransfer");
     const FString EnvSandbox = TEXT("sandbox");
     const FString EnvProduction = TEXT("production");
 }
@@ -461,18 +461,18 @@ public:
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
 
     /**
-    * Create a new transfer request.
+    * Create a new imx transfer request.
     * @param RequestData The transfer details structure of type FImxTransferRequest
     * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
     */
-    void Transfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ImxTransfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
 
     /**
-    * Creates a new batch nft transfer request with the given transfer details.
+    * Creates a new imx batch nft transfer request with the given transfer details.
     * @param RequestData The transfer details structure of type FImxBatchNftTransferRequest
     * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
     */
-    void BatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 protected:
     void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);

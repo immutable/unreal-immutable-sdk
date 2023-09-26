@@ -310,21 +310,21 @@ void UImmutablePassport::GetEmail(const FImtblPassportResponseDelegate& Response
     );
 }
 
-void UImmutablePassport::Transfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::ImxTransfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     IMTBL_LOG("Tranfer Request: %s", *UStructToJsonString(RequestData))
     CallJS(
-        ImmutablePassportAction::Transfer,
+        ImmutablePassportAction::ImxTransfer,
         UStructToJsonString(RequestData),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnTransferResponse)
     );
 }
 
-void UImmutablePassport::BatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     CallJS(
-        ImmutablePassportAction::BatchNftTransfer,
+        ImmutablePassportAction::ImxBatchNftTransfer,
         RequestData.ToJsonString(),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBatchNftTransferResponse)
@@ -772,7 +772,7 @@ void UImmutablePassport::OnTransferResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success)
         {
-            IMTBL_LOG("Transfer failed.");
+            IMTBL_LOG("ImxTransfer failed.");
             if (Response.Error.IsSet())
             {
                 Msg = Response.Error->ToString();
@@ -798,7 +798,7 @@ void UImmutablePassport::OnBatchNftTransferResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::Object>(TEXT("result")))
         {
-            IMTBL_LOG("Transfer failed.");
+            IMTBL_LOG("ImxBatchNftTransfer failed.");
             if (Response.Error.IsSet())
             {
                 Msg = Response.Error->ToString();
