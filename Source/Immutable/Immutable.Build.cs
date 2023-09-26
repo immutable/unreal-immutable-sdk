@@ -82,10 +82,25 @@ public class Immutable : ModuleRules
 
 		if (Target.Platform == UnrealTargetPlatform.Android)
 		{
-			PrivateDependencyModuleNames.AddRange(new string[] { "Launch", });
+			PrivateDependencyModuleNames.AddRange(new string[] { "Launch" });
 			
 			string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
 			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(PluginPath, "Immutable_UPL_Android.xml"));
+		}
+		
+		if (Target.Platform == UnrealTargetPlatform.IOS)
+		{
+			PrivateDependencyModuleNames.AddRange(new string[]{ "Launch" });
+            
+			PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private", "IOS") });
+			
+			PublicFrameworks.AddRange(
+				new string[]
+				{
+					"Foundation",
+					"AuthenticationServices"
+				}
+			);
 		}
 	}
 }

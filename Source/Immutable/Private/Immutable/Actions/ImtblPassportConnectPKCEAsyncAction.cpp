@@ -34,7 +34,7 @@ void UImtblPassportConnectPKCEAsyncAction::DoConnectPKCE(TWeakObjectPtr<UImtblJS
 {
     // Get Passport
     auto Passport = GetSubsystem()->GetPassport();
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
     // Run Connect
     Passport->ConnectPKCE(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportConnectPKCEAsyncAction::OnConnectPKCE));
 #endif

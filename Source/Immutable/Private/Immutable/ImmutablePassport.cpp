@@ -7,10 +7,16 @@
 #include "ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
 #include "GenericPlatform/GenericPlatformHttp.h"
-#include "Android/ImmutableAndroidJNI.h"
 #endif
+
+#if PLATFORM_ANDROID
+#include "Android/ImmutableAndroidJNI.h"
+#elif  PLATFORM_IOS
+#include "IOS/ImmutableIOS.h"
+#endif
+
 
 #if PLATFORM_ANDROID
 static void HandleDeepLink(FString DeepLink)
@@ -270,7 +276,7 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
 }
 
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
 void UImmutablePassport::ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     PKCEResponseDelegate = ResponseDelegate;
@@ -542,7 +548,7 @@ void UImmutablePassport::OnConnectEvmResponse(FImtblJSResponse Response)
     }
 }
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
 void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
 {
     if (PKCEResponseDelegate.IsBound())
@@ -556,12 +562,18 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
         else
         {
             // Handle deeplink calls
+#if PLATFORM_ANDROID
             SetDeeplinkCallbackMethod(HandleDeepLink);
+#endif
             OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 
             FString Err;
-            Msg = Response.JsonObject->GetStringField(TEXT("result"));
+            Msg = Response.JsonObject->GetStringField(TEXT("result")).Replace(TEXT(" "), TEXT("+"));
+#if PLATFORM_ANDROID
             FPlatformProcess::LaunchURL(*Msg, nullptr, &Err);
+#elif PLATFORM_IOS
+            [[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
+#endif
             if (Err.Len())
             {
                 Msg = "Failed to connect to Browser: " + Err;
@@ -815,9 +827,10 @@ void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
 }
 
 
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID | PLATFORM_IOS
 void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 {
+    IMTBL_LOG("On Deep Link Activated: %s", *DeepLink);
     if (DeepLink.StartsWith(InitData.redirectUri))
     {
         CompletePKCEFlow(DeepLink);
@@ -848,6 +861,19 @@ void UImmutablePassport::CompletePKCEFlow(FString Url)
             PKCEResponseDelegate,
             FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse)
         );
+    }
+}
+#endif
+
+
+#if PLATFORM_IOS
+void UImmutablePassport::HandleDeepLink(NSString* sDeepLink)
+{
+    FString DeepLink = FString(sDeepLink);
+    IMTBL_LOG("Handle iOS Deep Link: %s", *DeepLink);
+    if (OnHandleDeepLink.ExecuteIfBound(DeepLink))
+    {
+        IMTBL_WARN("OnHandleDeepLink delegate was not called");
     }
 }
 #endif
