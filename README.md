@@ -98,11 +98,11 @@ See this Blueprint showing how to logout from passport ![Passport Logout Bluepri
 
 > Note: The transfers feature require pre-approval from Immutable. Please [contact us](https://docs.immutable.com/docs/x/contact/) before making use of it.
 
-To transfer tokens of type ETH, ERC20 or ERC721 use UImmutablePassport::ImxTransfer method. See this Blueprint example showing how to use Imx Transfer
+To transfer tokens of type ETH, ERC20 or ERC721 use `UImmutablePassport::ImxTransfer` method. See this Blueprint example showing how to use Imx Transfer
 
 ![Imx Transfer](ImxTransferFlow.png)
 
-To transfer multiple NFTs in a single transaction use UImmutablePassport::ImxBatchNftTransfer method. See this Blueprint example showing how to use Imx Batch Nft Transfer
+To transfer multiple NFTs in a single transaction use `UImmutablePassport::ImxBatchNftTransfer` method. See this Blueprint example showing how to use Imx Batch Nft Transfer
 
 ![Imx Batch Nft Transfer](ImxBatchNftTransfer.png)
 
@@ -156,8 +156,6 @@ See the [sample game](https://github.com/immutable/sample-unreal-game) for an ex
 | GetEmail	              | Get Email Address associated with the Wallet Address |
 | ImxTransfer    	        | ImxTransfer used to send tokens of type ETH, ERC20, ERC721 to reciever's address|
 | ImxBatchNftTransfer    	| ImxBatchNftTransfer used to send multiple Nft tokens in a single transaction to reciever's address|
-
-
 
 See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
 
