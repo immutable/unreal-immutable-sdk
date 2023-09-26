@@ -15,7 +15,7 @@
 ### Supported Platforms
 
 - Windows 10 (64-bit)
-- MacOS
+- MacOS (Unreal Engine 5.2+: [minimum version 12.5 Monterey](https://docs.unrealengine.com/5.2/en-US/macos-development-requirements-for-unreal-engine/))
 - Android (minimum version 8.0)
 - iOS (minimum version 13.0)
 
