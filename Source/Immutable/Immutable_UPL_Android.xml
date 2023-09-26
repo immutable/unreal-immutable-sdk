@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<root>
-    <gameActivityImportAdditions>
-        <insert>
-        </insert>
-    </gameActivityImportAdditions>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    <prebuildCopies>
+        <copyDir src="$S(PluginDir)/Private/Immutable/Android/Java" dst="$S(BuildDir)/src/com/immutable/unreal" />
+    </prebuildCopies>
+    <androidManifestUpdates>
+        <addElements tag="queries">
+            <intent>
+                <action android:name="android.support.customtabs.action.CustomTabsService" />
+            </intent>
+        </addElements>
+    </androidManifestUpdates>
     <gameActivityOnCreateAdditions>
         <insert>
             Uri uri = getIntent().getData();
             if (uri != null) {
-            String deeplink = uri.toString();
-            handleDeepLink(uri.toString());
+                String deeplink = uri.toString();
+                handleDeepLink(uri.toString());
             }
         </insert>
     </gameActivityOnCreateAdditions>
@@ -17,8 +23,8 @@
         <insert>
             Uri uri = getIntent().getData();
             if (uri != null) {
-            String deeplink = uri.toString();
-            handleDeepLink(deeplink);
+                String deeplink = uri.toString();
+                handleDeepLink(deeplink);
             }
         </insert>
     </gameActivityOnResumeAdditions>
@@ -27,4 +33,11 @@
             public native void handleDeepLink(String Deeplink);
         </insert>
     </gameActivityClassAdditions>
+    <buildGradleAdditions>
+        <insert>
+            dependencies {
+                implementation 'androidx.browser:browser:1.5.0'
+            }
+        </insert>
+    </buildGradleAdditions>
 </root>
