@@ -96,7 +96,7 @@ See this Blueprint showing how to logout from passport ![Passport Logout Bluepri
 
 #### Imx Transfer
 
-> Note: The transfers feature require pre-approval from Immutable. Please reach out to us before making use of it.
+> Note: The transfers feature require pre-approval from Immutable. Please [contact us](https://docs.immutable.com/docs/x/contact/) before making use of it.
 
 To transfer tokens of type ETH, ERC20 or ERC721 use UImmutablePassport::ImxTransfer method. See this Blueprint example showing how to use Imx Transfer
 
