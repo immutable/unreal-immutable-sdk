@@ -49,7 +49,7 @@ On Android, iOS and macOS clients, you should set your application's deep link s
 #### Web Origins URLs
 Optional field. The URLs that are allowed to request authorisation. This field is available when you select the Native application type.
 
-See [here](/docs/x/passport/register-application) for more details.
+See [here](https://docs.immutable.com/docs/x/passport/register-application/) for more details.
 
 
 ### Installation
