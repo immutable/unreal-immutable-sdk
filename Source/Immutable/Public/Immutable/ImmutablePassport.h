@@ -6,8 +6,9 @@
 #include "Immutable/ImtblJSConnector.h"
 #include "UObject/Object.h"
 #include "JsonObjectConverter.h"
+#include "Runtime/Core/Public/HAL/Platform.h"
+#include "Misc/EngineVersion.h"
 #include "ImmutablePassport.generated.h"
-
 
 struct FImtblJSResponse;
 
@@ -87,6 +88,18 @@ struct FImmutablePassportInitData
 
     UPROPERTY()
     FString environment = ImmutablePassportAction::EnvSandbox;
+
+    UPROPERTY()
+    FString engine = TEXT("unreal");
+
+    UPROPERTY()
+    FString engineVersion = FEngineVersion::Current().ToString();
+
+    UPROPERTY()
+    FString platform = FPlatformProperties::IniPlatformName();
+
+    UPROPERTY()
+    FString platformVersion = FPlatformMisc::GetOSVersion();
 
     FString ToJsonString() const;
 };
