@@ -12,21 +12,12 @@
 #endif
 
 #if PLATFORM_ANDROID
+#include "Android/AndroidApplication.h"
 #include "Android/ImmutableAndroidJNI.h"
 #elif  PLATFORM_IOS
 #include "IOS/ImmutableIOS.h"
 #endif
 
-
-#if PLATFORM_ANDROID
-static void HandleDeepLink(FString DeepLink)
-{
-    if (OnHandleDeepLink.ExecuteIfBound(DeepLink))
-    {
-        IMTBL_WARN("OnHandleDeepLink delegate was not called");
-    }
-}
-#endif
 
 FString FImmutablePassportInitData::ToJsonString() const
 {
@@ -562,15 +553,19 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
         else
         {
             // Handle deeplink calls
-#if PLATFORM_ANDROID
-            SetDeeplinkCallbackMethod(HandleDeepLink);
-#endif
             OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 
             FString Err;
             Msg = Response.JsonObject->GetStringField(TEXT("result")).Replace(TEXT(" "), TEXT("+"));
 #if PLATFORM_ANDROID
-            FPlatformProcess::LaunchURL(*Msg, nullptr, &Err);
+            JNIEnv* Env = FAndroidApplication::GetJavaEnv();
+            if (Env)
+            {
+                jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Msg));
+                jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass("com/immutable/unreal/ImmutableAndroid");
+                static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(Env, jimmutableAndroidClass, "launchUrl", "(Landroid/app/Activity;Ljava/lang/String;)V", false);
+                CallJniStaticVoidMethod(Env, jimmutableAndroidClass, jlaunchUrl, FJavaWrapper::GameActivityThis, jurl);
+            }
 #elif PLATFORM_IOS
             [[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
 #endif
@@ -831,6 +826,7 @@ void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
 void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 {
     IMTBL_LOG("On Deep Link Activated: %s", *DeepLink);
+    OnHandleDeepLink = nullptr;
     if (DeepLink.StartsWith(InitData.redirectUri))
     {
         CompletePKCEFlow(DeepLink);
@@ -866,11 +862,15 @@ void UImmutablePassport::CompletePKCEFlow(FString Url)
 #endif
 
 
-#if PLATFORM_IOS
+#if PLATFORM_ANDROID | PLATFORM_IOS
+#if PLATFORM_ANDROID
+// Called from Android JNI
+void UImmutablePassport::HandleDeepLink(FString DeepLink)
+#elif PLATFORM_IOS
+// Called from iOS Objective C
 void UImmutablePassport::HandleDeepLink(NSString* sDeepLink)
+#endif
 {
-    FString DeepLink = FString(sDeepLink);
-    IMTBL_LOG("Handle iOS Deep Link: %s", *DeepLink);
     if (OnHandleDeepLink.ExecuteIfBound(DeepLink))
     {
         IMTBL_WARN("OnHandleDeepLink delegate was not called");
@@ -878,6 +878,17 @@ void UImmutablePassport::HandleDeepLink(NSString* sDeepLink)
 }
 #endif
 
+
+#if PLATFORM_ANDROID
+void UImmutablePassport::CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class, jmethodID Method, ...) {
+    va_list Args;
+    va_start(Args, Method);
+    Env->CallStaticVoidMethodV(Class, Method, Args);
+    va_end(Args);
+
+    Env->DeleteLocalRef(Class);
+}
+#endif
 
 // void UImmutablePassport::OnReady(const FOnPassportReadyDelegate::FDelegate& Delegate)
 // {

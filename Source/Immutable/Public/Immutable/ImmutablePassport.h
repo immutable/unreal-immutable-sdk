@@ -425,6 +425,7 @@ DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
 FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
 #endif
 
+
 /**
  *
  */
@@ -438,8 +439,10 @@ public:
     DECLARE_MULTICAST_DELEGATE(FOnPassportReadyDelegate);
     
     DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult);
-
-#if PLATFORM_IOS
+    
+#if PLATFORM_ANDROID
+    static void HandleDeepLink(FString DeepLink);
+#elif PLATFORM_IOS
     static void HandleDeepLink(NSString* sDeepLink);
 #endif
 
@@ -523,5 +526,9 @@ private:
 #if PLATFORM_ANDROID | PLATFORM_IOS
     void OnDeepLinkActivated(FString DeepLink);
     void CompletePKCEFlow(FString Url);
+#endif
+
+#if PLATFORM_ANDROID
+    void CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class, jmethodID Method, ...);
 #endif
 };
