@@ -35,18 +35,26 @@ bool FImtblMessagesTest::RunTest(const FString& Parameters)
 	{
     	const FString RedirectUri = "https://example.com";
         const FImmutablePassportInitData InitData{ClientId, RedirectUri, ImmutablePassportAction::EnvSandbox};
-        const FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"redirectUri\":\"https://example.com\",\"environment\":\"sandbox\"}";
+        FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"redirectUri\":\"https://example.com\",\"environment\":\"sandbox\",\"engine\":\"unreal\"";
+        // example: engineVersion":"5.2.1-26001984+++UE5+Release-5.2","platform":"Mac","platformVersion":"13.5.2"
+        ExpectedJson += ",\"engineVersion\":\"" +  FEngineVersion::Current().ToString() + "\"";
+        ExpectedJson += FString(",\"platform\":\"") + FPlatformProperties::IniPlatformName() + "\"";
+        ExpectedJson += FString(",\"platformVersion\":\"") + FPlatformMisc::GetOSVersion() + "\"";
+        ExpectedJson += "}";
         const FString Result = InitData.ToJsonString();
-        
 		TestEqual("toJsonString() on FPassportInitData with clientId and redirectUri should produce valid JSON output", Result, ExpectedJson);
 	}
 
     // an FImmutablePassportInitData with an empty redirectUri should leave the redirectUri field out of the json string when converted
     {
         const FImmutablePassportInitData InitData{ClientId, "", ImmutablePassportAction::EnvSandbox};
-        const FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"environment\":\"sandbox\"}";
+        FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"environment\":\"sandbox\",\"engine\":\"unreal\"";
+        // example: engineVersion":"5.2.1-26001984+++UE5+Release-5.2","platform":"Mac","platformVersion":"13.5.2"
+        ExpectedJson += ",\"engineVersion\":\"" +  FEngineVersion::Current().ToString() + "\"";
+        ExpectedJson += FString(",\"platform\":\"") + FPlatformProperties::IniPlatformName() + "\"";
+        ExpectedJson += FString(",\"platformVersion\":\"") + FPlatformMisc::GetOSVersion() + "\"";
+        ExpectedJson += "}";
         const FString Result = InitData.ToJsonString();
-        
 		TestEqual("toJsonString() on FPassportInitData with an empty redirectUri should produce a valid JSON string with no redirectUri field", Result, ExpectedJson);
     }
 	
