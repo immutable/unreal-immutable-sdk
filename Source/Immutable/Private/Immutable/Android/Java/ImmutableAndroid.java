@@ -23,8 +23,6 @@ import androidx.browser.customtabs.CustomTabsSession;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.epicgames.unreal.GameActivity;
-
 public class ImmutableAndroid {
     private static CustomTabsServiceConnection customTabsServiceConnection;
 
