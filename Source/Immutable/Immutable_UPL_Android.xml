@@ -3,6 +3,19 @@
     <prebuildCopies>
         <copyDir src="$S(PluginDir)/Private/Immutable/Android/Java" dst="$S(BuildDir)/src/com/immutable/unreal" />
     </prebuildCopies>
+    <proguardAdditions>
+        <insert>
+            <!-- Disable obfuscation -->
+            -dontwarn com.immutable.unreal
+            -keep class com.immutable.unreal.** { *; }
+            -keep interface com.immutable.unreal.** { *; }
+            -keep public class com.immutable.unreal.ImmutableAndroid.** { public protected *; }
+
+            -dontwarn androidx.**
+            -keep class androidx.** { *; }
+            -keep interface androidx.** { *; }
+        </insert>
+    </proguardAdditions>
     <androidManifestUpdates>
         <addElements tag="queries">
             <intent>
