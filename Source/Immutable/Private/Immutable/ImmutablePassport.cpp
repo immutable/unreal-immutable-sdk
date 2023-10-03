@@ -132,11 +132,11 @@ FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
 FString FImtblTransactionRequest::ToJsonString() const
 {
     FString OutString;
-    
+
     FJsonObjectWrapper Wrapper;
     Wrapper.JsonObject = MakeShared<FJsonObject>();
     FJsonObjectConverter::UStructToJsonObject(FImtblTransactionRequest::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
-    
+
     if (!Wrapper.JsonObject.IsValid())
     {
         IMTBL_ERR("Could not convert FImtblTransactionRequest to JSON")
@@ -150,10 +150,10 @@ FString FImtblTransactionRequest::ToJsonString() const
         CustomDataArray.Add(MakeShared<FJsonValueObject>(FJsonValueObject(CustomData.ToJsonObject())));
     }
     Wrapper.JsonObject->SetArrayField("customData", CustomDataArray);
-    
+
     Wrapper.JsonObjectToString(OutString);
 
-    
+
     return OutString;
 }
 
@@ -244,7 +244,7 @@ void UImmutablePassport::ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalance
 }
 
 void UImmutablePassport::ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate)
-{   
+{
     CallJS(
         ImmutablePassportAction::ZkEvmSendTransaction,
         Request.ToJsonString(),
@@ -382,11 +382,8 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
         }
         else
         {
-            IMTBL_LOG("Passport initialization failed.")
-            if (Response.Error.IsSet())
-            {
-                Msg = Response.Error->ToString();
-            }
+            IMTBL_ERR("Passport initialization failed.")
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
         }
 
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
@@ -405,8 +402,7 @@ void UImmutablePassport::OnCheckStoredCredentialsResponse(FImtblJSResponse Respo
         {
             IMTBL_LOG("No stored credentials found.");
             FString Msg;
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
         }
         else
@@ -429,8 +425,7 @@ void UImmutablePassport::OnConnectSilentResponse(FImtblJSResponse Response)
          {
              IMTBL_LOG("No stored credentials found.");
              FString Msg;
-             if (Response.Error.IsSet())
-                 Msg = Response.Error->ToString();
+             Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
              ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
              return;
          }
@@ -460,8 +455,7 @@ void UImmutablePassport::OnConnectWithCredentialsResponse(FImtblJSResponse Respo
         else
         {
             IMTBL_LOG("Connect with credentials failed.");
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             // Send log out action to Passport and move on, logging and ignoring the response
             JSConnector->CallJS(ImmutablePassportAction::Logout, TEXT(""), FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::LogAndIgnoreResponse));
         }
@@ -482,9 +476,8 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
         }
         else
         {
-            IMTBL_LOG("Error logging out.")
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_ERR("Error logging out.")
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
     }
@@ -499,11 +492,8 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
         if (!Response.success || !ConnectData || !ConnectData->code.Len())
         {
             FString Msg;
-            IMTBL_LOG("Connect attempt failed.");
-            if (Response.Error.IsSet())
-            {
-                Msg = Response.Error->ToString();
-            }
+            IMTBL_WARN("Connect attempt failed.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
             return;
         }
@@ -531,9 +521,8 @@ void UImmutablePassport::OnConnectEvmResponse(FImtblJSResponse Response)
         }
         else
         {
-            IMTBL_LOG("Error connecting to Evm.")
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Error connecting to Evm.")
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
     }
@@ -601,9 +590,8 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
         }
         else
         {
-            IMTBL_LOG("Connect PKCE attempt failed.");
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Connect PKCE attempt failed.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
         }
         PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
         PKCEResponseDelegate = nullptr;
@@ -626,9 +614,8 @@ void UImmutablePassport::OnGetAddressResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
         {
-            IMTBL_LOG("Could not fetch address from Passport.");
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Could not fetch address from Passport.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             bSuccess = false;
         }
         else
@@ -649,9 +636,8 @@ void UImmutablePassport::OnZkEvmRequestAccountsResponse(FImtblJSResponse Respons
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::Array>(TEXT("accounts")))
         {
-            IMTBL_LOG("Error requesting zkevm accounts.")
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Error requesting zkevm accounts.")
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             bSuccess = false;
         }
         else
@@ -679,9 +665,8 @@ void UImmutablePassport::OnZkEvmGetBalanceResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
         {
-            IMTBL_LOG("Could not get balance.");
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Could not get balance.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             bSuccess = false;
         }
         else
@@ -700,9 +685,8 @@ void UImmutablePassport::OnZkEvmSendTransactionResponse(FImtblJSResponse Respons
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
         {
-            IMTBL_LOG("Could not fetch send transaction.");
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Could not fetch send transaction.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             bSuccess = false;
         }
         else
@@ -725,9 +709,8 @@ void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
         }
         else
         {
-            IMTBL_LOG("Login code not confirmed.")
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Login code not confirmed.")
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
     }
@@ -744,9 +727,8 @@ void UImmutablePassport::OnGetEmailResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
         {
-            IMTBL_LOG("Connect attempt failed.");
-            if (Response.Error.IsSet())
-                Msg = Response.Error->ToString();
+            IMTBL_WARN("Connect attempt failed.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             bSuccess = false;
         }
         else
@@ -767,17 +749,13 @@ void UImmutablePassport::OnTransferResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success)
         {
-            IMTBL_LOG("ImxTransfer failed.");
-            if (Response.Error.IsSet())
-            {
-                Msg = Response.Error->ToString();
-            }
-
+            IMTBL_WARN("ImxTransfer failed.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             bSuccess = false;
         }
         else
         {
-            Msg = Response.JsonObject->GetStringField(TEXT("result"));
+            Msg = Response.JsonObject->GetStringField(TEXT("status"));
         }
         ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
     }
@@ -793,11 +771,8 @@ void UImmutablePassport::OnBatchNftTransferResponse(FImtblJSResponse Response)
         bool bSuccess = true;
         if (!Response.success || !Response.JsonObject->HasTypedField<EJson::Object>(TEXT("result")))
         {
-            IMTBL_LOG("ImxBatchNftTransfer failed.");
-            if (Response.Error.IsSet())
-            {
-                Msg = Response.Error->ToString();
-            }
+            IMTBL_WARN("ImxBatchNftTransfer failed.");
+            Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
             bSuccess = false;
         }
         else
@@ -817,7 +792,9 @@ void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
     }
     else
     {
-        IMTBL_WARN("Received error response from Passport for action %s -- %s", *Response.responseFor, *Response.Error->ToString());
+        FString Msg;
+        Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
+        IMTBL_WARN("Received error response from Passport for action %s -- %s", *Response.responseFor, *Msg);
     }
 }
 
