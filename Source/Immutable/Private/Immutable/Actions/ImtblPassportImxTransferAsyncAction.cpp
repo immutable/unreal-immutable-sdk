@@ -8,7 +8,7 @@
 #include "Immutable/Misc/ImtblLogging.h"
 
 
-UImmutablePassportImxTransferAsyncAction* UImmutablePassportImxTransferAsyncAction::Transfer(UObject* WorldContextObject,
+UImmutablePassportImxTransferAsyncAction* UImmutablePassportImxTransferAsyncAction::ImxTransfer(UObject* WorldContextObject,
 		const FString& Receiver, const FString& Type, const FString& Amount, const FString& TokenId,
 		const FString& TokenAddress)
 {
@@ -47,7 +47,7 @@ void UImmutablePassportImxTransferAsyncAction::DoTransfer(TWeakObjectPtr<UImtblJ
 	Request.tokenId = TokenId;
 	Request.tokenAddress = TokenAddress;
 	// Run Transfer
-	GetSubsystem()->GetPassport()->Transfer(Request, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImmutablePassportImxTransferAsyncAction::OnTransferResponse));
+	GetSubsystem()->GetPassport()->ImxTransfer(Request, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImmutablePassportImxTransferAsyncAction::OnTransferResponse));
 }
 
 

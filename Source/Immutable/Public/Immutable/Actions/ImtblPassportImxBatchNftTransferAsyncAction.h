@@ -19,7 +19,7 @@ class IMMUTABLE_API UImmutablePassportImxBatchNftTransferAsyncAction : public UI
     
 public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImmutablePassportImxBatchNftTransferAsyncAction* BatchNftTransfer(UObject* WorldContextObject,
+	static UImmutablePassportImxBatchNftTransferAsyncAction* ImxBatchNftTransfer(UObject* WorldContextObject,
 		const TArray<FNftTransferDetails>& NftTransferDetails);
 
 	virtual void Activate() override;

@@ -19,7 +19,7 @@ class IMMUTABLE_API UImmutablePassportImxTransferAsyncAction : public UImtblBlue
     
 public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImmutablePassportImxTransferAsyncAction* Transfer(UObject* WorldContextObject,
+	static UImmutablePassportImxTransferAsyncAction* ImxTransfer(UObject* WorldContextObject,
 		const FString& Receiver, const FString& Type, const FString& Amount, const FString& TokenId,
 		const FString& TokenAddress);
 

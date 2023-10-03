@@ -30,8 +30,8 @@ namespace ImmutablePassportAction
 #endif
     const FString GetAddress = TEXT("getAddress");
     const FString GetEmail = TEXT("getEmail");
-    const FString Transfer = TEXT("imxTransfer");
-    const FString BatchNftTransfer = TEXT("imxBatchNftTransfer");
+    const FString ImxTransfer = TEXT("imxTransfer");
+    const FString ImxBatchNftTransfer = TEXT("imxBatchNftTransfer");
     const FString EnvSandbox = TEXT("sandbox");
     const FString EnvProduction = TEXT("production");
 }
@@ -76,6 +76,28 @@ struct FImmutablePassportResult
 };
 
 USTRUCT()
+struct FImmutableEngineVersionData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString engine = TEXT("unreal");
+
+    //cannot have spaces
+    UPROPERTY()
+    FString engineVersion = FEngineVersion::Current().ToString().Replace(TEXT(" "),TEXT("_"));
+
+    //cannot have spaces
+    UPROPERTY()
+    FString platform = FString(FPlatformProperties::IniPlatformName()).Replace(TEXT(" "),TEXT("_"));
+
+    //cannot have spaces
+    UPROPERTY()
+    FString platformVersion = FPlatformMisc::GetOSVersion().Replace(TEXT(" "),TEXT("_"));
+
+};
+
+USTRUCT()
 struct FImmutablePassportInitData
 {
     GENERATED_BODY()
@@ -90,16 +112,7 @@ struct FImmutablePassportInitData
     FString environment = ImmutablePassportAction::EnvSandbox;
 
     UPROPERTY()
-    FString engine = TEXT("unreal");
-
-    UPROPERTY()
-    FString engineVersion = FEngineVersion::Current().ToString();
-
-    UPROPERTY()
-    FString platform = FPlatformProperties::IniPlatformName();
-
-    UPROPERTY()
-    FString platformVersion = FPlatformMisc::GetOSVersion();
+    FImmutableEngineVersionData engineVersion;
 
     FString ToJsonString() const;
 };
@@ -251,7 +264,7 @@ struct FImtblCustomData
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     int64 intValue;
-    
+
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     float floatValue;
 
@@ -438,6 +451,7 @@ DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
 FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
 #endif
 
+
 /**
  *
  */
@@ -449,10 +463,12 @@ class IMMUTABLE_API UImmutablePassport : public UObject
 
 public:
     DECLARE_MULTICAST_DELEGATE(FOnPassportReadyDelegate);
-    
+
     DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult);
 
-#if PLATFORM_IOS
+#if PLATFORM_ANDROID
+    static void HandleDeepLink(FString DeepLink);
+#elif PLATFORM_IOS
     static void HandleDeepLink(NSString* sDeepLink);
 #endif
 
@@ -474,18 +490,18 @@ public:
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
 
     /**
-    * Create a new transfer request.
+    * Create a new imx transfer request.
     * @param RequestData The transfer details structure of type FImxTransferRequest
     * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
     */
-    void Transfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ImxTransfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
 
     /**
-    * Creates a new batch nft transfer request with the given transfer details.
+    * Creates a new imx batch nft transfer request with the given transfer details.
     * @param RequestData The transfer details structure of type FImxBatchNftTransferRequest
     * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
     */
-    void BatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
+    void ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 protected:
     void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
@@ -536,5 +552,9 @@ private:
 #if PLATFORM_ANDROID | PLATFORM_IOS
     void OnDeepLinkActivated(FString DeepLink);
     void CompletePKCEFlow(FString Url);
+#endif
+
+#if PLATFORM_ANDROID
+    void CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class, jmethodID Method, ...);
 #endif
 };

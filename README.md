@@ -15,12 +15,42 @@
 ### Supported Platforms
 
 - Windows 10 (64-bit)
-- MacOS
+- MacOS (Unreal Engine 5.2+: [minimum version 12.5 Monterey](https://docs.unrealengine.com/5.2/en-US/macos-development-requirements-for-unreal-engine/))
+- Android (minimum version 8.0)
+- iOS (minimum version 13.0)
 
 ### Supported Unreal Engine Versions
 
 - Unreal Engine 5.0 and above
 - Unreal Engine 4.26 and above
+
+## Registering your game
+
+Before using Passport, you must register your application as an OAuth 2.0 **Native** client in the [Immutable Developer Hub](https://hub.immutable.com). First, you'll need to create a project and a testnet environment.
+Then, you can navigate to the Passport config screen and create a passport client for your created environment.
+When you're ready to launch your application on the mainnet, please ensure you configure a passport client under a mainnet environment. Here's how you can configure the fields while creating a client:
+
+### Creating an OAuth2.0 Native client
+
+#### Application Type
+You must register your application as an OAuth 2.0 **Native** client.
+
+#### Client name
+The name you wish to use to identify your application.
+
+#### Logout URLs
+Native clients don't make use of Logout URLs, you might set your own website or https://localhost:3000 as this is a required field.
+
+#### Callback URLs
+On Android, iOS and macOS clients, you should set your application's deep link scheme (e.g. `mygame://callback`) if you wish to make use of [PKCE login](#android-and-ios-pkce-login-unreal-engine-50-only), otherwise set the same as [Logout URLs](#logout-urls).
+
+[PKCE login](#android-and-ios-pkce-login-unreal-engine-50-only) is not supported on Windows clients. Hence, they do not use Callback URLs. You may set Callback URLs to be the same as [Logout URLs](#logout-urls), as it is a required field.
+
+#### Web Origins URLs
+Optional field. The URLs that are allowed to request authorisation. This field is available when you select the Native application type.
+
+See [here](https://docs.immutable.com/docs/x/passport/register-application/) for more details.
+
 
 ### Installation
 
@@ -31,8 +61,6 @@ To install the plugin download it into your project's `Plugins` folder, e.g.: `M
 > Install Blui Plugin only for UE4.
 > Please update `immutable.uplugin->Plugins->WebBrowserWidget` to false and restart your UE4 editor.
 > For Unreal Engine 5.0 and above we use inbuilt browser.
-
-
 
 ### Setup
 
@@ -66,17 +94,68 @@ Once the gamer is connected to Passport, the SDK will store your credentials (ac
 
 See this Blueprint showing how to logout from passport ![Passport Logout Blueprint](PassportLogoutFlow.jpg)
 
+#### Imx Transfer
+
+> Note: The transfers feature require pre-approval from Immutable. Please [contact us](https://docs.immutable.com/docs/x/contact/) before making use of it.
+
+To transfer tokens of type ETH, ERC20 or ERC721 use `UImmutablePassport::ImxTransfer` method. See this Blueprint example showing how to use Imx Transfer
+
+![Imx Transfer](ImxTransferFlow.png)
+
+To transfer multiple NFTs in a single transaction use `UImmutablePassport::ImxBatchNftTransfer` method. See this Blueprint example showing how to use Imx Batch Nft Transfer
+
+![Imx Batch Nft Transfer](ImxBatchNftTransfer.png)
+
+
+### Android and iOS PKCE login (Unreal Engine 5.0+ only)
+
+For Android and iOS, you can use the [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) login flow instead of [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.). This means the gamer has one less step to complete and will be redirected back to the game after successfully authenticating.
+
+To use this flow you will need to:
+
+1. Define a deep link scheme for your game (e.g. `mygame://callback`)
+2. Login to the [Immutable Developer Hub](https://hub.immutable.com/) and add the deeplink to your clients **Callback URLs** and **Logout URLs**
+3. Set this deep link as your redirect URI in `Initialize Passport`
+
+![Passport PKCE Login Blueprint](PassportPKCELoginFlow.png)
+
+#### Unreal Editor Android setup
+
+1. In Unreal Editor go to **Project Settings** -> **Android** -> **Advanced APK Packaging**
+2. Add the following code inside the **Extra Settings for \<activity> section (\n to separate lines)** field:
+
+```XML
+<intent-filter>\n<action android:name="android.intent.action.VIEW" />\n<category android:name="android.intent.category.DEFAULT" />\n<category android:name="android.intent.category.BROWSABLE" />\n<data android:host="callback" android:scheme="mygame" />\n</intent-filter>
+```
+
+The application will now open when the device processes any link that starts with `mygame://callback`.
+
+#### Unreal Editor iOS setup
+
+1. In Unreal Editor go to **Project Settings** -> **iOS** -> **Extra PList Data**
+2. Add the following code inside the **Additional Plist Data** field:
+
+```
+<key>CFBundleURLTypes</key><array><dict><key>CFBundleURLSchemes</key><array><string>mygame</string></array></dict></array>
+```
+
+After this set-up and the redirect URI you set in `Initialize Passport`, your game can log in using `mygame://callback`.
+
+See the [sample game](https://github.com/immutable/sample-unreal-game) for an example of how to set up PKCE for Android and iOS.
+
 ## Supported Functionality
 
 
 | Method	                | Description |
 |---	                    |:---|
-| GetAddress	            | Gets Wallet Address |
-| GetEmail	                | Get Email Address associated with the Wallet Address |
-| CheckStoredCredentials	| Checks if there are stored credits from previous login |
-| Connect	                | New login connection |
+| Connect	                | Log into Passport using [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.)  |
 | ConnectSilent	            | Attempts to login using stored credentials |
-
+| ConnectPKCE	            | (Android and iOS on Unreal Engine 5.0+ only) Log into Passport using [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) |
+| CheckStoredCredentials	| Checks if there are stored credits from previous login |
+| GetAddress	            | Gets Wallet Address |
+| GetEmail	              | Get Email Address associated with the Wallet Address |
+| ImxTransfer    	        | ImxTransfer used to send tokens of type ETH, ERC20, ERC721 to reciever's address|
+| ImxBatchNftTransfer    	| ImxBatchNftTransfer used to send multiple Nft tokens in a single transaction to reciever's address|
 
 See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
 

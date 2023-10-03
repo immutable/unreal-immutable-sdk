@@ -8,7 +8,7 @@
 #include "Immutable/Misc/ImtblLogging.h"
 
 
-UImmutablePassportImxBatchNftTransferAsyncAction* UImmutablePassportImxBatchNftTransferAsyncAction::BatchNftTransfer(UObject* WorldContextObject,
+UImmutablePassportImxBatchNftTransferAsyncAction* UImmutablePassportImxBatchNftTransferAsyncAction::ImxBatchNftTransfer(UObject* WorldContextObject,
 	const TArray<FNftTransferDetails>& NftTransferDetails)
 {
 	UImmutablePassportImxBatchNftTransferAsyncAction* BlueprintNode = NewObject<UImmutablePassportImxBatchNftTransferAsyncAction>();
@@ -40,7 +40,7 @@ void UImmutablePassportImxBatchNftTransferAsyncAction::DoTransfer(TWeakObjectPtr
 	Request.nftTransferDetails = NftTransferDetails;
 
 	// Run Transfer
-	GetSubsystem()->GetPassport()->BatchNftTransfer(Request, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImmutablePassportImxBatchNftTransferAsyncAction::OnTransferResponse));
+	GetSubsystem()->GetPassport()->ImxBatchNftTransfer(Request, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImmutablePassportImxBatchNftTransferAsyncAction::OnTransferResponse));
 }
 
 

@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<root>
-    <gameActivityImportAdditions>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    <prebuildCopies>
+        <copyDir src="$S(PluginDir)/Private/Immutable/Android/Java" dst="$S(BuildDir)/src/com/immutable/unreal" />
+    </prebuildCopies>
+    <proguardAdditions>
         <insert>
+            <!-- Disable obfuscation -->
+            -dontwarn com.immutable.unreal
+            -keep class com.immutable.unreal.** { *; }
+            -keep interface com.immutable.unreal.** { *; }
+            -keep public class com.immutable.unreal.ImmutableAndroid.** { public protected *; }
+
+            -dontwarn androidx.**
+            -keep class androidx.** { *; }
+            -keep interface androidx.** { *; }
         </insert>
-    </gameActivityImportAdditions>
+    </proguardAdditions>
+    <androidManifestUpdates>
+        <addElements tag="queries">
+            <intent>
+                <action android:name="android.support.customtabs.action.CustomTabsService" />
+            </intent>
+        </addElements>
+    </androidManifestUpdates>
     <gameActivityOnCreateAdditions>
         <insert>
             Uri uri = getIntent().getData();
             if (uri != null) {
-            String deeplink = uri.toString();
-            handleDeepLink(uri.toString());
+                String deeplink = uri.toString();
+                handleDeepLink(uri.toString());
             }
         </insert>
     </gameActivityOnCreateAdditions>
@@ -17,8 +36,8 @@
         <insert>
             Uri uri = getIntent().getData();
             if (uri != null) {
-            String deeplink = uri.toString();
-            handleDeepLink(deeplink);
+                String deeplink = uri.toString();
+                handleDeepLink(deeplink);
             }
         </insert>
     </gameActivityOnResumeAdditions>
@@ -27,4 +46,11 @@
             public native void handleDeepLink(String Deeplink);
         </insert>
     </gameActivityClassAdditions>
+    <buildGradleAdditions>
+        <insert>
+            dependencies {
+                implementation 'androidx.browser:browser:1.5.0'
+            }
+        </insert>
+    </buildGradleAdditions>
 </root>
