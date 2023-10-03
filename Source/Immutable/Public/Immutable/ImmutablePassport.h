@@ -6,8 +6,9 @@
 #include "Immutable/ImtblJSConnector.h"
 #include "UObject/Object.h"
 #include "JsonObjectConverter.h"
+#include "Runtime/Core/Public/HAL/Platform.h"
+#include "Misc/EngineVersion.h"
 #include "ImmutablePassport.generated.h"
-
 
 struct FImtblJSResponse;
 
@@ -75,6 +76,28 @@ struct FImmutablePassportResult
 };
 
 USTRUCT()
+struct FImmutableEngineVersionData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString engine = TEXT("unreal");
+
+    //cannot have spaces
+    UPROPERTY()
+    FString engineVersion = FEngineVersion::Current().ToString().Replace(TEXT(" "),TEXT("_"));
+
+    //cannot have spaces
+    UPROPERTY()
+    FString platform = FString(FPlatformProperties::IniPlatformName()).Replace(TEXT(" "),TEXT("_"));
+
+    //cannot have spaces
+    UPROPERTY()
+    FString platformVersion = FPlatformMisc::GetOSVersion().Replace(TEXT(" "),TEXT("_"));
+
+};
+
+USTRUCT()
 struct FImmutablePassportInitData
 {
     GENERATED_BODY()
@@ -87,6 +110,9 @@ struct FImmutablePassportInitData
 
     UPROPERTY()
     FString environment = ImmutablePassportAction::EnvSandbox;
+
+    UPROPERTY()
+    FImmutableEngineVersionData engineVersion;
 
     FString ToJsonString() const;
 };
@@ -238,7 +264,7 @@ struct FImtblCustomData
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     int64 intValue;
-    
+
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     float floatValue;
 
@@ -437,9 +463,9 @@ class IMMUTABLE_API UImmutablePassport : public UObject
 
 public:
     DECLARE_MULTICAST_DELEGATE(FOnPassportReadyDelegate);
-    
+
     DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult);
-    
+
 #if PLATFORM_ANDROID
     static void HandleDeepLink(FString DeepLink);
 #elif PLATFORM_IOS
