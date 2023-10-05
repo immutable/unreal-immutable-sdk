@@ -303,45 +303,10 @@ struct FImtblTransactionRequest
     FString to;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString from;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString nonce;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString gasLimit;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString gasPrice;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
     FString data = "0x";
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     FString value;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    int64 chainId;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    int64 type;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    TArray<FImtblAccessListItem> accessList;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString maxPriorityFeePerGas;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    FString maxFeePerGas;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    TArray<FImtblCustomData> customData;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
-    bool ccipReadEnabled;
-
-    FString ToJsonString() const;
 };
 
 USTRUCT()

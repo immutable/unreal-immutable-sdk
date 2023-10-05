@@ -129,34 +129,6 @@ FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
     return OutString;
 }
 
-FString FImtblTransactionRequest::ToJsonString() const
-{
-    FString OutString;
-
-    FJsonObjectWrapper Wrapper;
-    Wrapper.JsonObject = MakeShared<FJsonObject>();
-    FJsonObjectConverter::UStructToJsonObject(FImtblTransactionRequest::StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
-
-    if (!Wrapper.JsonObject.IsValid())
-    {
-        IMTBL_ERR("Could not convert FImtblTransactionRequest to JSON")
-        return "";
-    }
-
-    // Replace Blueprint JSON with API expected contract { key : value }
-    TArray<TSharedPtr<FJsonValue>> CustomDataArray;
-    for (FImtblCustomData CustomData : customData)
-    {
-        CustomDataArray.Add(MakeShared<FJsonValueObject>(FJsonValueObject(CustomData.ToJsonObject())));
-    }
-    Wrapper.JsonObject->SetArrayField("customData", CustomDataArray);
-
-    Wrapper.JsonObjectToString(OutString);
-
-
-    return OutString;
-}
-
 // @param Environment can be one of ImmutablePassportAction::EnvSandbox or ImmutablePassportAction::EnvProduction
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
@@ -247,7 +219,7 @@ void UImmutablePassport::ZkEvmSendTransaction(const FImtblTransactionRequest& Re
 {
     CallJS(
         ImmutablePassportAction::ZkEvmSendTransaction,
-        Request.ToJsonString(),
+        UStructToJsonString(Request),
         ResponseDelegate,
         FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmSendTransactionResponse)
     );
