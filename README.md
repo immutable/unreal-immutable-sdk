@@ -106,6 +106,11 @@ To transfer multiple NFTs in a single transaction use `UImmutablePassport::ImxBa
 
 ![Imx Batch Nft Transfer](ImxBatchNftTransfer.png)
 
+#### zkEVM Send Transaction
+
+To send a transaction on zkEVM use `UImmutablePassport::ZkEvmSendTransaction` method. See this Blueprint example showing how to use Zk Evm Send Transaction
+
+![Zk Evm Send Transaction](ZkEvmSendTransaction.png)
 
 ### Android and iOS PKCE login (Unreal Engine 5.0+ only)
 
@@ -146,24 +151,29 @@ See the [sample game](https://github.com/immutable/sample-unreal-game) for an ex
 ## Supported Functionality
 
 
-| Method	                | Description |
-|---	                    |:---|
-| Connect	                | Log into Passport using [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.)  |
-| ConnectSilent	            | Attempts to login using stored credentials |
-| ConnectPKCE	            | (Android and iOS on Unreal Engine 5.0+ only) Log into Passport using [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) |
-| CheckStoredCredentials	| Checks if there are stored credits from previous login |
-| GetAddress	            | Gets Wallet Address |
-| GetEmail	              | Get Email Address associated with the Wallet Address |
-| ImxTransfer    	        | ImxTransfer used to send tokens of type ETH, ERC20, ERC721 to reciever's address|
-| ImxBatchNftTransfer    	| ImxBatchNftTransfer used to send multiple Nft tokens in a single transaction to reciever's address|
+| Method	                     | Description                                                                                                                                                                                                                                                                    |
+|-----------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Connect	                    | Log into Passport using [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.)                        |
+| ConnectSilent	              | Attempts to login using stored credentials                                                                                                                                                                                                                                     |
+| ConnectPKCE	                | (Android and iOS on Unreal Engine 5.0+ only) Log into Passport using [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) |
+| CheckStoredCredentials	     | Checks if there are stored credits from previous login                                                                                                                                                                                                                         |
+| GetAddress	                 | Gets Wallet Address                                                                                                                                                                                                                                                            |
+| GetEmail	                   | Get Email Address associated with the Wallet Address                                                                                                                                                                                                                           |
+| ImxTransfer    	            | ImxTransfer used to send tokens of type ETH, ERC20, ERC721 to reciever's address                                                                                                                                                                                               |
+| ImxBatchNftTransfer    	    | ImxBatchNftTransfer used to send multiple Nft tokens in a single transaction to reciever's address                                                                                                                                                                             |
+| GetEmail	                   | Get Email Address associated with the Wallet Address                                                                                                                                                                                                                           |
+| zkEVM request accounts    	 | Initialises the user for zkEVM and returns their associated addresses.                                                                                                                                                                                                         |
+| zkEVM get balance    	      | Gets the balance for a given address.                                                                                                                                                                                                                                          |
+| zkEVM send transaction    	         | Calls a contract's function with the given value.                                                                                                                                                                                                                              |
+
 
 See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
 
 ## Examples
 
-- **Sample Blueprints** - see the [sample blueprints](https://github.com/immutable/unreal-immutable-sdk/tree/main/Content/BlueprintSampleContent) for examples of how to use the Immutable Unity SDK.
+- **Sample Blueprints** - see the [sample blueprints](https://github.com/immutable/unreal-immutable-sdk/tree/main/Content/BlueprintSampleContent) for examples of how to use the Immutable Unreal SDK.
 
-- **Sample Game** - see the [sample game](https://github.com/immutable/sample-unreal-game) for example of how to use the Immutable Unity SDK.
+- **Sample Game** - see the [sample game](https://github.com/immutable/sample-unreal-game) for example of how to use the Immutable Unreal SDK.
 
 ## Plugin Maintainers' Guide
 
@@ -296,4 +306,4 @@ You can also apply for marketing support for your project. Or, if you need help 
 
 ## License
 
-Immutable Unity SDK repository is distributed under the terms of the [Apache License (Version 2.0)](LICENSE).
+Immutable Unreal SDK repository is distributed under the terms of the [Apache License (Version 2.0)](LICENSE).

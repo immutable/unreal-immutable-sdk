@@ -447,9 +447,32 @@ public:
     void ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate);
 #endif
 
+    /**
+    * Initializes the zkEVM provider.
+    * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+    */
     void ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate);
+
+    /**
+    * Logs the user into the zkEVM provider and returns an array of associated addresses with the user.
+    *
+    * This must be called before using other zkEVM functions. 
+    * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+    */
     void ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate);
+
+    /**
+    * Gets the balance of the given address for the provided block number.
+    * @param Data The address and block number for the request
+    * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+    */
     void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate);
+
+    /**
+    * Sends a zkEVM transaction.
+    * @param Request The contract to call (to), the function to signature (data), and the value. 
+    * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+    */
     void ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
     void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
