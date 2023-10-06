@@ -454,7 +454,7 @@ public:
     void ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate);
 
     /**
-    * Logs the user into the zkEVM provider and returns an array of associated addresses with the user.
+    * This method attempts to authenticate the user and initialises their Passport wallet before returning an array of wallet addresses.
     *
     * This must be called before using other zkEVM functions. 
     * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
@@ -462,15 +462,15 @@ public:
     void ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate);
 
     /**
-    * Gets the balance of the given address for the provided block number.
+    * Returns the balance of the account of given address in wei.
     * @param Data The address and block number for the request
     * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
     */
     void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate);
 
     /**
-    * Sends a zkEVM transaction.
-    * @param Request The contract to call (to), the function to signature (data), and the value. 
+    * Creates new message call transaction or a contract creation, if the data field contains code.
+    * @param Request The request data to perform the transaction. 
     * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
     */
     void ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
