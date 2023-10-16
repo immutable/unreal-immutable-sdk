@@ -15,7 +15,7 @@
 ### Supported Platforms
 
 - Windows 10 (64-bit)
-- MacOS (Unreal Engine 5.2+: [minimum version 12.5 Monterey](https://docs.unrealengine.com/5.2/en-US/macos-development-requirements-for-unreal-engine/))
+- macOS (minimum version 10.5)
 - Android (minimum version 8.0)
 - iOS (minimum version 13.0)
 
@@ -112,9 +112,9 @@ To send a transaction on zkEVM use `UImmutablePassport::ZkEvmSendTransaction` me
 
 ![Zk Evm Send Transaction](ZkEvmSendTransaction.png)
 
-### Android and iOS PKCE login (Unreal Engine 5.0+ only)
+### Android, iOS and macOS PKCE login (Unreal Engine 5.0+ only)
 
-For Android and iOS, you can use the [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) login flow instead of [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.). This means the gamer has one less step to complete and will be redirected back to the game after successfully authenticating.
+For Android, iOS and macOS, you can use the [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) login flow instead of [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.). This means the gamer has one less step to complete and will be redirected back to the game after successfully authenticating.
 
 To use this flow you will need to:
 
@@ -146,25 +146,46 @@ The application will now open when the device processes any link that starts wit
 
 After this set-up and the redirect URI you set in `Initialize Passport`, your game can log in using `mygame://callback`.
 
-See the [sample game](https://github.com/immutable/sample-unreal-game) for an example of how to set up PKCE for Android and iOS.
+#### Unreal Editor macOS setup
+
+Since there is no way to add extra plist data like iOS from the Unreal Editor Project Settings, you must edit the Engine's default `Info.plist`.
+
+1. In your preferred IDE, open the Engine's `Info.plist` file (e.g. `Engine/Source/Runtime/Launch/Resources/Mac/Info.plist`)
+2. Add the following code inside the root `<dict>...</dict>`:
+
+```
+<key>CFBundleURLTypes</key>
+<array>
+	<dict>
+		<key>CFBundleURLSchemes</key>
+		<array>
+			<string>mygame</string>
+		</array>
+	</dict>
+</array>
+```
+
+After setting up and specifying the redirect URI in `Initialize Passport`, the user will be automatically redirected back to the game through `mygame://callback` upon completing the login process.
+
+See the [sample game](https://github.com/immutable/sample-unreal-game) for an example of how to set up PKCE for Android, iOS and macOS.
 
 ## Supported Functionality
 
 
-| Method	                     | Description                                                                                                                                                                                                                                                                    |
-|-----------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Connect	                    | Log into Passport using [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.)                        |
-| ConnectSilent	              | Attempts to login using stored credentials                                                                                                                                                                                                                                     |
-| ConnectPKCE	                | (Android and iOS on Unreal Engine 5.0+ only) Log into Passport using [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) |
-| CheckStoredCredentials	     | Checks if there are stored credits from previous login                                                                                                                                                                                                                         |
-| GetAddress	                 | Gets Wallet Address                                                                                                                                                                                                                                                            |
-| GetEmail	                   | Get Email Address associated with the Wallet Address                                                                                                                                                                                                                           |
-| ImxTransfer    	            | ImxTransfer used to send tokens of type ETH, ERC20, ERC721 to reciever's address                                                                                                                                                                                               |
-| ImxBatchNftTransfer    	    | ImxBatchNftTransfer used to send multiple Nft tokens in a single transaction to reciever's address                                                                                                                                                                             |
-| GetEmail	                   | Get Email Address associated with the Wallet Address                                                                                                                                                                                                                           |
-| zkEVM request accounts    	 | This method attempts to authenticate the user and initialises their Passport wallet before returning an array of wallet addresses                                                                                                                                                                                                       |
-| zkEVM get balance    	      | Returns the balance of the account of given address in wei                                                                                                                                                                                                                                         |
-| zkEVM send transaction    	         | Creates new message call transaction or a contract creation, if the data field contains code                                                                                                                                                                                                                              |
+| Method	                     | Description                                                                                                                                                                                                                                                                           |
+|-----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Connect	                    | Log into Passport using [Device Code Authorisation](https://auth0.com/docs/get-started/authentication-and-authorization-flow/device-authorization-flow#:~:text=Your%20Auth0%20Authorization%20Server%20redirects,authorized%20to%20access%20the%20API.)                               |
+| ConnectSilent	              | Attempts to login using stored credentials                                                                                                                                                                                                                                            |
+| ConnectPKCE	                | (Android, iOS and macOS on Unreal Engine 5.0+ only) Log into Passport using [Authorization Code Flow with Proof Key for Code Exchange (PKCE)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce) |
+| CheckStoredCredentials	     | Checks if there are stored credits from previous login                                                                                                                                                                                                                                |
+| GetAddress	                 | Gets Wallet Address                                                                                                                                                                                                                                                                   |
+| GetEmail	                   | Get Email Address associated with the Wallet Address                                                                                                                                                                                                                                  |
+| ImxTransfer    	            | ImxTransfer used to send tokens of type ETH, ERC20, ERC721 to reciever's address                                                                                                                                                                                                      |
+| ImxBatchNftTransfer    	    | ImxBatchNftTransfer used to send multiple Nft tokens in a single transaction to reciever's address                                                                                                                                                                                    |
+| GetEmail	                   | Get Email Address associated with the Wallet Address                                                                                                                                                                                                                                  |
+| zkEVM request accounts    	 | This method attempts to authenticate the user and initialises their Passport wallet before returning an array of wallet addresses                                                                                                                                                     |
+| zkEVM get balance    	      | Returns the balance of the account of given address in wei                                                                                                                                                                                                                            |
+| zkEVM send transaction    	         | Creates new message call transaction or a contract creation, if the data field contains code                                                                                                                                                                                          |
 
 
 See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/blob/dc39324db204f2ba30e9c9f0ca25c070987785cb/Source/Immutable/Public/Immutable/ImmutablePassport.h#L115C8-L115C8) header for the full API.
@@ -232,7 +253,7 @@ For UE4 we are using Blui as the in built browser does not work.
 3. Navigate to Plugins -> Immutable Content -> Packages Resources
 4. Delete the existing imported asset if you wish to replace with new one
 5. Right Click and Import the `index.js` file
-    ![Import Asset](Docs/ImportAsset.png)
+   ![Import Asset](Docs/ImportAsset.png)
 
 
 ## Changelog Management

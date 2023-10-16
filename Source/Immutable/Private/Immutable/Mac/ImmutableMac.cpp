@@ -48,7 +48,7 @@ ASWebAuthenticationSession *_authSession;
 }
 
 - (ASPresentationAnchor)presentationAnchorForWebAuthenticationSession:(ASWebAuthenticationSession *)session API_AVAILABLE(macos(10.15)) {
-    return [NSApp mainWindow];
+    return [[[NSApplication sharedApplication] windows] firstObject];
 }
 
 @end
