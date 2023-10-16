@@ -102,5 +102,18 @@ public class Immutable : ModuleRules
 				}
 			);
 		}
+		
+		if (Target.Platform == UnrealTargetPlatform.Mac)
+		{
+			PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private", "Mac") });
+			
+			PublicFrameworks.AddRange(
+				new string[]
+				{
+					"Foundation",
+					"AuthenticationServices"
+				}
+			);
+		}
 	}
 }

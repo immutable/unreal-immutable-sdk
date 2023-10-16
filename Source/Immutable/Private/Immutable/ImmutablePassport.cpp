@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Immutable/ImmutablePassport.h"
@@ -7,15 +7,18 @@
 #include "ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
-#if PLATFORM_ANDROID | PLATFORM_IOS
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #include "GenericPlatform/GenericPlatformHttp.h"
 #endif
 
 #if PLATFORM_ANDROID
 #include "Android/AndroidApplication.h"
 #include "Android/ImmutableAndroidJNI.h"
-#elif  PLATFORM_IOS
+#elif PLATFORM_IOS
 #include "IOS/ImmutableIOS.h"
+#elif PLATFORM_MAC
+#include "Mac/ImmutableMac.h"
+#include "GenericPlatform/GenericPlatformProcess.h"
 #endif
 
 
@@ -239,7 +242,7 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
 }
 
 
-#if PLATFORM_ANDROID | PLATFORM_IOS
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
     PKCEResponseDelegate = ResponseDelegate;
@@ -500,7 +503,7 @@ void UImmutablePassport::OnConnectEvmResponse(FImtblJSResponse Response)
     }
 }
 
-#if PLATFORM_ANDROID | PLATFORM_IOS
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
 {
     if (PKCEResponseDelegate.IsBound())
@@ -529,7 +532,10 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
             }
 #elif PLATFORM_IOS
             [[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
+#elif PLATFORM_MAC
+            [[ImmutableMac instance] launchUrl:TCHAR_TO_ANSI(*Msg) forRedirectUri:TCHAR_TO_ANSI(*InitData.redirectUri)];
 #endif
+            
             if (Err.Len())
             {
                 Msg = "Failed to connect to Browser: " + Err;
@@ -771,11 +777,12 @@ void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
 }
 
 
-#if PLATFORM_ANDROID | PLATFORM_IOS
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 {
     IMTBL_LOG("On Deep Link Activated: %s", *DeepLink);
     OnHandleDeepLink = nullptr;
+    
     if (DeepLink.StartsWith(InitData.redirectUri))
     {
         CompletePKCEFlow(DeepLink);
@@ -785,10 +792,25 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 
 void UImmutablePassport::CompletePKCEFlow(FString Url)
 {
-    TOptional<FString> Code = FGenericPlatformHttp::GetUrlParameter(Url, TEXT("code"));
-    IMTBL_LOG("CompletePKCEFlow code: %s", *(Code.GetValue()));
-    TOptional<FString> State = FGenericPlatformHttp::GetUrlParameter(Url, TEXT("state"));
-    IMTBL_LOG("CompletePKCEFlow State: %s", *(State.GetValue()));
+    // Get code and state from deeplink URL
+    TOptional<FString> Code, State;
+    FString Endpoint, Params;
+    Url.Split(TEXT("?"), &Endpoint, &Params);
+    TArray<FString> ParamsArray;
+    Params.ParseIntoArray(ParamsArray, TEXT("&"));
+    for (FString Param : ParamsArray)
+    {
+        FString Key, Value;
+        if (Param.StartsWith("code"))
+        {
+            Param.Split(TEXT("="), &Key, &Value);
+            Code = Value;
+        } else if (Param.StartsWith("state"))
+        {
+            Param.Split(TEXT("="), &Key, &Value);
+            State = Value;
+        }   
+    }
 
     if (!Code.IsSet() || !State.IsSet())
     {
@@ -811,16 +833,20 @@ void UImmutablePassport::CompletePKCEFlow(FString Url)
 #endif
 
 
-#if PLATFORM_ANDROID | PLATFORM_IOS
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #if PLATFORM_ANDROID
 // Called from Android JNI
 void UImmutablePassport::HandleDeepLink(FString DeepLink)
-#elif PLATFORM_IOS
+{
+#elif PLATFORM_IOS | PLATFORM_MAC
 // Called from iOS Objective C
 void UImmutablePassport::HandleDeepLink(NSString* sDeepLink)
-#endif
 {
-    if (OnHandleDeepLink.ExecuteIfBound(DeepLink))
+    FString DeepLink = FString(UTF8_TO_TCHAR([sDeepLink UTF8String]));
+    IMTBL_LOG("Handle Deep Link: %s", *DeepLink);
+#endif
+
+    if (!OnHandleDeepLink.ExecuteIfBound(DeepLink))
     {
         IMTBL_WARN("OnHandleDeepLink delegate was not called");
     }
