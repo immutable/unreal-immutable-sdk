@@ -54,7 +54,13 @@ See [here](https://docs.immutable.com/docs/x/passport/register-application/) for
 
 ### Installation
 
-To install the plugin download it into your project's `Plugins` folder, e.g.: `MyGame/Plugins/unreal-immutable-sdk`.
+> :clipboard: Prerequisites
+>
+>[git-lfs](https://git-lfs.github.com/): since `.uasset` and `.umap` files are stored on Git Large File Storage, ensure you have [git-lfs]((https://git-lfs.github.com/)) installed.
+
+1. Clone the [unreal-immutable-sdk](https://github.com/immutable/unreal-immutable-sdk) repository or download the zip/tarball from one of the versions [here](https://github.com/immutable/unreal-immutable-sdk/tags)
+2. Copy the cloned repo into your project's `Plugins` folder, e.g.: `MyGame/Plugins/unreal-immutable-sdk`.
+3. Restart your project (Unreal Editor & Rider), upon restart it should load the `unreal-sdk-plugin` and should be good to use.
 
 > [!NOTE]
 > For Unreal Engine 4.26 and above we use Blui as a browser instead of inbuilt browser.
