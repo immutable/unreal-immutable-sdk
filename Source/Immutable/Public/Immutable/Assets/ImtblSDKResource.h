@@ -9,11 +9,10 @@
  *
  */
 UCLASS()
-class IMMUTABLE_API UImtblSDKResource : public UObject
-{
-	GENERATED_BODY()
+class IMMUTABLE_API UImtblSDKResource : public UObject {
+  GENERATED_BODY()
 
 public:
-	UPROPERTY()
-	FString Js;
+  UPROPERTY()
+  FString Js;
 };

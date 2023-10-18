@@ -7,30 +7,34 @@
 #include "ImtblBlueprintAsyncAction.h"
 #include "ImtblPassportGetAddressAsyncAction.generated.h"
 
-
-
 /**
- * 
+ *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportGetAddressAsyncAction : public UImtblBlueprintAsyncAction
-{
-    GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportGetAddressAsyncAction
+    : public UImtblBlueprintAsyncAction {
+  GENERATED_BODY()
 
-    DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportGetAddressOutputPin, FString, ErrorMessage, FString, Address);
-    
+  DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportGetAddressOutputPin,
+                                               FString, ErrorMessage, FString,
+                                               Address);
+
 public:
-    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-    static UImtblPassportGetAddressAsyncAction* GetAddress(UObject* WorldContextObject);
+  UFUNCTION(BlueprintCallable,
+            meta = (WorldContext = "WorldContextObject",
+                    BlueprintInternalUseOnly = "true"),
+            Category = "Immutable")
+  static UImtblPassportGetAddressAsyncAction *
+  GetAddress(UObject *WorldContextObject);
 
-    virtual void Activate() override;
+  void Activate() override;
 
 private:
-    void DoGetAddress(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
-    void OnGetAddressResponse(FImmutablePassportResult Result);
+  void DoGetAddress(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
+  void OnGetAddressResponse(FImmutablePassportResult Result);
 
-    UPROPERTY(BlueprintAssignable)
-    FPassportGetAddressOutputPin GotAddress;
-    UPROPERTY(BlueprintAssignable)
-    FPassportGetAddressOutputPin Failed;
+  UPROPERTY(BlueprintAssignable)
+  FPassportGetAddressOutputPin GotAddress;
+  UPROPERTY(BlueprintAssignable)
+  FPassportGetAddressOutputPin Failed;
 };

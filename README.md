@@ -39,7 +39,7 @@ You must register your application as an OAuth 2.0 **Native** client.
 The name you wish to use to identify your application.
 
 #### Logout URLs
-Native clients don't make use of Logout URLs, you might set your own website or https://localhost:3000 as this is a required field.
+Native clients don't make use of Logout URLs, you might set your own site or https://localhost:3000 as this is a required field.
 
 #### Callback URLs
 On Android, iOS and macOS clients, you should set your application's deep link scheme (e.g. `mygame://callback`) if you wish to make use of [PKCE login](#android-and-ios-pkce-login-unreal-engine-50-only), otherwise set the same as [Logout URLs](#logout-urls).
@@ -59,7 +59,7 @@ See [here](https://docs.immutable.com/docs/x/passport/register-application/) for
 >[git-lfs](https://git-lfs.github.com/): since `.uasset` and `.umap` files are stored on Git Large File Storage, ensure you have [git-lfs]((https://git-lfs.github.com/)) installed.
 
 1. Clone the [unreal-immutable-sdk](https://github.com/immutable/unreal-immutable-sdk) repository or download the zip/tarball from one of the versions [here](https://github.com/immutable/unreal-immutable-sdk/tags)
-2. Copy the cloned repo into your project's `Plugins` folder, e.g.: `MyGame/Plugins/unreal-immutable-sdk`.
+2. Copy the cloned repository into your project's `Plugins` folder, e.g.: `MyGame/Plugins/unreal-immutable-sdk`.
 3. Restart your project (Unreal Editor & Rider), upon restart it should load the `unreal-sdk-plugin` and should be good to use.
 
 > [!NOTE]
@@ -209,7 +209,7 @@ See the [ImmutablePassport.h](https://github.com/immutable/unreal-immutable-sdk/
 - Epic Games Launcher
 - Unreal Engine installed from the Epic Games Launcher; you will need every version that the plugin supports (currently 4.27, 5.0, 5.1, 5.2)
 - Visual Studio 2022 with C++ support
-- Jetbrains Rider IDE (recommended for working with Unreal Engine C++ code)
+- JetBrains Rider IDE (recommended for working with Unreal Engine C++ code)
 
 If not Rider, Visual Studio is fine and even better with the Resharper plugin.
 
@@ -229,13 +229,13 @@ In Unreal Engine 5.1+ the project is set up so that `console.log()` will pass al
 
 #### Remote Debugging
 
-To set up Chromium remote debugging, edit project build/launch configurations in your IDE to add the following program command line argument to the appropriate configurations: `cefdebug=9222`
+To set up Chromium remote debugging, edit project build/launch configurations in your IDE to add the following program command-line argument to the appropriate configurations: `cefdebug=9222`
 
 Next, launch the game and then open a separate Chrome/Chromium browser and navigate to `chrome://inspect` where your app should be listed, sometimes intermittently or after a delay, under the `Remote Target #localhost` section.  Click `inspect` to launch the remote debugging session.
 
 ## Release Unreal Immutable SDK Plugin
 
-1. Release the plugin using github releases. See https://github.com/immutable/unreal-immutable-sdk/releases
+1. Release the plugin using GitHub releases. See https://github.com/immutable/unreal-immutable-sdk/releases
 
 ## Release Blui Plugin for UE4
 
@@ -249,7 +249,7 @@ For UE4 we are using Blui as the in built browser does not work.
     ```
     // BluManager::Settings.remote_debugging_port = 7777;
     ```
-6. Zip the Blui plugin folder and upload to the github release.
+6. Zip the Blui plugin folder and upload to the GitHub release.
 
 ## How to Add Game Bridge Asset to Packaged Resources
 

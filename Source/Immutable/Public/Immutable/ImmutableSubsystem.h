@@ -3,59 +3,63 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/GameInstanceSubsystem.h"
 #include "ImmutableSubsystem.generated.h"
+#include "Subsystems/GameInstanceSubsystem.h"
 
-
-DECLARE_MULTICAST_DELEGATE_OneParam(FImmutableSubsystemReadyDelegate, TWeakObjectPtr<class UImtblJSConnector>);
+DECLARE_MULTICAST_DELEGATE_OneParam(FImmutableSubsystemReadyDelegate,
+                                    TWeakObjectPtr<class UImtblJSConnector>);
 
 /**
  *
  */
 UCLASS()
-class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem
-{
-	GENERATED_BODY()
+class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem {
+  GENERATED_BODY()
 
 public:
-    UImmutableSubsystem();
+  UImmutableSubsystem();
 
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-	virtual void Deinitialize() override;
+  void Initialize(FSubsystemCollectionBase &Collection) override;
+  void Deinitialize() override;
 
-    TWeakObjectPtr<class UImmutablePassport> GetPassport() const { return MakeWeakObjectPtr(Passport); }
+  TWeakObjectPtr<class UImmutablePassport> GetPassport() const {
+    return MakeWeakObjectPtr(Passport);
+  }
 
-    bool IsReady() const { return bIsReady; }
+  bool IsReady() const { return bIsReady; }
 
-    // FOnGameViewportTick& OnGameViewportTick() { return GameViewportTickEvent; }
+  // FOnGameViewportTick& OnGameViewportTick() { return GameViewportTickEvent; }
 
-    // Execute a delegate when the subsystem is ready (i.e.: when the browser is running and the Immutable SDK game bridge has loaded).
-    template<class UserClass>
-    void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func);
+  // Execute a delegate when the subsystem is ready (i.e.: when the browser is
+  // running and the Immutable SDK game bridge has loaded).
+  template <class UserClass>
+  void WhenReady(UserClass *Object,
+                 typename FImmutableSubsystemReadyDelegate::FDelegate::
+                     TUObjectMethodDelegate<UserClass>::FMethodPtr Func);
 
 private:
-	UPROPERTY()
-	class UImtblBrowserUserWidget* BrowserWidget = nullptr;
+  UPROPERTY()
+  class UImtblBrowserUserWidget *BrowserWidget = nullptr;
 
-	UPROPERTY()
-	class UImtblBlui* ImtblBlui = nullptr;
+  UPROPERTY()
+  class UImtblBlui *ImtblBlui = nullptr;
 
-    UPROPERTY()
-    class UImmutablePassport* Passport = nullptr;
+  UPROPERTY()
+  class UImmutablePassport *Passport = nullptr;
 
-    bool bHasSetupGameBridge = false;
-    bool bIsReady = false;
-    FImmutableSubsystemReadyDelegate OnReady;
+  bool bHasSetupGameBridge = false;
+  bool bIsReady = false;
+  FImmutableSubsystemReadyDelegate OnReady;
 
-    FDelegateHandle WorldTickHandle;
-    FDelegateHandle ViewportCreatedHandle;
+  FDelegateHandle WorldTickHandle;
+  FDelegateHandle ViewportCreatedHandle;
 #if PLATFORM_ANDROID | PLATFORM_IOS
-    FDelegateHandle EngineInitCompleteHandle;
+  FDelegateHandle EngineInitCompleteHandle;
 #endif
 
-    void SetupGameBridge();
-	void OnBridgeReady();
-    void ManageBridgeDelegateQueue();
-    void OnViewportCreated();
-    void WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds);
+  void SetupGameBridge();
+  void OnBridgeReady();
+  void ManageBridgeDelegateQueue();
+  void OnViewportCreated();
+  void WorldTickStart(UWorld *World, ELevelTick TickType, float DeltaSeconds);
 };

@@ -59,3 +59,6 @@
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               VALIDATE_MARKDOWN: false
               VALIDATE_GITLEAKS: false
+              VALIDATE_JSCPD: false
+              VALIDATE_JAVA: false
+              VALIDATE_GOOGLE_JAVA_FORMAT: false

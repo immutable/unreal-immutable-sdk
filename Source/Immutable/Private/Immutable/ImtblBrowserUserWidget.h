@@ -2,30 +2,28 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "CoreMinimal.h"
 #include "ImtblBrowserUserWidget.generated.h"
 
 UCLASS()
-class IMMUTABLE_API UImtblBrowserUserWidget : public UUserWidget
-{
-	GENERATED_BODY()
+class IMMUTABLE_API UImtblBrowserUserWidget : public UUserWidget {
+  GENERATED_BODY()
 public:
-	virtual TSharedRef<SWidget> RebuildWidget() override;
-	virtual void BeginDestroy() override;
-	virtual void RemoveFromParent() override;
-    virtual void OnWidgetRebuilt() override;
-    
-    TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
-    
+  TSharedRef<SWidget> RebuildWidget() override;
+  void BeginDestroy() override;
+  void RemoveFromParent() override;
+  void OnWidgetRebuilt() override;
+
+  TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
+
 private:
-	UPROPERTY()
-	class UImtblBrowserWidget* Browser = nullptr;
+  UPROPERTY()
+  class UImtblBrowserWidget *Browser = nullptr;
 
-    bool bIsBrowserAppInitialized = false;
-    
-    FTimerHandle Timer;
+  bool bIsBrowserAppInitialized = false;
 
-    FMargin DefaultOffsets = FMargin(150, 150, 150, 150);
+  FTimerHandle Timer;
+
+  FMargin DefaultOffsets = FMargin(150, 150, 150, 150);
 };
-
