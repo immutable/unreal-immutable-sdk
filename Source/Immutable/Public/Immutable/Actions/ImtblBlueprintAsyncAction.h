@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ImtblBlueprintAsyncAction.generated.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
+// clang-format off
+#include "ImtblBlueprintAsyncAction.generated.h"
+// clang-format on
 
 /**
  *

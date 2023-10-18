@@ -2,8 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Immutable/Misc/ImtblLogging.h"
-#include "ImtblJSMessages.generated.h"
 #include "JsonObjectConverter.h"
+// clang-format off
+#include "ImtblJSMessages.generated.h"
+// clang-format on
 
 UENUM()
 enum class EImtblPassportError : int8 {

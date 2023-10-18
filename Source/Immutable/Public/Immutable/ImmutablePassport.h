@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Immutable/ImtblJSConnector.h"
-#include "ImmutablePassport.generated.h"
 #include "JsonObjectConverter.h"
 #include "Misc/EngineVersion.h"
 #include "Runtime/Core/Public/HAL/Platform.h"
 #include "UObject/Object.h"
+// clang-format off
+#include "ImmutablePassport.generated.h"
+// clang-format on
 
 struct FImtblJSResponse;
 

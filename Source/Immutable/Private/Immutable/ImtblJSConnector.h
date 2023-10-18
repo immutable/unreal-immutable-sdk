@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ImtblJSConnector.generated.h"
 #include "ImtblJSMessages.h"
 #include "UObject/Object.h"
+// clang-format off
+#include "ImtblJSConnector.generated.h"
+// clang-format on
 
 DECLARE_DELEGATE_OneParam(FImtblJSResponseDelegate, struct FImtblJSResponse);
 

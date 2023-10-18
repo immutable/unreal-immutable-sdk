@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ImtblBlui.generated.h"
 #include "UObject/Object.h"
+// clang-format off
+#include "ImtblBlui.generated.h"
+// clang-format on
 
 /**
  *

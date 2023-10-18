@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ImmutableSubsystem.generated.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+// clang-format off
+#include "ImmutableSubsystem.generated.h"
+// clang-format on
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FImmutableSubsystemReadyDelegate,
                                     TWeakObjectPtr<class UImtblJSConnector>);
