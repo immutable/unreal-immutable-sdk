@@ -63,10 +63,9 @@ See [here](https://docs.immutable.com/docs/x/passport/register-application/) for
 3. Restart your project (Unreal Editor & Rider), upon restart it should load the `unreal-sdk-plugin` and should be good to use.
 
 > [!NOTE]
-> For Unreal Engine 4.26 and above we use Blui as a browser instead of inbuilt browser.
-> Install Blui Plugin only for UE4.
+> For Unreal Engine 4.26 and above we use Blui as a browser instead of inbuilt browser. For Unreal Engine 5.0 and above we use inbuilt browser
+> For UE4 only download the Blui Plugin from https://github.com/immutable/unreal-immutable-sdk/releases/download/0.1.1/BLUI.4.2.BluBrowserCEF.90.0.4430.212-Win64.zip into your project Plugins directory.
 > Please update `immutable.uplugin->Plugins->WebBrowserWidget` to false and restart your UE4 editor.
-> For Unreal Engine 5.0 and above we use inbuilt browser.
 
 ### Setup
 
