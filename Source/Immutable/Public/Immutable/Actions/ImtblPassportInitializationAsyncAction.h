@@ -8,31 +8,37 @@
 #include "ImtblPassportInitializationAsyncAction.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportInitializationAsyncAction : public UImtblBlueprintAsyncAction
-{
-    GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportInitializationAsyncAction
+    : public UImtblBlueprintAsyncAction {
+  GENERATED_BODY()
 
-    DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportInitializationOutputPin, FString, Message);
-    
+  DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportInitializationOutputPin,
+                                              FString, Message);
+
 public:
-    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-    static UImtblPassportInitializationAsyncAction* InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& Environment);
+  UFUNCTION(BlueprintCallable,
+            meta = (WorldContext = "WorldContextObject",
+                    BlueprintInternalUseOnly = "true"),
+            Category = "Immutable")
+  static UImtblPassportInitializationAsyncAction *
+  InitializePassport(UObject *WorldContextObject, const FString &ClientID,
+                     const FString &RedirectUri, const FString &Environment);
 
-    virtual void Activate() override;
+  void Activate() override;
 
 private:
-    FString ClientId;
-    FString RedirectUri;
-    FString Environment;
-    
-    UPROPERTY(BlueprintAssignable)
-    FPassportInitializationOutputPin Initialized;
-    UPROPERTY(BlueprintAssignable)
-    FPassportInitializationOutputPin Failed;
+  FString ClientId;
+  FString RedirectUri;
+  FString Environment;
 
-    void DoInit(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
-    void OnInitialized(FImmutablePassportResult Result);
+  UPROPERTY(BlueprintAssignable)
+  FPassportInitializationOutputPin Initialized;
+  UPROPERTY(BlueprintAssignable)
+  FPassportInitializationOutputPin Failed;
+
+  void DoInit(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
+  void OnInitialized(FImmutablePassportResult Result);
 };

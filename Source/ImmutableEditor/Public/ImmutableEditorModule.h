@@ -5,13 +5,11 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FImmutableEditorModule : public IModuleInterface
-{
+class FImmutableEditorModule : public IModuleInterface {
 public:
-
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+  /** IModuleInterface implementation */
+  void StartupModule() override;
+  void ShutdownModule() override;
 
 private:
 };

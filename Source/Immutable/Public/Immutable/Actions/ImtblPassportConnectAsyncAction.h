@@ -7,31 +7,34 @@
 #include "ImtblBlueprintAsyncAction.h"
 #include "ImtblPassportConnectAsyncAction.generated.h"
 
-
 /**
- * 
+ *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportConnectAsyncAction : public UImtblBlueprintAsyncAction
-{
-    GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportConnectAsyncAction
+    : public UImtblBlueprintAsyncAction {
+  GENERATED_BODY()
 
-    DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportConnectOutputPin, FString, ErrorMessage);
-    
+  DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportConnectOutputPin,
+                                              FString, ErrorMessage);
+
 public:
-    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-    static UImtblPassportConnectAsyncAction* Connect(UObject* WorldContextObject);
+  UFUNCTION(BlueprintCallable,
+            meta = (WorldContext = "WorldContextObject",
+                    BlueprintInternalUseOnly = "true"),
+            Category = "Immutable")
+  static UImtblPassportConnectAsyncAction *Connect(UObject *WorldContextObject);
 
-    virtual void Activate() override;
+  void Activate() override;
 
 private:
-    FImmutablePassportConnectData ConnectData;
-    
-    void DoConnect(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
-    void OnConnect(FImmutablePassportResult Result);
+  FImmutablePassportConnectData ConnectData;
 
-    UPROPERTY(BlueprintAssignable)
-    FPassportConnectOutputPin Success;
-    UPROPERTY(BlueprintAssignable)
-    FPassportConnectOutputPin Failed;
+  void DoConnect(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
+  void OnConnect(FImmutablePassportResult Result);
+
+  UPROPERTY(BlueprintAssignable)
+  FPassportConnectOutputPin Success;
+  UPROPERTY(BlueprintAssignable)
+  FPassportConnectOutputPin Failed;
 };

@@ -1,9 +1,10 @@
 #pragma once
 
-#import <Foundation/Foundation.h>
 #import <AuthenticationServices/ASWebAuthenticationSession.h>
+#import <Foundation/Foundation.h>
 
-@interface ImmutableIOS: NSObject<ASWebAuthenticationPresentationContextProviding>
-+(ImmutableIOS*)instance;
--(void)launchUrl: (const char*)url;
+@interface ImmutableIOS
+    : NSObject <ASWebAuthenticationPresentationContextProviding>
++ (ImmutableIOS *)instance;
+- (void)launchUrl:(const char *)url;
 @end
