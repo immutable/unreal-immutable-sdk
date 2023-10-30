@@ -14,4 +14,10 @@ Java_com_epicgames_unreal_GameActivity_handleDeepLink(JNIEnv *env, jobject obj,
   UImmutablePassport::HandleDeepLink(deeplink);
   env->ReleaseStringUTFChars(jDeeplink, deeplinkCStr);
 }
+
+JNI_METHOD void
+Java_com_epicgames_unreal_GameActivity_handleOnCustomTabsDismissed(
+    JNIEnv *env, jobject obj) {
+  UImmutablePassport::HandleCustomTabsDismissed();
+}
 #endif

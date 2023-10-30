@@ -401,6 +401,10 @@ struct FImmutablePassportConnectPKCEData {
 DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
 FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
 #endif
+#if PLATFORM_ANDROID
+DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
+FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
+#endif
 
 /**
  *
@@ -418,6 +422,7 @@ public:
 
 #if PLATFORM_ANDROID
   static void HandleDeepLink(FString DeepLink);
+  static void HandleCustomTabsDismissed();
 #elif PLATFORM_IOS | PLATFORM_MAC
   static void HandleDeepLink(NSString *sDeepLink);
 #endif
@@ -503,6 +508,10 @@ private:
   bool bIsInitialized = false;
   bool bIsLoggedIn = false;
 
+#if PLATFORM_ANDROID
+  bool completingPKCE = false; // Used for the PKCE callback
+#endif
+
   TWeakObjectPtr<UImtblJSConnector> JSConnector;
   FImmutablePassportInitData InitData;
   FDelegateHandle BridgeReadyHandle;
@@ -557,6 +566,7 @@ private:
 #endif
 
 #if PLATFORM_ANDROID
+  void HandleOnPKCEDismissed();
   void CallJniStaticVoidMethod(JNIEnv *Env, const jclass Class,
                                jmethodID Method, ...);
 #endif
