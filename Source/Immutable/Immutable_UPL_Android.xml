@@ -23,6 +23,16 @@
             </intent>
         </addElements>
     </androidManifestUpdates>
+    <gameActivityImportAdditions>
+        <insert>
+            import com.immutable.unreal.ImmutableAndroid;
+        </insert>
+    </gameActivityImportAdditions>
+    <gameActivityImplementsAdditions>
+        <insert>
+            ImmutableAndroid.Callback,
+        </insert>
+    </gameActivityImplementsAdditions>
     <gameActivityOnCreateAdditions>
         <insert>
             Uri uri = getIntent().getData();
@@ -44,6 +54,13 @@
     <gameActivityClassAdditions>
         <insert>
             public native void handleDeepLink(String Deeplink);
+
+            public native void handleOnCustomTabsDismissed();
+
+            @Override
+            public void onCustomTabsDismissed() {
+                handleOnCustomTabsDismissed();
+            }
         </insert>
     </gameActivityClassAdditions>
     <buildGradleAdditions>

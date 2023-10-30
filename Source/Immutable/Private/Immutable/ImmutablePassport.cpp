@@ -229,6 +229,10 @@ void UImmutablePassport::ConfirmCode(
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::ConnectPKCE(
     const FImtblPassportResponseDelegate &ResponseDelegate) {
+#if PLATFORM_ANDROID
+  completingPKCE = false;
+#endif
+
   PKCEResponseDelegate = ResponseDelegate;
   CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""),
          PKCEResponseDelegate,
@@ -487,6 +491,9 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response) {
       Msg = Response.JsonObject->GetStringField(TEXT("result"))
                 .Replace(TEXT(" "), TEXT("+"));
 #if PLATFORM_ANDROID
+      OnPKCEDismissed = FImtblPassportOnPKCEDismissedDelegate::CreateUObject(
+          this, &UImmutablePassport::HandleOnPKCEDismissed);
+
       JNIEnv *Env = FAndroidApplication::GetJavaEnv();
       if (Env) {
         jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Msg));
@@ -539,6 +546,9 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response) {
   } else {
     IMTBL_ERR("Unable to return a response for Connect PKCE");
   }
+#if PLATFORM_ANDROID
+  completingPKCE = false;
+#endif
 }
 #endif
 
@@ -737,6 +747,10 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink) {
 }
 
 void UImmutablePassport::CompletePKCEFlow(FString Url) {
+#if PLATFORM_ANDROID
+  completingPKCE = true;
+#endif
+
   // Get code and state from deeplink URL
   TOptional<FString> Code, State;
   FString Endpoint, Params;
@@ -761,6 +775,9 @@ void UImmutablePassport::CompletePKCEFlow(FString Url) {
     PKCEResponseDelegate.ExecuteIfBound(
         FImmutablePassportResult{false, ErrorMsg});
     PKCEResponseDelegate = nullptr;
+#if PLATFORM_ANDROID
+    completingPKCE = false;
+#endif
   } else {
     FImmutablePassportConnectPKCEData Data =
         FImmutablePassportConnectPKCEData{Code.GetValue(), State.GetValue()};
@@ -790,6 +807,34 @@ void UImmutablePassport::HandleDeepLink(NSString *sDeepLink) {
 #endif
 
 #if PLATFORM_ANDROID
+void UImmutablePassport::HandleOnPKCEDismissed() {
+  IMTBL_LOG("Handle On PKCE Dismissed");
+  FFunctionGraphTask::CreateAndDispatchWhenReady(
+      [=]() {
+        OnPKCEDismissed = nullptr;
+        if (!completingPKCE) {
+          // User hasn't entered all required details (e.g. email address) into
+          // Passport yet
+          IMTBL_LOG("PKCE dismissed before completing the flow");
+          if (!PKCEResponseDelegate.ExecuteIfBound(
+                  FImmutablePassportResult{false, "Cancelled"})) {
+            IMTBL_WARN("PKCEResponseDelegate delegate was not called");
+          }
+          PKCEResponseDelegate = nullptr;
+        } else {
+          IMTBL_LOG("PKCE dismissed by user or SDK");
+        }
+      },
+      TStatId(), nullptr, ENamedThreads::GameThread);
+}
+
+void UImmutablePassport::HandleCustomTabsDismissed() {
+  IMTBL_LOG("On PKCE Dismissed");
+  if (!OnPKCEDismissed.ExecuteIfBound()) {
+    IMTBL_WARN("OnPKCEDismissed delegate was not called");
+  }
+}
+
 void UImmutablePassport::CallJniStaticVoidMethod(JNIEnv *Env,
                                                  const jclass Class,
                                                  jmethodID Method, ...) {

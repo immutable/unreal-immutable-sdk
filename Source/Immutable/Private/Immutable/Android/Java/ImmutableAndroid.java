@@ -8,11 +8,13 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Insets;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.WindowInsets;
 import android.view.WindowMetrics;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -68,7 +70,14 @@ public class ImmutableAndroid {
 
                     @Override
                     public void onCustomTabsServiceConnected(@NonNull ComponentName name, @NonNull CustomTabsClient client) {
-                        CustomTabsSession session = client.newSession(new CustomTabsCallback());
+                        CustomTabsSession session = client.newSession(new CustomTabsCallback() {
+                            @Override
+                            public void onNavigationEvent(int navigationEvent, @Nullable Bundle extras) {
+                                if (context instanceof Callback && navigationEvent == CustomTabsCallback.TAB_HIDDEN) {
+                                    ((Callback) context).onCustomTabsDismissed();
+                                }
+                            }
+                        });
                         // Need to set the session to get custom tabs to show as a bottom sheet
                         CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(session)
                                 .setInitialActivityHeightPx(getCustomTabsHeight(context))
@@ -83,5 +92,9 @@ public class ImmutableAndroid {
             // Custom Tabs not supported by any browser on the device so launch URL in any browser
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         }
+    }
+
+    public interface Callback {
+        void onCustomTabsDismissed();
     }
 }
