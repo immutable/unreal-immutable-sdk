@@ -477,6 +477,7 @@ public:
   ZkEvmSendTransaction(const FImtblTransactionRequest &Request,
                        const FImtblPassportResponseDelegate &ResponseDelegate);
   void GetIdToken(const FImtblPassportResponseDelegate &ResponseDelegate);
+  void GetAccessToken(const FImtblPassportResponseDelegate &ResponseDelegate);
   void GetAddress(const FImtblPassportResponseDelegate &ResponseDelegate);
   void GetEmail(const FImtblPassportResponseDelegate &ResponseDelegate);
 
@@ -555,6 +556,7 @@ private:
   void OnConnectPKCEResponse(FImtblJSResponse Response);
 #endif
   void OnGetIdTokenResponse(FImtblJSResponse Response);
+  void OnGetAccessTokenResponse(FImtblJSResponse Response);
   void OnGetAddressResponse(FImtblJSResponse Response);
   void OnGetEmailResponse(FImtblJSResponse Response);
   void OnTransferResponse(FImtblJSResponse Response);
