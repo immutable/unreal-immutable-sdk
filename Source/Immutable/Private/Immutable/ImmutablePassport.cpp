@@ -250,11 +250,11 @@ void UImmutablePassport::GetIdToken(
 }
 
 void UImmutablePassport::GetAccessToken(
-	const FImtblPassportResponseDelegate &ResponseDelegate) {
-	CallJS(ImmutablePassportAction::CheckStoredCredentials, TEXT(""),
-		   ResponseDelegate,
-		   FImtblJSResponseDelegate::CreateUObject(
-			   this, &UImmutablePassport::OnGetAccessTokenResponse));
+    const FImtblPassportResponseDelegate &ResponseDelegate) {
+  CallJS(ImmutablePassportAction::CheckStoredCredentials, TEXT(""),
+         ResponseDelegate,
+         FImtblJSResponseDelegate::CreateUObject(
+             this, &UImmutablePassport::OnGetAccessTokenResponse));
 }
 
 void UImmutablePassport::GetAddress(
@@ -592,26 +592,26 @@ void UImmutablePassport::OnGetIdTokenResponse(FImtblJSResponse Response) {
 }
 
 void UImmutablePassport::OnGetAccessTokenResponse(FImtblJSResponse Response) {
-	if (auto ResponseDelegate = GetResponseDelegate(Response)) {
-		// Extract the credentials
-		auto Credentials =
-			JsonObjectToUStruct<FImmutablePassportTokenData>(Response.JsonObject);
+  if (auto ResponseDelegate = GetResponseDelegate(Response)) {
+    // Extract the credentials
+    auto Credentials =
+        JsonObjectToUStruct<FImmutablePassportTokenData>(Response.JsonObject);
 
-		if (!Response.success || !Credentials.IsSet() ||
-			!Credentials->accessToken.Len()) {
-			IMTBL_LOG("No stored credentials found.");
-			FString Msg;
-			Response.Error.IsSet()
-				? Msg = Response.Error->ToString()
-				: Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			ResponseDelegate->ExecuteIfBound(
-				FImmutablePassportResult{false, Msg, Response});
-			} else {
-				IMTBL_LOG("Stored access token found.");
-				ResponseDelegate->ExecuteIfBound(
-					FImmutablePassportResult{true, Credentials->accessToken});
-			}
-	}
+    if (!Response.success || !Credentials.IsSet() ||
+        !Credentials->accessToken.Len()) {
+      IMTBL_LOG("No stored credentials found.");
+      FString Msg;
+      Response.Error.IsSet()
+          ? Msg = Response.Error->ToString()
+          : Msg = Response.JsonObject->GetStringField(TEXT("error"));
+      ResponseDelegate->ExecuteIfBound(
+          FImmutablePassportResult{false, Msg, Response});
+    } else {
+      IMTBL_LOG("Stored access token found.");
+      ResponseDelegate->ExecuteIfBound(
+          FImmutablePassportResult{true, Credentials->accessToken});
+    }
+  }
 }
 
 void UImmutablePassport::OnGetAddressResponse(FImtblJSResponse Response) {

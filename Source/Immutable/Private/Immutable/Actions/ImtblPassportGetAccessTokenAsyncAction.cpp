@@ -7,7 +7,8 @@
 #include "Immutable/Misc/ImtblLogging.h"
 
 UImtblPassportGetAccessTokenAsyncAction *
-UImtblPassportGetAccessTokenAsyncAction::GetAccessToken(UObject *WorldContextObject) {
+UImtblPassportGetAccessTokenAsyncAction::GetAccessToken(
+    UObject *WorldContextObject) {
   UImtblPassportGetAccessTokenAsyncAction *PassportInitBlueprintNode =
       NewObject<UImtblPassportGetAccessTokenAsyncAction>();
   PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
@@ -23,8 +24,8 @@ void UImtblPassportGetAccessTokenAsyncAction::Activate() {
     return;
   }
 
-  GetSubsystem()->WhenReady(this,
-                            &UImtblPassportGetAccessTokenAsyncAction::DoGetAccessToken);
+  GetSubsystem()->WhenReady(
+      this, &UImtblPassportGetAccessTokenAsyncAction::DoGetAccessToken);
 }
 
 void UImtblPassportGetAccessTokenAsyncAction::DoGetAccessToken(
@@ -34,7 +35,8 @@ void UImtblPassportGetAccessTokenAsyncAction::DoGetAccessToken(
   // Run GetAccessToken
   Passport->GetAccessToken(
       UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(
-          this, &UImtblPassportGetAccessTokenAsyncAction::OnGetAccessTokenResponse));
+          this,
+          &UImtblPassportGetAccessTokenAsyncAction::OnGetAccessTokenResponse));
 }
 
 void UImtblPassportGetAccessTokenAsyncAction::OnGetAccessTokenResponse(
