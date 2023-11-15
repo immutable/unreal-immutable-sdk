@@ -12,7 +12,8 @@ void FImmutableModule::StartupModule() {
   // timing is specified in the .uplugin file per-module
 
 #if USING_BLUI_CEF
-  if (IPluginManager::Get().FindPlugin("WebBrowserWidget") != nullptr && IPluginManager::Get().FindPlugin("WebBrowserWidget")->IsEnabled()) {
+  if (IPluginManager::Get().FindPlugin("WebBrowserWidget") != nullptr && 
+      IPluginManager::Get().FindPlugin("WebBrowserWidget")->IsEnabled()) {
     IMTBL_ERR("Cannot enable both BLUI and WebBrowserWidget plugin at the same "
               "time as it crashes.  In Immutable.uplugin file, "
               "'Plugins->WebBrowserWidget->Enabled' to 'false' and ensure the "
