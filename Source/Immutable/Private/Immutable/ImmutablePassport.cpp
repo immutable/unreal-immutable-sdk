@@ -433,16 +433,31 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response) {
   if (auto ResponseDelegate = GetResponseDelegate(Response)) {
     FString Msg;
     if (Response.success) {
+      FString Err;
+      // Todo: This is an interim solution until we have logout URL and redirect page 
+      // fully implemented by Passport team. https://immutable.atlassian.net/browse/ID-1238
+      FString LogoutUrl = "https://auth.immutable .com/v2/logout";
+      FPlatformProcess::LaunchURL(*LogoutUrl, nullptr, &Err);
+      if (Err.Len()) {
+        Msg = "Error logging out, failed to connect to Browser: " + Err;
+        IMTBL_ERR("%s", *Msg);
+        ResponseDelegate->ExecuteIfBound(
+            FImmutablePassportResult{false, Msg, Response});
+        return;
+      }
       IMTBL_LOG("Logged out.")
       bIsLoggedIn = false;
-    } else {
-      IMTBL_ERR("Error logging out.")
-      Response.Error.IsSet()
-          ? Msg = Response.Error->ToString()
-          : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-    }
-    ResponseDelegate->ExecuteIfBound(
+      ResponseDelegate->ExecuteIfBound(
         FImmutablePassportResult{Response.success, Msg, Response});
+	  return;
+    } 
+
+    IMTBL_ERR("Error logging out.")
+    Response.Error.IsSet()
+        ? Msg = Response.Error->ToString()
+        : Msg = Response.JsonObject->GetStringField(TEXT("error"));
+    ResponseDelegate->ExecuteIfBound(
+        FImmutablePassportResult{false, Msg, Response});
   }
 }
 
