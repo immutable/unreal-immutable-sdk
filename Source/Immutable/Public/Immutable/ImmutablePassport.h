@@ -522,6 +522,7 @@ private:
   // Since the second part of PKCE is triggered by deep links, saving the
   // response delegate here so it's easier to get
   FImtblPassportResponseDelegate PKCEResponseDelegate;
+  bool bLoggedInWithPKCE = false;
 #endif
 
   // Ensures that Passport has been initialized before calling JS

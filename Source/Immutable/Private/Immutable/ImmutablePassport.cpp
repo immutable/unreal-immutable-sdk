@@ -434,23 +434,27 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response) {
     FString Msg;
     if (Response.success) {
       FString Err;
-      // Todo: This is an interim solution until we have logout URL and redirect page 
-      // fully implemented by Passport team. https://immutable.atlassian.net/browse/ID-1238
-      FString LogoutUrl = "https://auth.immutable .com/v2/logout";
-      FPlatformProcess::LaunchURL(*LogoutUrl, nullptr, &Err);
-      if (Err.Len()) {
-        Msg = "Error logging out, failed to connect to Browser: " + Err;
-        IMTBL_ERR("%s", *Msg);
-        ResponseDelegate->ExecuteIfBound(
-            FImmutablePassportResult{false, Msg, Response});
-        return;
+      // Todo: This is an interim solution until we have logout URL and redirect
+      // page fully implemented by Passport team.
+      // https://immutable.atlassian.net/browse/ID-1238
+      if (!bLoggedInWithPKCE) {
+        FString LogoutUrl = "https://auth.immutable .com/v2/logout";
+        FPlatformProcess::LaunchURL(*LogoutUrl, nullptr, &Err);
+        if (Err.Len()) {
+          Msg = "Error logging out, failed to connect to Browser: " + Err;
+          IMTBL_ERR("%s", *Msg);
+          ResponseDelegate->ExecuteIfBound(
+              FImmutablePassportResult{false, Msg, Response});
+          return;
+        }
       }
+      bLoggedInWithPKCE = false;
       IMTBL_LOG("Logged out.")
       bIsLoggedIn = false;
       ResponseDelegate->ExecuteIfBound(
-        FImmutablePassportResult{Response.success, Msg, Response});
-	  return;
-    } 
+          FImmutablePassportResult{Response.success, Msg, Response});
+      return;
+    }
 
     IMTBL_ERR("Error logging out.")
     Response.Error.IsSet()
@@ -551,6 +555,7 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response) {
         return;
       }
     }
+    bLoggedInWithPKCE = true;
     PKCEResponseDelegate.ExecuteIfBound(
         FImmutablePassportResult{bSuccess, Msg});
     PKCEResponseDelegate = nullptr;
