@@ -512,6 +512,11 @@ public:
    */
   void ImxRegisterOffchain(const FImtblPassportResponseDelegate& ResponseDelegate);
 
+  /**
+   * Checks if the user's credentials have been stored
+   * @param ResponseDelegate The response delegate of type
+   * FImtblPassportResponseDelegate to call on response from JS.
+   */
   void HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 protected:
