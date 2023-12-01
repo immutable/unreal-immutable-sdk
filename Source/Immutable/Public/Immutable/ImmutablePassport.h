@@ -30,7 +30,7 @@ const FString ConnectPKCE = TEXT("connectPKCE");
 #endif
 const FString GetAddress = TEXT("getAddress");
 const FString GetEmail = TEXT("getEmail");
-const FString GetAcessToken = TEXT("getAccessToken");
+const FString GetAccessToken = TEXT("getAccessToken");
 const FString GetIdToken = TEXT("getIdToken");
 const FString ImxTransfer = TEXT("imxTransfer");
 const FString ImxBatchNftTransfer = TEXT("imxBatchNftTransfer");
@@ -118,22 +118,6 @@ struct FImmutablePassportInitData {
   FImmutableEngineVersionData engineVersion;
 
   FString ToJsonString() const;
-};
-
-USTRUCT()
-struct FImmutablePassportTokenData {
-  GENERATED_BODY()
-
-  UPROPERTY()
-  FString accessToken;
-  UPROPERTY()
-  FString refreshToken;
-  UPROPERTY()
-  FString idToken;
-  UPROPERTY()
-  FString tokenType;
-  UPROPERTY()
-  int64 expiresIn = 0;
 };
 
 USTRUCT()
@@ -527,6 +511,8 @@ public:
    * FImtblPassportResponseDelegate to call on response from JS.
    */
   void ImxRegisterOffchain(const FImtblPassportResponseDelegate& ResponseDelegate);
+
+  void HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 protected:
   void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
