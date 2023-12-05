@@ -293,10 +293,13 @@ void UImmutablePassport::HasStoredCredentials(const FImtblPassportResponseDelega
 	CallJS(ImmutablePassportAction::GetAccessToken, TEXT(""), ResponseDelegate,
 		FImtblJSResponseDelegate::CreateLambda([=](FImtblJSResponse Response)
 		{
-			if (!Response.success || Response.JsonObject->GetStringField(TEXT("result")).IsEmpty())
+		  FString AccessToken;
+		  
+		  Response.JsonObject->TryGetStringField(TEXT("result"), AccessToken);
+		  if (!Response.success || AccessToken.IsEmpty())
 			{
 				ResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false,
-					Response.Error.IsSet() ? Response.Error->ToString() : Response.JsonObject->GetStringField(TEXT("error")),
+					Response.JsonObject->HasField(TEXT("error")) ? Response.JsonObject->GetStringField(TEXT("error")) : "Failed to retrieve Access Token.",
 						Response});
 			}
 			else
@@ -305,10 +308,13 @@ void UImmutablePassport::HasStoredCredentials(const FImtblPassportResponseDelega
 				CallJS(ImmutablePassportAction::GetIdToken, TEXT(""), ResponseDelegate,
 					FImtblJSResponseDelegate::CreateLambda([ResponseDelegate](FImtblJSResponse Response)
 				{
-					  if (!Response.success || Response.JsonObject->GetStringField(TEXT("result")).IsEmpty())
+					FString IdToken;
+		  
+          Response.JsonObject->TryGetStringField(TEXT("result"), IdToken);
+					if (!Response.success || IdToken.IsEmpty())
 					{
 						ResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false,
-							Response.Error.IsSet() ? Response.Error->ToString() : Response.JsonObject->GetStringField(TEXT("error")),
+							Response.JsonObject->HasField(TEXT("error")) ? Response.JsonObject->GetStringField(TEXT("error")) : "Failed to retrieve Id Token.",
 							Response});
 					}
 					else
@@ -549,20 +555,22 @@ void UImmutablePassport::OnGetIdTokenResponse(FImtblJSResponse Response)
 {
   if (auto ResponseDelegate = GetResponseDelegate(Response))
   {
-    const FString IdToken = Response.JsonObject->GetStringField(TEXT("result"));
-        
+    FString IdToken;
+
+    Response.JsonObject->TryGetStringField(TEXT("result"), IdToken);
+
     if (!Response.success || IdToken.IsEmpty())
     {
-      IMTBL_LOG("No stored Id token found.");
+      IMTBL_LOG("Failed to retrieve Id Token.");
 
-      const FString Msg = Response.Error.IsSet() ? Response.Error->ToString() : Response.JsonObject->GetStringField(TEXT("error"));
+      const FString Msg = Response.JsonObject->HasField(TEXT("error")) ? Response.JsonObject->GetStringField(TEXT("error")) : "Failed to retrieve Id Token.";
 
-      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
+      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
     }
     else
     {
-      IMTBL_LOG("Stored Id token found.");
-      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, IdToken});
+      IMTBL_LOG("Retrieved Id Token.");
+      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ true, IdToken });
     }
   }
 }
@@ -571,20 +579,22 @@ void UImmutablePassport::OnGetAccessTokenResponse(FImtblJSResponse Response)
 {
   if (auto ResponseDelegate = GetResponseDelegate(Response))
   {
-    const FString AccessToken = Response.JsonObject->GetStringField(TEXT("result"));
+    FString AccessToken;
+
+    Response.JsonObject->TryGetStringField(TEXT("result"), AccessToken);
 
     if (!Response.success || AccessToken.IsEmpty())
     {
-      IMTBL_LOG("No stored access token found.");
+      IMTBL_LOG("Failed to retrieve Access Token");
 
-      const FString Msg = Response.Error.IsSet() ? Response.Error->ToString() : Response.JsonObject->GetStringField(TEXT("error"));
+      const FString Msg = Response.JsonObject->HasField(TEXT("error")) ? Response.JsonObject->GetStringField(TEXT("error")) : "Failed to retrieve Access Token.";
 
-      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
+      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
     }
     else
     {
-      IMTBL_LOG("Stored access token found.");
-      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, AccessToken});
+      IMTBL_LOG("Retrieved Access Token.");
+      ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ true, AccessToken });
     }
   }
 }
