@@ -16,10 +16,9 @@ struct FImtblJSResponse;
 
 namespace ImmutablePassportAction {
 const FString Initialize = TEXT("init");
-const FString CheckStoredCredentials = TEXT("checkStoredCredentials");
-const FString ConnectWithCredentials = TEXT("connectWithCredentials");
 const FString Logout = TEXT("logout");
 const FString Connect = TEXT("connect");
+const FString Reconnect = TEXT("reconnect");
 const FString ConnectEvm = TEXT("connectEvm");
 const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
 const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
@@ -31,10 +30,14 @@ const FString ConnectPKCE = TEXT("connectPKCE");
 #endif
 const FString GetAddress = TEXT("getAddress");
 const FString GetEmail = TEXT("getEmail");
+const FString GetAccessToken = TEXT("getAccessToken");
+const FString GetIdToken = TEXT("getIdToken");
 const FString ImxTransfer = TEXT("imxTransfer");
 const FString ImxBatchNftTransfer = TEXT("imxBatchNftTransfer");
 const FString EnvSandbox = TEXT("sandbox");
 const FString EnvProduction = TEXT("production");
+const FString ImxIsRegisteredOffchain = TEXT("isRegisteredOffchain");
+const FString ImxRegisterOffchain = TEXT("registerOffchain");
 } // namespace ImmutablePassportAction
 
 template <typename UStructType>
@@ -115,22 +118,6 @@ struct FImmutablePassportInitData {
   FImmutableEngineVersionData engineVersion;
 
   FString ToJsonString() const;
-};
-
-USTRUCT()
-struct FImmutablePassportTokenData {
-  GENERATED_BODY()
-
-  UPROPERTY()
-  FString accessToken;
-  UPROPERTY()
-  FString refreshToken;
-  UPROPERTY()
-  FString idToken;
-  UPROPERTY()
-  FString tokenType;
-  UPROPERTY()
-  int64 expiresIn = 0;
 };
 
 USTRUCT()
@@ -397,6 +384,15 @@ struct FImmutablePassportConnectPKCEData {
   FString state;
 };
 
+
+USTRUCT()
+struct FImxRegisterOffchainResponse {
+  GENERATED_BODY()
+
+  UPROPERTY()
+  FString tx_hash;
+};
+
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
 FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
@@ -429,11 +425,9 @@ public:
 
   void Initialize(const FImmutablePassportInitData &InitData,
                   const FImtblPassportResponseDelegate &ResponseDelegate);
-  void CheckStoredCredentials(
-      const FImtblPassportResponseDelegate &ResponseDelegate);
-  void ConnectSilent(const FImtblPassportResponseDelegate &ResponseDelegate);
   void Logout(const FImtblPassportResponseDelegate &ResponseDelegate);
   void Connect(const FImtblPassportResponseDelegate &ResponseDelegate);
+  void Reconnect(const FImtblPassportResponseDelegate &ResponseDelegate);
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
   void ConnectPKCE(const FImtblPassportResponseDelegate &ResponseDelegate);
@@ -503,6 +497,28 @@ public:
   ImxBatchNftTransfer(const FImxBatchNftTransferRequest &RequestData,
                       const FImtblPassportResponseDelegate &ResponseDelegate);
 
+  /**
+   *
+   * Checks if the user is registered off-chain.
+   * @param ResponseDelegate The response delegate of type
+   * FImtblPassportResponseDelegate to call on response from JS.
+   */
+  void ImxIsRegisteredOffchain(const FImtblPassportResponseDelegate& ResponseDelegate);
+  
+  /**
+   * Register the user to Immutable X if they are not already registered
+   * @param ResponseDelegate The response delegate of type
+   * FImtblPassportResponseDelegate to call on response from JS.
+   */
+  void ImxRegisterOffchain(const FImtblPassportResponseDelegate& ResponseDelegate);
+
+  /**
+   * Checks if the user's credentials have been stored
+   * @param ResponseDelegate The response delegate of type
+   * FImtblPassportResponseDelegate to call on response from JS.
+   */
+  void HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
+
 protected:
   void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
 
@@ -541,11 +557,9 @@ private:
                    const FImtblPassportResponseDelegate &ResponseDelegate);
 
   void OnInitializeResponse(FImtblJSResponse Response);
-  void OnCheckStoredCredentialsResponse(FImtblJSResponse Response);
-  void OnConnectSilentResponse(FImtblJSResponse Response);
-  void OnConnectWithCredentialsResponse(FImtblJSResponse Response);
   void OnLogoutResponse(FImtblJSResponse Response);
   void OnConnectResponse(FImtblJSResponse Response);
+  void OnReconnectResponse(FImtblJSResponse Response);
   void OnConnectEvmResponse(FImtblJSResponse Response);
   void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
   void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
@@ -561,6 +575,8 @@ private:
   void OnGetEmailResponse(FImtblJSResponse Response);
   void OnTransferResponse(FImtblJSResponse Response);
   void OnBatchNftTransferResponse(FImtblJSResponse Response);
+  void OnImxIsRegisteredOffchain(FImtblJSResponse Response);
+  void OnImxRegisterOffchain(FImtblJSResponse Response);
 
   void LogAndIgnoreResponse(FImtblJSResponse Response);
 
@@ -575,3 +591,4 @@ private:
                                jmethodID Method, ...);
 #endif
 };
+
