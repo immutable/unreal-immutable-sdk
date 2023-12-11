@@ -889,23 +889,19 @@ void UImmutablePassport::HandleDeepLink(NSString *sDeepLink) {
 #if PLATFORM_ANDROID
 void UImmutablePassport::HandleOnPKCEDismissed() {
   IMTBL_LOG("Handle On PKCE Dismissed");
-  FFunctionGraphTask::CreateAndDispatchWhenReady(
-      [=]() {
-        OnPKCEDismissed = nullptr;
-        if (!completingPKCE) {
-          // User hasn't entered all required details (e.g. email address) into
-          // Passport yet
-          IMTBL_LOG("PKCE dismissed before completing the flow");
-          if (!PKCEResponseDelegate.ExecuteIfBound(
-                  FImmutablePassportResult{false, "Cancelled"})) {
-            IMTBL_WARN("PKCEResponseDelegate delegate was not called");
-          }
-          PKCEResponseDelegate = nullptr;
-        } else {
-          IMTBL_LOG("PKCE dismissed by user or SDK");
-        }
-      },
-      TStatId(), nullptr, ENamedThreads::GameThread);
+  OnPKCEDismissed = nullptr;
+  if (!completingPKCE) {
+    // User hasn't entered all required details (e.g. email address) into
+    // Passport yet
+    IMTBL_LOG("PKCE dismissed before completing the flow");
+    if (!PKCEResponseDelegate.ExecuteIfBound(
+            FImmutablePassportResult{false, "Cancelled"})) {
+      IMTBL_WARN("PKCEResponseDelegate delegate was not called");
+            }
+    PKCEResponseDelegate = nullptr;
+  } else {
+    IMTBL_LOG("PKCE dismissed by user or SDK");
+  }
 }
 
 void UImmutablePassport::HandleCustomTabsDismissed() {

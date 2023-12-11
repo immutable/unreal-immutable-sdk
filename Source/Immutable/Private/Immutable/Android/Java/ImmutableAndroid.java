@@ -9,6 +9,8 @@ import android.graphics.Insets;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.WindowInsets;
 import android.view.WindowMetrics;
@@ -74,7 +76,17 @@ public class ImmutableAndroid {
                             @Override
                             public void onNavigationEvent(int navigationEvent, @Nullable Bundle extras) {
                                 if (context instanceof Callback && navigationEvent == CustomTabsCallback.TAB_HIDDEN) {
-                                    ((Callback) context).onCustomTabsDismissed();
+                                    // Adding some delay before calling onCustomTabsDismissed as sometimes this gets called 
+                                    // before the PKCE deeplink is triggered (by 100ms). This means PKCEResponseDelegate will be 
+                                    // set to null before the SDK can use it to notify the consumer of the PKCE result.
+                                    // See UImmutablePassport::HandleOnPKCEDismissed and UImmutablePassport::OnDeepLinkActivated
+                                    final Handler handler = new Handler(Looper.getMainLooper());
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ((Callback) context).onCustomTabsDismissed();
+                                        }
+                                    }, 1000);
                                 }
                             }
                         });
