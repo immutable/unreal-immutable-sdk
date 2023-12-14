@@ -74,48 +74,6 @@ For UE4 we are using Blui as the in built browser does not work.
 5. Right Click and Import the `index.js` file
    ![Import Asset](Docs/ImportAsset.png)
 
-
-## Changelog Management
-
-The following headings should be used as appropriate.
-
-- Added
-- Changed
-- Deprecated
-- Removed
-- Fixed
-
-What follows is an example with all the change headings, for real world use only use headings when appropriate.
-This goes at the top of the CHANGELOG.md above the most recent release.
-
-```markdown
-...
-
-## [Unreleased]
-
-### Added
-
-for new features.
-
-### Changed
-
-for changes in existing functionality.
-
-### Deprecated
-
-for soon-to-be removed features.
-
-### Removed
-
-for now removed features.
-
-### Fixed
-
-for any bug fixes.
-
-...
-```
-
 ## Contributing
 
 If you would like to contribute, please read the following:
