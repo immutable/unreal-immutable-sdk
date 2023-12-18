@@ -20,13 +20,14 @@ class IMMUTABLE_API UImtblPassportInitializationAsyncAction : public UImtblBluep
 
 public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblPassportInitializationAsyncAction* InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& Environment);
+	static UImtblPassportInitializationAsyncAction* InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& LogoutUri, const FString& Environment);
 
 	virtual void Activate() override;
 
 private:
 	FString ClientId;
 	FString RedirectUri;
+	FString LogoutUri;
 	FString Environment;
 
 	UPROPERTY(BlueprintAssignable)
