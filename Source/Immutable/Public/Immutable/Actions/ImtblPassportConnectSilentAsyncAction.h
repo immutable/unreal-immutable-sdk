@@ -3,13 +3,13 @@
 #include "CoreMinimal.h"
 #include "ImtblBlueprintAsyncAction.h"
 
-#include "ImtblPassportReconnectAsyncAction.generated.h"
+#include "ImtblPassportConnectSilentAsyncAction.generated.h"
 
 /**
  *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportReconnectAsyncAction : public UImtblBlueprintAsyncAction
+class IMMUTABLE_API UImtblPassportConnectSilentAsyncAction : public UImtblBlueprintAsyncAction
 {
 	GENERATED_BODY()
 
@@ -18,7 +18,7 @@ class IMMUTABLE_API UImtblPassportReconnectAsyncAction : public UImtblBlueprintA
 public:
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblPassportReconnectAsyncAction* Reconnect(UObject* WorldContextObject);
+	static UImtblPassportConnectSilentAsyncAction* ConnectSilent(UObject* WorldContextObject);
 
 	void Activate() override;
 
@@ -29,6 +29,6 @@ private:
 	UPROPERTY(BlueprintAssignable)
 	FPassportConnectSilentOutputPin OnFailure;
 
-	void DoReconnect(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
-	void OnReconnectResponse(struct FImmutablePassportResult Result);
+	void DoConnectSilent(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
+	void OnConnectSilentResponse(struct FImmutablePassportResult Result);
 };
