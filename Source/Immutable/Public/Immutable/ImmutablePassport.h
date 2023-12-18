@@ -8,9 +8,9 @@
 #include "Misc/EngineVersion.h"
 #include "Runtime/Core/Public/HAL/Platform.h"
 #include "UObject/Object.h"
-// clang-format off
+
 #include "ImmutablePassport.generated.h"
-// clang-format on
+
 
 struct FImtblJSResponse;
 
@@ -19,7 +19,7 @@ namespace ImmutablePassportAction
 	const FString Initialize = TEXT("init");
 	const FString Logout = TEXT("logout");
 	const FString Connect = TEXT("connect");
-	const FString Reconnect = TEXT("reconnect");
+	const FString ConnectSilent = TEXT("reconnect");
 	const FString ConnectEvm = TEXT("connectEvm");
 	const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
 	const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
@@ -57,7 +57,7 @@ template <typename UStructType> TOptional<UStructType> JsonObjectToUStruct(const
 
 	// Parse the JSON
 	UStructType StructInstance;
-	if (!FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &StructInstance, nullptr, 0))
+	if (!FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &StructInstance, 0, 0))
 	{
 		IMTBL_ERR("Could not parse response from JavaScript into the expected Ustruct")
 		return TOptional<UStructType>();
@@ -109,6 +109,9 @@ struct FImmutablePassportInitData
 
 	UPROPERTY()
 	FString redirectUri;
+
+	UPROPERTY()
+	FString logoutRedirectUri;
 
 	UPROPERTY()
 	FString environment = ImmutablePassportAction::EnvSandbox;
@@ -403,14 +406,6 @@ struct FImxRegisterOffchainResponse
 	FString tx_hash;
 };
 
-#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
-FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
-#endif
-#if PLATFORM_ANDROID
-DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
-FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
-#endif
 
 /**
  *
@@ -427,16 +422,16 @@ public:
 	DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult);
 
 #if PLATFORM_ANDROID
-	static void HandleDeepLink(FString DeepLink);
-	static void HandleCustomTabsDismissed();
+	void HandleDeepLink(FString DeepLink) const;
+	void HandleCustomTabsDismissed(FString Url) const;
 #elif PLATFORM_IOS | PLATFORM_MAC
-	static void HandleDeepLink(NSString* sDeepLink);
+	void HandleDeepLink(NSString* sDeepLink) const;
 #endif
 
 	void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
 	void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
 	void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
-	void Reconnect(const FImtblPassportResponseDelegate& ResponseDelegate);
+	void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	void ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -465,8 +460,7 @@ public:
 	 * @param ResponseDelegate The response delegate of type
 	 * FImtblPassportResponseDelegate to call on response from JS.
 	 */
-	void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data,
-const FImtblPassportResponseDelegate& ResponseDelegate);
+	void ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
 	 * Creates new message call transaction or a contract creation, if the data
@@ -532,7 +526,12 @@ private:
 	bool bIsLoggedIn = false;
 
 #if PLATFORM_ANDROID
+	DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
+  
+	FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
+	
 	bool completingPKCE = false; // Used for the PKCE callback
+	static FString LoginPKCEUrl;
 #endif
 
 	TWeakObjectPtr<UImtblJSConnector> JSConnector;
@@ -540,6 +539,9 @@ private:
 	FDelegateHandle BridgeReadyHandle;
 	TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+	DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
+  
+	FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
 	// Since the second part of PKCE is triggered by deep links, saving the
 	// response delegate here so it's easier to get
 	FImtblPassportResponseDelegate PKCEResponseDelegate;
@@ -560,7 +562,7 @@ private:
 	void OnInitializeResponse(FImtblJSResponse Response);
 	void OnLogoutResponse(FImtblJSResponse Response);
 	void OnConnectResponse(FImtblJSResponse Response);
-	void OnReconnectResponse(FImtblJSResponse Response);
+	void OnConnectSilentResponse(FImtblJSResponse Response);
 	void OnConnectEvmResponse(FImtblJSResponse Response);
 	void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
 	void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
@@ -583,12 +585,12 @@ private:
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	void OnDeepLinkActivated(FString DeepLink);
-	void CompletePKCEFlow(FString Url);
+	void CompleteLoginPKCEFlow(FString Url);
 #endif
 
 #if PLATFORM_ANDROID
-	void HandleOnPKCEDismissed();
-	void CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class,
-		jmethodID Method, ...);
+	void HandleOnLoginPKCEDismissed();
+	void CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class, jmethodID Method, ...);
+	void LaunchAndroidUrl(FString Url);
 #endif
 };

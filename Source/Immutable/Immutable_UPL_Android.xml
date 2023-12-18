@@ -55,11 +55,11 @@
         <insert>
             public native void handleDeepLink(String Deeplink);
 
-            public native void handleOnCustomTabsDismissed();
+            public native void handleOnCustomTabsDismissed(String Url);
 
             @Override
-            public void onCustomTabsDismissed() {
-                handleOnCustomTabsDismissed();
+            public void onCustomTabsDismissed(String Url) {
+                handleOnCustomTabsDismissed(Url);
             }
         </insert>
     </gameActivityClassAdditions>
