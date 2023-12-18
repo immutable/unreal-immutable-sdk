@@ -132,6 +132,10 @@ FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
 	return OutString;
 }
 
+#if PLATFORM_ANDROID
+	FString UImmutablePassport::LoginPKCEUrl(TEXT(""));
+#endif
+
 // @param Environment can be one of ImmutablePassportAction::EnvSandbox or
 // ImmutablePassportAction::EnvProduction
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
@@ -140,7 +144,7 @@ void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
 	check(JSConnector.IsValid());
 
 	InitData = Data;
-
+	
 	CallJS(ImmutablePassportAction::Initialize, InitData.ToJsonString(), ResponseDelegate,
 	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse), false);
 }
@@ -157,10 +161,10 @@ void UImmutablePassport::Connect(const FImtblPassportResponseDelegate& ResponseD
 	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectResponse));
 }
 
-void UImmutablePassport::Reconnect(const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::Reconnect, TEXT(""), ResponseDelegate,
-	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnReconnectResponse));
+	CallJS(ImmutablePassportAction::ConnectSilent, TEXT(""), ResponseDelegate,
+	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectSilentResponse));
 }
 
 void UImmutablePassport::ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate)
@@ -193,6 +197,7 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
                                      const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	FImmutablePassportCodeConfirmRequestData Data;
+	
 	Data.deviceCode = DeviceCode;
 	Data.interval = Interval;
 	CallJS(ImmutablePassportAction::ConfirmCode, UStructToJsonString(Data), ResponseDelegate,
@@ -200,17 +205,14 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-void UImmutablePassport::ConnectPKCE(
-    const FImtblPassportResponseDelegate &ResponseDelegate) {
+void UImmutablePassport::ConnectPKCE(const FImtblPassportResponseDelegate &ResponseDelegate)
+{
 #if PLATFORM_ANDROID
-  completingPKCE = false;
+	completingPKCE = false;
 #endif
 
-  PKCEResponseDelegate = ResponseDelegate;
-  CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""),
-         PKCEResponseDelegate,
-         FImtblJSResponseDelegate::CreateUObject(
-             this, &UImmutablePassport::OnGetPKCEAuthUrlResponse));
+	PKCEResponseDelegate = ResponseDelegate;
+	CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""), PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetPKCEAuthUrlResponse));
 }
 #endif
 
@@ -382,7 +384,7 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 				: Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
 
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Msg, Response });
 	}
 }
 
@@ -391,19 +393,38 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
 		FString Msg;
+		
 		if (Response.success)
 		{
 			IMTBL_LOG("Logged out.")
+
+			FString Url;
+			FString Err;
+			
+			Response.JsonObject->TryGetStringField(TEXT("result"), Url);
+			if (!Url.IsEmpty())
+			{
+#if PLATFORM_WINDOWS
+				FPlatformProcess::LaunchURL(*Url, nullptr, &Err);
+				if (Err.Len())
+				{
+					Msg = "Failed to connect to Browser: " + Err;
+					IMTBL_ERR("%s", *Msg);
+					ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
+					return;
+				}
+#elif PLATFORM_ANDROID
+				LaunchAndroidUrl(Url);
+#endif
+			}
 			bIsLoggedIn = false;
 		}
 		else
 		{
 			IMTBL_ERR("Error logging out.")
-			Response.Error.IsSet()
-				? Msg = Response.Error->ToString()
-				: Msg = Response.JsonObject->GetStringField(TEXT("error"));
+			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Msg, Response });
 	}
 }
 
@@ -416,10 +437,8 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
 		{
 			FString Msg;
 			IMTBL_WARN("Connect attempt failed.");
-			Response.Error.IsSet()
-				? Msg = Response.Error->ToString()
-				: Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
+			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
+			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
 			return;
 		}
 		FString Err;
@@ -428,14 +447,14 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
 		{
 			FString Msg = "Failed to connect to Browser: " + Err;
 			IMTBL_ERR("%s", *Msg);
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
+			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
 			return;
 		}
 		ConfirmCode(ConnectData->deviceCode, ConnectData->interval, ResponseDelegate.GetValue());
 	}
 }
 
-void UImmutablePassport::OnReconnectResponse(FImtblJSResponse Response)
+void UImmutablePassport::OnConnectSilentResponse(FImtblJSResponse Response)
 {
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
@@ -448,12 +467,10 @@ void UImmutablePassport::OnReconnectResponse(FImtblJSResponse Response)
 		else
 		{
 			IMTBL_ERR("Failed to reconnect.")
-			Response.Error.IsSet()
-				? Msg = Response.Error->ToString()
-				: Msg = Response.JsonObject->GetStringField(TEXT("error"));
+			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
 
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Msg, Response });
 	}
 }
 
@@ -478,57 +495,62 @@ void UImmutablePassport::OnConnectEvmResponse(FImtblJSResponse Response)
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response) {
-  if (PKCEResponseDelegate.IsBound()) {
-    FString Msg;
-    bool bSuccess = true;
-    if (!Response.success ||
-        !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result"))) {
-      IMTBL_LOG("Could not get PKCE auth URL from Passport.");
-    } else {
-      // Handle deeplink calls
-      OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(
-          this, &UImmutablePassport::OnDeepLinkActivated);
+//       private async UniTask LaunchAuthUrl()
+void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
+{
+	if (PKCEResponseDelegate.IsBound())
+	{
+		FString Msg;
+		bool bSuccess = true;
+		
+		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
+		{
+			IMTBL_LOG("Could not get PKCE auth URL from Passport.");
+		}
+		else
+		{
+			// Handle deeplink calls
+			OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 
-      FString Err;
-      Msg = Response.JsonObject->GetStringField(TEXT("result"))
-                .Replace(TEXT(" "), TEXT("+"));
+			FString Err;
+			
+			Msg = Response.JsonObject->GetStringField(TEXT("result")).Replace(TEXT(" "), TEXT("+"));
 #if PLATFORM_ANDROID
-      OnPKCEDismissed = FImtblPassportOnPKCEDismissedDelegate::CreateUObject(
-          this, &UImmutablePassport::HandleOnPKCEDismissed);
-
-      JNIEnv *Env = FAndroidApplication::GetJavaEnv();
-      if (Env) {
-        jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Msg));
-        jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass(
-            "com/immutable/unreal/ImmutableAndroid");
-        static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(
-            Env, jimmutableAndroidClass, "launchUrl",
-            "(Landroid/app/Activity;Ljava/lang/String;)V", false);
-        CallJniStaticVoidMethod(Env, jimmutableAndroidClass, jlaunchUrl,
-                                FJavaWrapper::GameActivityThis, jurl);
-      }
+			OnPKCEDismissed = FImtblPassportOnPKCEDismissedDelegate::CreateUObject(this, &UImmutablePassport::HandleOnLoginPKCEDismissed);
+			LoginPKCEUrl = Msg;
+			LaunchAndroidUrl(Msg);
+			// if (Env)
+			// {
+			// 	jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Msg));
+			// 	jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass("com/immutable/unreal/ImmutableAndroid");
+			// 	static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(Env, jimmutableAndroidClass, "launchUrl", "(Landroid/app/Activity;Ljava/lang/String;)V", false);
+			// 	
+			// 	CallJniStaticVoidMethod(Env, jimmutableAndroidClass, jlaunchUrl, FJavaWrapper::GameActivityThis, jurl);
+			// }
 #elif PLATFORM_IOS
-      [[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
+			[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
 #elif PLATFORM_MAC
-      [[ImmutableMac instance] launchUrl:TCHAR_TO_ANSI(*Msg)
-                          forRedirectUri:TCHAR_TO_ANSI(*InitData.redirectUri)];
+			[[ImmutableMac instance] launchUrl:TCHAR_TO_ANSI(*Msg) forRedirectUri:TCHAR_TO_ANSI(*InitData.redirectUri)];
 #endif
 
-      if (Err.Len()) {
-        Msg = "Failed to connect to Browser: " + Err;
-        IMTBL_ERR("%s", *Msg);
-        bSuccess = false;
-      } else {
-        return;
-      }
-    }
-    PKCEResponseDelegate.ExecuteIfBound(
-        FImmutablePassportResult{bSuccess, Msg});
-    PKCEResponseDelegate = nullptr;
-  } else {
-    IMTBL_ERR("Unable to return a response for Connect PKCE");
-  }
+			if (Err.Len())
+			{
+				Msg = "Failed to connect to Browser: " + Err;
+				IMTBL_ERR("%s", *Msg);
+				bSuccess = false;
+			}
+			else
+			{
+				return;
+			}
+		}
+		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ bSuccess, Msg });
+		PKCEResponseDelegate = nullptr;
+	}
+	else
+	{
+		IMTBL_ERR("Unable to return a response for Connect PKCE");
+	}
 }
 
 void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response) {
@@ -712,6 +734,7 @@ void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
 		FString Msg;
+		
 		if (Response.success)
 		{
 			IMTBL_LOG("Log in code confirmed.")
@@ -720,11 +743,9 @@ void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
 		else
 		{
 			IMTBL_WARN("Login code not confirmed.")
-			Response.Error.IsSet()
-				? Msg = Response.Error->ToString()
-				: Msg = Response.JsonObject->GetStringField(TEXT("error"));
+			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Msg, Response });
 	}
 }
 
@@ -854,19 +875,24 @@ void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
 	}
 }
 
+
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 {
-	IMTBL_LOG("On Deep Link Activated: %s", *DeepLink);
+	IMTBL_LOG_FUNC("URL : %s", *DeepLink);
 	OnHandleDeepLink = nullptr;
-
+	// if (DeepLink.StartsWith(InitData.logoutRedirectUri))
+	// {
+	// }
+	// else
 	if (DeepLink.StartsWith(InitData.redirectUri))
 	{
-		CompletePKCEFlow(DeepLink);
+		CompleteLoginPKCEFlow(DeepLink);
 	}
+	LoginPKCEUrl.Empty();
 }
 
-void UImmutablePassport::CompletePKCEFlow(FString Url)
+void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 {
 #if PLATFORM_ANDROID
 	completingPKCE = true;
@@ -919,11 +945,11 @@ void UImmutablePassport::CompletePKCEFlow(FString Url)
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #if PLATFORM_ANDROID
 // Called from Android JNI
-void UImmutablePassport::HandleDeepLink(FString DeepLink)
+void UImmutablePassport::HandleDeepLink(FString DeepLink) const
 {
 #elif PLATFORM_IOS | PLATFORM_MAC
 // Called from iOS Objective C
-void UImmutablePassport::HandleDeepLink(NSString *sDeepLink)
+void UImmutablePassport::HandleDeepLink(NSString *sDeepLink) const
 {
 	FString DeepLink = FString(UTF8_TO_TCHAR([sDeepLink UTF8String]));
 	IMTBL_LOG("Handle Deep Link: %s", *DeepLink);
@@ -937,19 +963,19 @@ void UImmutablePassport::HandleDeepLink(NSString *sDeepLink)
 #endif
 
 #if PLATFORM_ANDROID
-void UImmutablePassport::HandleOnPKCEDismissed()
+void UImmutablePassport::HandleOnLoginPKCEDismissed()
 {
-	IMTBL_LOG("Handle On PKCE Dismissed");
+	IMTBL_LOG("Handle On Login PKCE Dismissed");
 	OnPKCEDismissed = nullptr;
 
 	if (!completingPKCE)
 	{
 		// User hasn't entered all required details (e.g. email address) into
 		// Passport yet
-		IMTBL_LOG("PKCE dismissed before completing the flow");
-		if (!PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, "Cancelled"}))
+		IMTBL_LOG("Login PKCE dismissed before completing the flow");
+		if (!PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ false, "Cancelled" }))
 		{
-			IMTBL_WARN("PKCEResponseDelegate delegate was not called");
+			IMTBL_WARN("Login PKCEResponseDelegate delegate was not called");
 		}
 		PKCEResponseDelegate = nullptr;
 	}
@@ -959,9 +985,15 @@ void UImmutablePassport::HandleOnPKCEDismissed()
 	}
 }
 
-void UImmutablePassport::HandleCustomTabsDismissed()
+void UImmutablePassport::HandleCustomTabsDismissed(FString Url) const
 {
 	IMTBL_LOG("On PKCE Dismissed");
+
+	if (!Url.StartsWith(LoginPKCEUrl))
+	{
+		return;
+	}
+
 	if (!OnPKCEDismissed.ExecuteIfBound())
 	{
 		IMTBL_WARN("OnPKCEDismissed delegate was not called");
@@ -976,6 +1008,38 @@ void UImmutablePassport::CallJniStaticVoidMethod(JNIEnv *Env, const jclass Class
 	Env->CallStaticVoidMethodV(Class, Method, Args);
 	va_end(Args);
 	Env->DeleteLocalRef(Class);
+}
+
+// class AndroidPKCECallback
+// {
+// 	private UImmutablePassport* ImmutablePassport = nullptr;
+//
+// 	public AndroidPKCECallback(UImmutablePassport* callback)
+// 	{
+// 		this.callback = callback;
+// 	}
+//
+// 	void onCustomTabsDismissed(FString url)
+// 	{
+// 		// To differentiate what triggered this
+// 		// if (url == PassportImpl.loginPKCEUrl)
+// 		{
+// 		// Custom tabs dismissed for login flow
+// 			ImmutablePassport->HandleOnLoginPKCEDismissed(PassportImpl.completingPKCE);
+// 		}
+// 	}
+// }
+
+void UImmutablePassport::LaunchAndroidUrl(FString Url)
+{
+	if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
+	{
+		jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Url));
+		jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass("com/immutable/unreal/ImmutableAndroid");
+		static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(Env, jimmutableAndroidClass, "launchUrl", "(Landroid/app/Activity;Ljava/lang/String;)V", false);
+					
+		CallJniStaticVoidMethod(Env, jimmutableAndroidClass, jlaunchUrl, FJavaWrapper::GameActivityThis, jurl);
+	}
 }
 #endif
 
