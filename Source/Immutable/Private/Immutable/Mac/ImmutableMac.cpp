@@ -1,5 +1,7 @@
 #include "ImmutableMac.h"
 #include "Immutable/ImmutablePassport.h"
+#include "Immutable/ImmutableSubsystem.h"
+#include "Engine/GameEngine.h"
 
 ASWebAuthenticationSession *_authSession;
 
@@ -17,6 +19,34 @@ ASWebAuthenticationSession *_authSession;
     staticImmutableMac = [[self alloc] init];
   });
   return staticImmutableMac;
+}
+
++ (UImmutablePassport*) getPassport {
+	UGameEngine* GameEngine = Cast<UGameEngine>(GEngine);
+
+	if (!GameEngine) {
+		return nil;
+	}
+
+	UWorld* World = GameEngine ? GameEngine->GetGameWorld() : NULL;
+
+	if (!World) {
+		return nil;
+	}
+
+	auto ImmutableSubsystem = World->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
+
+	if (!ImmutableSubsystem) {
+		return nil;
+	}
+
+	auto Passport = ImmutableSubsystem->GetPassport();
+
+	if (!Passport.IsValid()) {
+		return nil;
+	}
+
+	return Passport.Get();
 }
 
 - (void)launchUrl:(const char *)url forRedirectUri:(const char *)redirectUri {
@@ -40,7 +70,11 @@ ASWebAuthenticationSession *_authSession;
               _authSession = nil;
 
               if (callbackURL) {
-                UImmutablePassport::HandleDeepLink(callbackURL.absoluteString);
+                UImmutablePassport* passport = [ImmutableMac getPassport];
+
+                if (passport) {
+                  passport->HandleDeepLink(callbackURL.absoluteString);
+                }
               } else {
                 return;
               }

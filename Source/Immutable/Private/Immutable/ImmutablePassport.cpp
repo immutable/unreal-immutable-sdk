@@ -415,6 +415,8 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 				}
 #elif PLATFORM_ANDROID
 				LaunchAndroidUrl(Url);
+#elif PLATFORM_IOS || PLATFORM_MAC
+				[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Url)];
 #endif
 			}
 			bIsLoggedIn = false;
@@ -519,14 +521,6 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
 			OnPKCEDismissed = FImtblPassportOnPKCEDismissedDelegate::CreateUObject(this, &UImmutablePassport::HandleOnLoginPKCEDismissed);
 			LoginPKCEUrl = Msg;
 			LaunchAndroidUrl(Msg);
-			// if (Env)
-			// {
-			// 	jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Msg));
-			// 	jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass("com/immutable/unreal/ImmutableAndroid");
-			// 	static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(Env, jimmutableAndroidClass, "launchUrl", "(Landroid/app/Activity;Ljava/lang/String;)V", false);
-			// 	
-			// 	CallJniStaticVoidMethod(Env, jimmutableAndroidClass, jlaunchUrl, FJavaWrapper::GameActivityThis, jurl);
-			// }
 #elif PLATFORM_IOS
 			[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
 #elif PLATFORM_MAC
@@ -889,7 +883,9 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 	{
 		CompleteLoginPKCEFlow(DeepLink);
 	}
+#if PLATFORM_ANDROID	
 	LoginPKCEUrl.Empty();
+#endif
 }
 
 void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
