@@ -423,7 +423,7 @@ public:
 
 #if PLATFORM_ANDROID
 	void HandleDeepLink(FString DeepLink) const;
-	void HandleCustomTabsDismissed(FString Url) const;
+	void HandleCustomTabsDismissed(FString Url);
 #elif PLATFORM_IOS | PLATFORM_MAC
 	void HandleDeepLink(NSString* sDeepLink) const;
 #endif
@@ -545,6 +545,8 @@ private:
 	// Since the second part of PKCE is triggered by deep links, saving the
 	// response delegate here so it's easier to get
 	FImtblPassportResponseDelegate PKCEResponseDelegate;
+	FImtblPassportResponseDelegate PKCELogoutResponseDelegate;
+	bool IsPKCEConnected = false;
 #endif
 
 	// Ensures that Passport has been initialized before calling JS
