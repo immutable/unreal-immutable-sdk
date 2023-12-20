@@ -1,40 +1,42 @@
 #include "ImmutableAndroidJNI.h"
 
-#include "Immutable/ImmutablePassport.h"
-#include "Immutable/ImmutableSubsystem.h"
-
-
 #if PLATFORM_ANDROID
 
-const UImmutablePassport* GetPassport()
+#include "Immutable/ImmutablePassport.h"
+#include "Immutable/ImmutableSubsystem.h"
+#include "Engine/GameEngine.h"
+
+UImmutablePassport* GetPassport()
 {
-  if (!GEngine)
-  {
-    return nullptr;
-  }
+	UGameEngine* GameEngine = Cast<UGameEngine>(GEngine);
 
-  const auto GameWorld = GEngine->GetWorld();
+	if (!GameEngine)
+	{
+		return nullptr;
+	}
 
-  if (!GameWorld)
-  {
-    return nullptr;
-  }
+	UWorld* World = GameEngine ? GameEngine->GetGameWorld() : NULL;
 
-  auto ImmutableSubsystem = GameWorld->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
+	if (!World)
+	{
+		return nullptr;
+	}
 
-  if (!ImmutableSubsystem)
-  {
-    return nullptr;
-  }
+	auto ImmutableSubsystem = World->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
 
-  auto Passport = ImmutableSubsystem->GetPassport();
+	if (!ImmutableSubsystem)
+	{
+		return nullptr;
+	}
 
-  if (!Passport.IsValid())
-  {
-    return nullptr;
-  }
+	auto Passport = ImmutableSubsystem->GetPassport();
 
-  return Passport.Get();
+	if (!Passport.IsValid())
+	{
+		return nullptr;
+	}
+
+	return Passport.Get();
 }
 
 JNI_METHOD void Java_com_epicgames_unreal_GameActivity_handleDeepLink(JNIEnv *env, jobject obj, jstring jDeeplink)
