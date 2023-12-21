@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
-// clang-format off
+
 #include "ImtblBlueprintAsyncAction.generated.h"
-// clang-format on
 
 /**
- *
+ 
+ * base class for asynchronous actions
  */
 UCLASS()
-class IMMUTABLE_API UImtblBlueprintAsyncAction
-    : public UBlueprintAsyncActionBase {
-  GENERATED_BODY()
+class IMMUTABLE_API UImtblBlueprintAsyncAction : public UBlueprintAsyncActionBase
+{
+	GENERATED_BODY()
 
 protected:
-  UObject *WorldContextObject;
+	UObject* WorldContextObject;
 
-  // Get subsystem
-  class UImmutableSubsystem *GetSubsystem() const;
+	// Get subsystem
+	class UImmutableSubsystem* GetSubsystem() const;
 };

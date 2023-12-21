@@ -1,5 +1,7 @@
 #include "ImmutableIOS.h"
 #include "Immutable/ImmutablePassport.h"
+#include "Immutable/ImmutableSubsystem.h"
+#include "Engine/GameEngine.h"
 
 API_AVAILABLE(ios(12.0))
 ASWebAuthenticationSession *_authSession;
@@ -20,6 +22,34 @@ ASWebAuthenticationSession *_authSession;
   return staticImmutableIOS;
 }
 
++ (UImmutablePassport*) getPassport {
+	UGameEngine* GameEngine = Cast<UGameEngine>(GEngine);
+
+	if (!GameEngine) {
+		return nil;
+	}
+
+	UWorld* World = GameEngine ? GameEngine->GetGameWorld() : NULL;
+
+	if (!World) {
+		return nil;
+	}
+
+	auto ImmutableSubsystem = World->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
+
+	if (!ImmutableSubsystem) {
+		return nil;
+	}
+
+	auto Passport = ImmutableSubsystem->GetPassport();
+
+	if (!Passport.IsValid()) {
+		return nil;
+	}
+
+	return Passport.Get();
+}
+
 - (void)launchUrl:(const char *)url {
   NSURL *URL = [NSURL URLWithString:[[NSString alloc] initWithUTF8String:url]];
   NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
@@ -31,7 +61,11 @@ ASWebAuthenticationSession *_authSession;
                           NSError *_Nullable error) {
         _authSession = nil;
         if (callbackURL) {
-          UImmutablePassport::HandleDeepLink(callbackURL.absoluteString);
+          UImmutablePassport* passport = [ImmutableIOS getPassport];
+
+          if (passport) {
+            passport->HandleDeepLink(callbackURL.absoluteString);
+          }
         } else {
           return;
         }

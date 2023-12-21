@@ -43,7 +43,7 @@ public class ImmutableAndroid {
         }
     }
 
-    public static void launchUrl(Activity context, String url) {
+    public static void launchUrl(final Activity context, final String url) {
         // Get all apps that can support Custom Tabs Service
         // i.e. services that can handle ACTION_CUSTOM_TABS_CONNECTION intents
         PackageManager packageManager = context.getPackageManager();
@@ -84,7 +84,7 @@ public class ImmutableAndroid {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            ((Callback) context).onCustomTabsDismissed();
+                                            ((Callback) context).onCustomTabsDismissed(url);
                                         }
                                     }, 1000);
                                 }
@@ -107,6 +107,6 @@ public class ImmutableAndroid {
     }
 
     public interface Callback {
-        void onCustomTabsDismissed();
+        void onCustomTabsDismissed(String url);
     }
 }
