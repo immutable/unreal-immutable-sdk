@@ -531,7 +531,6 @@ private:
 	FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
 	
 	bool completingPKCE = false; // Used for the PKCE callback
-	static FString LoginPKCEUrl;
 #endif
 
 	TWeakObjectPtr<UImtblJSConnector> JSConnector;

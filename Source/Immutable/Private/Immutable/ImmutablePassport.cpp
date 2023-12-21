@@ -132,10 +132,6 @@ FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
 	return OutString;
 }
 
-#if PLATFORM_ANDROID
-	FString UImmutablePassport::LoginPKCEUrl(TEXT(""));
-#endif
-
 // @param Environment can be one of ImmutablePassportAction::EnvSandbox or
 // ImmutablePassportAction::EnvProduction
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
@@ -151,6 +147,9 @@ void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
 
 void UImmutablePassport::Logout(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+	PKCELogoutResponseDelegate = ResponseDelegate;
+#endif
 	CallJS(ImmutablePassportAction::Logout, TEXT(""), ResponseDelegate,
 	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnLogoutResponse));
 }
@@ -395,8 +394,6 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 	{
 		if (Response.success)
 		{
-			IMTBL_LOG("Logged out.")
-
 			FString Url;
 			FString Err;
 			
@@ -406,11 +403,13 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 				if (IsPKCEConnected)
 				{
-					PKCELogoutResponseDelegate = ResponseDelegate.GetValue();
+					OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 #if PLATFORM_ANDROID
 					LaunchAndroidUrl(Url);
-#elif PLATFORM_IOS || PLATFORM_MAC
+#elif PLATFORM_IOS
 					[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Url)];
+#elif PLATFORM_MAC
+					[[ImmutableMac instance] launchUrl:TCHAR_TO_ANSI(*Url) forRedirectUri:TCHAR_TO_ANSI(*InitData.logoutRedirectUri)];
 #endif
 				}
 				else
@@ -424,7 +423,7 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 						ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
 						return;
 					}
-					
+					IMTBL_LOG("Logged out.")
 					ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, "Logged out" });
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 				}
@@ -533,7 +532,6 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
 			Msg = Response.JsonObject->GetStringField(TEXT("result")).Replace(TEXT(" "), TEXT("+"));
 #if PLATFORM_ANDROID
 			OnPKCEDismissed = FImtblPassportOnPKCEDismissedDelegate::CreateUObject(this, &UImmutablePassport::HandleOnLoginPKCEDismissed);
-			LoginPKCEUrl = Msg;
 			LaunchAndroidUrl(Msg);
 #elif PLATFORM_IOS
 			[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
@@ -541,14 +539,12 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
 			[[ImmutableMac instance] launchUrl:TCHAR_TO_ANSI(*Msg) forRedirectUri:TCHAR_TO_ANSI(*InitData.redirectUri)];
 #endif
 		}
-#if PLATFORM_IOS || PLATFORM_MAC
-		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ bSuccess, Msg });
-		PKCEResponseDelegate = nullptr;
-#endif
 	}
 	else
 	{
 		IMTBL_ERR("Unable to return a response for Connect PKCE");
+		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ false, "Response delegate is not assigned" });
+		PKCEResponseDelegate = nullptr;
 	}
 }
 
@@ -886,17 +882,15 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 {
 	IMTBL_LOG_FUNC("URL : %s", *DeepLink);
 	OnHandleDeepLink = nullptr;
-	// if (DeepLink.StartsWith(InitData.logoutRedirectUri))
-	// {
-	// }
-	// else
-	if (DeepLink.StartsWith(InitData.redirectUri))
+	if (DeepLink.StartsWith(InitData.logoutRedirectUri) && PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ true, "Logged out" }))
+	{
+		PKCELogoutResponseDelegate = nullptr;
+		IsPKCEConnected = false;
+	}
+	else if (DeepLink.StartsWith(InitData.redirectUri))
 	{
 		CompleteLoginPKCEFlow(DeepLink);
 	}
-#if PLATFORM_ANDROID	
-	LoginPKCEUrl.Empty();
-#endif
 }
 
 void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
@@ -995,27 +989,6 @@ void UImmutablePassport::HandleOnLoginPKCEDismissed()
 void UImmutablePassport::HandleCustomTabsDismissed(FString Url)
 {
 	IMTBL_LOG("On PKCE Dismissed");
-
-	// Dismiss routine for logout
-	IMTBL_LOG("PKCE received url %s", *Url);
-
-	TOptional<FString> Parameter = FGenericPlatformHttp::GetUrlParameter(Url, TEXT("resultTo"));
-	
-	if (Parameter.IsSet())
-	{
-		IMTBL_LOG("PKCE received url resultTo parameter %s", *Parameter.GetValue());
-	}
-	if (IsPKCEConnected)
-	{
-		if (PKCELogoutResponseDelegate.IsBound())
-		{
-			PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ true, "Logged out" });
-			PKCELogoutResponseDelegate = nullptr;
-		}
-		IsPKCEConnected = false;
-
-		return;
-	}
 
 	if (!OnPKCEDismissed.ExecuteIfBound())
 	{
