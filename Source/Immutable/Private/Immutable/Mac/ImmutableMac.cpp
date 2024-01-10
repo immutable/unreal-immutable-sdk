@@ -3,6 +3,10 @@
 #include "Immutable/ImmutableSubsystem.h"
 #include "Engine/GameEngine.h"
 
+#if WITH_EDITOR
+#include "Editor.h"
+#endif
+
 ASWebAuthenticationSession *_authSession;
 
 @implementation ImmutableMac
@@ -22,13 +26,26 @@ ASWebAuthenticationSession *_authSession;
 }
 
 + (UImmutablePassport*) getPassport {
-	UGameEngine* GameEngine = Cast<UGameEngine>(GEngine);
+    UWorld* World = nullptr;
 
-	if (!GameEngine) {
-		return nil;
+#if WITH_EDITOR
+	if (GEditor)
+	{
+		for (const auto& Context : GEditor->GetWorldContexts())
+		{
+			if (Context.WorldType == EWorldType::PIE && Context.World())
+			{
+				World = Context.World();
+				break;
+			}
+		}
 	}
-
-	UWorld* World = GameEngine ? GameEngine->GetGameWorld() : NULL;
+#else
+	if (UGameEngine* GameEngine = Cast<UGameEngine>(GEngine))
+	{
+		World = GameEngine->GetGameWorld();
+	}
+#endif
 
 	if (!World) {
 		return nil;

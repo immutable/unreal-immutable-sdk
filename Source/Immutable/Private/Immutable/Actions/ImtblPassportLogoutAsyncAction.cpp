@@ -21,7 +21,7 @@ void UImtblPassportLogoutAsyncAction::Activate()
 	{
 		FString Err = "Logout failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Err)
-		Failed.Broadcast(Err);
+		OnFailure.Broadcast(Err);
 		return;
 	}
 
@@ -36,14 +36,14 @@ void UImtblPassportLogoutAsyncAction::DoLogout(TWeakObjectPtr<UImtblJSConnector>
 	Passport->Logout(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportLogoutAsyncAction::OnLogoutResponse));
 }
 
-void UImtblPassportLogoutAsyncAction::OnLogoutResponse(FImmutablePassportResult Result)
+void UImtblPassportLogoutAsyncAction::OnLogoutResponse(FImmutablePassportResult Result) const
 {
 	if (Result.Success)
 	{
-		LoggedOut.Broadcast(Result.Message);
+		OnSuccess.Broadcast(Result.Message);
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message);
+		OnFailure.Broadcast(Result.Message);
 	}
 }
