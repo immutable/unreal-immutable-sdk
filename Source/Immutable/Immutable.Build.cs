@@ -79,6 +79,11 @@ public class Immutable : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
         );
+        
+        if (Target.bBuildEditor == true)
+        {
+            PrivateDependencyModuleNames.Add("UnrealEd");
+        }
 
         if (Target.Platform == UnrealTargetPlatform.Android)
         {

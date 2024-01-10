@@ -148,7 +148,10 @@ void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
 void UImmutablePassport::Logout(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-	PKCELogoutResponseDelegate = ResponseDelegate;
+	if (bIsLoggedIn && IsPKCEConnected)
+	{
+		PKCELogoutResponseDelegate = ResponseDelegate;
+	}
 #endif
 	CallJS(ImmutablePassportAction::Logout, TEXT(""), ResponseDelegate,
 	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnLogoutResponse));
@@ -543,8 +546,6 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
 	else
 	{
 		IMTBL_ERR("Unable to return a response for Connect PKCE");
-		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ false, "Response delegate is not assigned" });
-		PKCEResponseDelegate = nullptr;
 	}
 }
 
@@ -882,8 +883,9 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 {
 	IMTBL_LOG_FUNC("URL : %s", *DeepLink);
 	OnHandleDeepLink = nullptr;
-	if (DeepLink.StartsWith(InitData.logoutRedirectUri) && PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ true, "Logged out" }))
+	if (DeepLink.StartsWith(InitData.logoutRedirectUri))
 	{
+		PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ true, "Logged out" });
 		PKCELogoutResponseDelegate = nullptr;
 		IsPKCEConnected = false;
 	}
