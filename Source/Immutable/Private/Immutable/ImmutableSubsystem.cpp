@@ -50,10 +50,13 @@ void UImmutableSubsystem::Deinitialize() {
 }
 
 template <class UserClass>
-void UImmutableSubsystem::WhenReady(
-    UserClass *Object, typename FImmutableSubsystemReadyDelegate::FDelegate::
-                           TUObjectMethodDelegate<UserClass>::FMethodPtr Func) {
-  OnReady.AddUObject(Object, Func);
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func)
+#else
+void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func)
+#endif
+{
+    OnReady.AddUObject(Object, Func);
 }
 
 void UImmutableSubsystem::OnBridgeReady() {
