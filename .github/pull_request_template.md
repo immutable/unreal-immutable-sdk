@@ -41,4 +41,5 @@
 <!-- List of things to check before/after submitting the PR -->
 
 - [ ] Sample blueprints are updated with new SDK changes
+- [ ] Updated public documentation with new SDK changes ([Immutable X](https://docs.immutable.com/docs/x/sdks/unreal) and [Immutable zkEVM](https://docs.immutable.com/docs/zkEVM/sdks/unreal))
 - [ ] Replied to GitHub issues
