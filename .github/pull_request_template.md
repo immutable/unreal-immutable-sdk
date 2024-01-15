@@ -41,4 +41,4 @@
 <!-- List of things to check before/after submitting the PR -->
 
 - [ ] Sample blueprints are updated with new SDK changes
-- [ ] Replied to Github issues
+- [ ] Replied to GitHub issues
