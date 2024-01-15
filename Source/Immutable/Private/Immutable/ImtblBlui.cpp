@@ -141,6 +141,10 @@ void UImtblBlui::Init() {
           this, &UImtblBlui::WorldTickStart);
     }
   }
+  else
+  {
+      IMTBL_ERR("Failed to load Immutable bridge asset.")
+  }
 
   // Do this after the the page is given to the browser and being loaded...
   JSConnector->Init(!BluEye->IsBrowserLoading());

@@ -5,6 +5,8 @@
 #include "Immutable/Misc/ImtblLogging.h"
 #include "ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
+#include "Policies/CondensedJsonPrintPolicy.h"
+
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #include "GenericPlatform/GenericPlatformHttp.h"
