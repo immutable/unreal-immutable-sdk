@@ -887,8 +887,16 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 	OnHandleDeepLink = nullptr;
 	if (DeepLink.StartsWith(InitData.logoutRedirectUri))
 	{
-		PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ true, "Logged out" });
-		PKCELogoutResponseDelegate = nullptr;
+        // execute on game thread
+		if (FTaskGraphInterface::IsRunning())
+		{
+			FGraphEventRef GameThreadTask = FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
+			{
+				PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ true, "Logged out" });
+				PKCELogoutResponseDelegate = nullptr;
+			}, TStatId(), nullptr, ENamedThreads::GameThread);
+		}
+		
 		IsPKCEConnected = false;
 	}
 	else if (DeepLink.StartsWith(InitData.redirectUri))
