@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Immutable/ImmutablePassport.h"
@@ -12,28 +10,29 @@
  */
 // UCLASS(meta = (HasDedicatedAsyncNode))
 UCLASS()
-class IMMUTABLE_API UImtblPassportLogoutAsyncAction
-    : public UImtblBlueprintAsyncAction {
-  GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportLogoutAsyncAction : public UImtblBlueprintAsyncAction
+{
+	GENERATED_BODY()
 
-  DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportLogoutOutputPin, FString,
-                                              ErrorMessage);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportLogoutOutPin, FString, Message);
 
 public:
-  UFUNCTION(BlueprintCallable,
-            meta = (WorldContext = "WorldContextObject",
-                    BlueprintInternalUseOnly = "true"),
-            Category = "Immutable")
-  static UImtblPassportLogoutAsyncAction *Logout(UObject *WorldContextObject);
+	
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblPassportLogoutAsyncAction* Logout(UObject* WorldContextObject);
 
-  void Activate() override;
+	virtual void Activate() override;
 
 private:
-  void DoLogout(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
-  void OnLogoutResponse(FImmutablePassportResult Result);
 
-  UPROPERTY(BlueprintAssignable)
-  FPassportLogoutOutputPin LoggedOut;
-  UPROPERTY(BlueprintAssignable)
-  FPassportLogoutOutputPin Failed;
+	void DoLogout(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
+	void OnLogoutResponse(FImmutablePassportResult Result) const;
+
+private:
+
+	UPROPERTY(BlueprintAssignable)
+	FPassportLogoutOutPin OnSuccess;
+	UPROPERTY(BlueprintAssignable)
+	FPassportLogoutOutPin OnFailure;
+	
 };
