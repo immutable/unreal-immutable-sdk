@@ -9,37 +9,11 @@
 #include "Runtime/Core/Public/HAL/Platform.h"
 #include "UObject/Object.h"
 
+#include "Immutable/ImmutableDataTypes.h"
+#include "Immutable/ImmutableRequests.h"
+
 #include "ImmutablePassport.generated.h"
 
-
-struct FImtblJSResponse;
-
-namespace ImmutablePassportAction
-{
-	const FString Initialize = TEXT("init");
-	const FString Logout = TEXT("logout");
-	const FString Connect = TEXT("connect");
-	const FString ConnectSilent = TEXT("reconnect");
-	const FString ConnectEvm = TEXT("connectEvm");
-	const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
-	const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
-	const FString ZkEvmSendTransaction = TEXT("zkEvmSendTransaction");
-	const FString ConfirmCode = TEXT("confirmCode");
-#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-	const FString GetPKCEAuthUrl = TEXT("getPKCEAuthUrl");
-	const FString ConnectPKCE = TEXT("connectPKCE");
-#endif
-	const FString GetAddress = TEXT("getAddress");
-	const FString GetEmail = TEXT("getEmail");
-	const FString GetAccessToken = TEXT("getAccessToken");
-	const FString GetIdToken = TEXT("getIdToken");
-	const FString ImxTransfer = TEXT("imxTransfer");
-	const FString ImxBatchNftTransfer = TEXT("imxBatchNftTransfer");
-	const FString EnvSandbox = TEXT("sandbox");
-	const FString EnvProduction = TEXT("production");
-	const FString ImxIsRegisteredOffchain = TEXT("isRegisteredOffchain");
-	const FString ImxRegisterOffchain = TEXT("registerOffchain");
-} // namespace ImmutablePassportAction
 
 template <typename UStructType> FString UStructToJsonString(const UStructType& InStruct)
 {
@@ -65,348 +39,6 @@ template <typename UStructType> TOptional<UStructType> JsonObjectToUStruct(const
 	return StructInstance;
 }
 
-USTRUCT()
-struct FImmutablePassportResult
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	bool Success = false;
-	UPROPERTY()
-	FString Message;
-
-	FImtblJSResponse Response;
-};
-
-USTRUCT()
-struct FImmutableEngineVersionData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString engine = TEXT("unreal");
-
-	// cannot have spaces
-	UPROPERTY()
-	FString engineVersion = FEngineVersion::Current().ToString().Replace(TEXT(" "), TEXT("_"));
-
-	// cannot have spaces
-	UPROPERTY()
-	FString platform = FString(FPlatformProperties::IniPlatformName()).Replace(TEXT(" "), TEXT("_"));
-
-	// cannot have spaces
-	UPROPERTY()
-	FString platformVersion = FPlatformMisc::GetOSVersion().Replace(TEXT(" "), TEXT("_"));
-};
-
-USTRUCT()
-struct FImmutablePassportInitData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString clientId;
-
-	UPROPERTY()
-	FString redirectUri;
-
-	UPROPERTY()
-	FString logoutRedirectUri;
-
-	UPROPERTY()
-	FString environment = ImmutablePassportAction::EnvSandbox;
-
-	UPROPERTY()
-	FImmutableEngineVersionData engineVersion;
-
-	FString ToJsonString() const;
-};
-
-USTRUCT()
-struct FImmutablePassportConnectData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString code;
-	UPROPERTY()
-	FString deviceCode;
-	UPROPERTY()
-	FString url;
-	UPROPERTY()
-	float interval = 0;
-
-	static TOptional<FImmutablePassportConnectData> FromJsonString(const FString& JsonObjectString);
-};
-
-USTRUCT()
-struct FImmutablePassportZkEvmRequestAccountsData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	TArray<FString> accounts;
-
-	FString ToJsonString() const;
-	static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonString(const FString& JsonObjectString);
-	static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonObject(
-		const TSharedPtr<FJsonObject>& JsonObject);
-};
-
-USTRUCT()
-struct FImmutablePassportZkEvmGetBalanceData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString address;
-
-	UPROPERTY()
-	FString blockNumberOrTag = "latest";
-
-	FString ToJsonString() const;
-};
-
-USTRUCT(BlueprintType)
-struct FImtblAccessListItem
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString address;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<FString> storageKeys;
-};
-
-/**
- * Key Value wrappers for converting to JSON
- */
-USTRUCT()
-struct FStringCustomData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString key;
-
-	UPROPERTY()
-	FString value;
-};
-
-USTRUCT()
-struct FInt64CustomData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString key;
-
-	UPROPERTY()
-	int64 value;
-};
-
-USTRUCT()
-struct FFloatCustomData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString key;
-
-	UPROPERTY()
-	float value;
-};
-
-USTRUCT()
-struct FBoolCustomData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString key;
-
-	UPROPERTY()
-	bool value;
-};
-
-UENUM(BlueprintType)
-enum EImtblCustomDataType { String, Int64, Float, Bool };
-
-/**
- * Blueprint doesn't support any sort of generics or polymorphism. To workaround
- * this select the primitive type for this custom data item and set the
- * corresponding value. This will later be mapped to the proper API structure.
- */
-USTRUCT(BlueprintType)
-struct FImtblCustomData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString stringValue;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int64 intValue;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float floatValue;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool boolValue;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TEnumAsByte<EImtblCustomDataType> type;
-
-	/**
-	 * Convert from blueprint structure to the expected API data structure
-	 */
-	TSharedPtr<FJsonObject> ToJsonObject() const
-	{
-		switch (type)
-		{
-		case String: return FJsonObjectConverter::UStructToJsonObject<FStringCustomData>({key, stringValue});
-		case Int64: return FJsonObjectConverter::UStructToJsonObject<FInt64CustomData>({key, intValue});
-		case Float: return FJsonObjectConverter::UStructToJsonObject<FFloatCustomData>({key, floatValue});
-		case Bool: return FJsonObjectConverter::UStructToJsonObject<FBoolCustomData>({key, boolValue});
-		default:
-			{
-			}
-		}
-		return {};
-	}
-};
-
-USTRUCT(BlueprintType)
-struct FImtblTransactionRequest
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString to;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString data = "0x";
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString value;
-};
-
-USTRUCT()
-struct FImmutablePassportCodeConfirmRequestData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString deviceCode;
-	UPROPERTY()
-	float interval = 5;
-	UPROPERTY()
-	float timeoutMs = 15 * 60 * 1000;
-};
-
-USTRUCT()
-struct FImxTransferRequest
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString receiver;
-
-	UPROPERTY()
-	FString type;
-
-	UPROPERTY()
-	FString amount;
-
-	UPROPERTY()
-	FString tokenId;
-
-	UPROPERTY()
-	FString tokenAddress;
-
-	FString ToJsonString() const;
-};
-
-USTRUCT()
-struct FImxTransferResponse
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString sentSignature;
-
-	UPROPERTY()
-	FString status;
-
-	UPROPERTY()
-	float time;
-
-	UPROPERTY()
-	unsigned transferId;
-};
-
-USTRUCT(BlueprintType)
-struct FNftTransferDetails
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	FString receiver;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString tokenId;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString tokenAddress;
-};
-
-USTRUCT()
-struct FImxBatchNftTransferRequest
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	TArray<FNftTransferDetails> nftTransferDetails;
-
-	FString ToJsonString() const;
-};
-
-USTRUCT()
-struct FImxBatchNftTransferResponse
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	TArray<int> transferIds;
-};
-
-USTRUCT()
-struct FImmutablePassportConnectPKCEData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString authorizationCode;
-
-	UPROPERTY()
-	FString state;
-};
-
-
-USTRUCT()
-struct FImxRegisterOffchainResponse
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString tx_hash;
-};
-
-
 /**
  *
  */
@@ -429,9 +61,10 @@ public:
 #endif
 
 	void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
+
+	void Connect(bool IsConnectImx, bool TryToRelogin, const FImtblPassportResponseDelegate& ResponseDelegate);
+	
 	void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
-	void Connect(const FImtblPassportResponseDelegate& ResponseDelegate);
-	void ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	void ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -519,11 +152,13 @@ public:
 	void HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 protected:
+	
 	void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
+	void ReinstateConnection(FImtblJSResponse Response);
 
 private:
-	bool bIsInitialized = false;
-	bool bIsLoggedIn = false;
+	// bool bIsInitialized = false;
+	// bool bIsLoggedIn = false;
 
 #if PLATFORM_ANDROID
 	DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
@@ -545,7 +180,7 @@ private:
 	// response delegate here so it's easier to get
 	FImtblPassportResponseDelegate PKCEResponseDelegate;
 	FImtblPassportResponseDelegate PKCELogoutResponseDelegate;
-	bool IsPKCEConnected = false;
+	// bool IsPKCEConnected = false;
 #endif
 
 	// Ensures that Passport has been initialized before calling JS
@@ -561,6 +196,9 @@ private:
 					 const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	void OnInitializeResponse(FImtblJSResponse Response);
+
+	void OnInitDeviceFlowResponse(FImtblJSResponse Response);
+	
 	void OnLogoutResponse(FImtblJSResponse Response);
 	void OnConnectResponse(FImtblJSResponse Response);
 	void OnConnectSilentResponse(FImtblJSResponse Response);
@@ -594,4 +232,22 @@ private:
 	void CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class, jmethodID Method, ...);
 	void LaunchAndroidUrl(FString Url);
 #endif
+
+	void SetStateFlags(uint8 StateIn);
+	void ResetStateFlags(uint8 StateIn);
+	bool IsStateFlagSet(uint8 StateIn) const;
+
+private:
+
+	enum EImmutablePassportStateFlags : uint8
+	{
+		IPS_NONE			= 0,
+		IPS_CONNECTING		= 1 << 0,
+		IPS_CONNECTED		= 1 << 1,
+		IPS_IMX				= 1 << 2,
+		IPS_PKCE			= 1 << 3,
+		IPS_INITIALIZED		= 1 << 4
+	};
+
+	uint8 StateFlags = IPS_NONE;
 };

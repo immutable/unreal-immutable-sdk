@@ -26,7 +26,7 @@ public:
   void Activate() override;
 
 private:
-  FImmutablePassportConnectData ConnectData;
+  FImmutablePassportInitDeviceFlowData ConnectData;
 
   void DoConnectPKCE(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
   void OnConnectPKCE(FImmutablePassportResult Result);

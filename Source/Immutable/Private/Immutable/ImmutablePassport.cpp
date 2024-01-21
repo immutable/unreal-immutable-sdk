@@ -69,13 +69,13 @@ FString FImxBatchNftTransferRequest::ToJsonString() const
 	return OutString;
 }
 
-TOptional<FImmutablePassportConnectData> FImmutablePassportConnectData::FromJsonString(const FString& JsonObjectString)
+TOptional<FImmutablePassportInitDeviceFlowData> FImmutablePassportInitDeviceFlowData::FromJsonString(const FString& JsonObjectString)
 {
-	FImmutablePassportConnectData PassportConnect;
+	FImmutablePassportInitDeviceFlowData PassportConnect;
 	if (!FJsonObjectConverter::JsonObjectStringToUStruct(JsonObjectString, &PassportConnect, 0, 0))
 	{
 		IMTBL_WARN("Could not parse response from JavaScript into the expected " "Passport connect format")
-		return TOptional<FImmutablePassportConnectData>();
+		return TOptional<FImmutablePassportInitDeviceFlowData>();
 	}
 	return PassportConnect;
 }
@@ -134,8 +134,6 @@ FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
 	return OutString;
 }
 
-// @param Environment can be one of ImmutablePassportAction::EnvSandbox or
-// ImmutablePassportAction::EnvProduction
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
                                     const FImtblPassportResponseDelegate& ResponseDelegate)
 {
@@ -143,32 +141,46 @@ void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
 
 	InitData = Data;
 	
-	CallJS(ImmutablePassportAction::Initialize, InitData.ToJsonString(), ResponseDelegate,
+	CallJS(ImmutablePassportAction::INIT, InitData.ToJsonString(), ResponseDelegate,
 	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse), false);
+}
+
+void UImmutablePassport::Connect(bool IsConnectImx, bool TryToRelogin, const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+	SetStateFlags(IPS_CONNECTING);
+	if (IsConnectImx)
+	{
+		SetStateFlags(IPS_IMX);
+	}
+	if (TryToRelogin)
+	{
+		CallJS(IsConnectImx ? ImmutablePassportAction::RECONNECT : ImmutablePassportAction::RELOGIN, TEXT(""), ResponseDelegate,
+			FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::ReinstateConnection));
+	}
+	else
+	{
+		CallJS(ImmutablePassportAction::INIT_DEVICE_FLOW, TEXT(""), ResponseDelegate,
+			FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitDeviceFlowResponse));
+	}
 }
 
 void UImmutablePassport::Logout(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-	if (bIsLoggedIn && IsPKCEConnected)
+	if (IsStateFlagSet(IPS_PKCE))
 	{
 		PKCELogoutResponseDelegate = ResponseDelegate;
 	}
 #endif
-	CallJS(ImmutablePassportAction::Logout, TEXT(""), ResponseDelegate,
-	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnLogoutResponse));
-}
-
-void UImmutablePassport::Connect(const FImtblPassportResponseDelegate& ResponseDelegate)
-{
-	CallJS(ImmutablePassportAction::Connect, TEXT(""), ResponseDelegate,
-	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectResponse));
-}
-
-void UImmutablePassport::ConnectSilent(const FImtblPassportResponseDelegate& ResponseDelegate)
-{
-	CallJS(ImmutablePassportAction::ConnectSilent, TEXT(""), ResponseDelegate,
-	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectSilentResponse));
+	if (IsStateFlagSet(IPS_CONNECTED))
+	{
+		CallJS(ImmutablePassportAction::Logout, TEXT(""), ResponseDelegate,
+		   FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnLogoutResponse));
+	}
+	else
+	{
+		IMTBL_ERR("Passport is not connected to execute logout.");
+	}
 }
 
 void UImmutablePassport::ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate)
@@ -200,20 +212,17 @@ void UImmutablePassport::ZkEvmSendTransaction(const FImtblTransactionRequest& Re
 void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Interval,
                                      const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	FImmutablePassportCodeConfirmRequestData Data;
+	FImmutablePassportCodeConfirmRequestData Data { DeviceCode, Interval };
+	FString Action = IsStateFlagSet(IPS_IMX) ? ImmutablePassportAction::CONNECT_CONFIRM_CODE : ImmutablePassportAction::LOGIN_CONFIRM_CODE;
 	
-	Data.deviceCode = DeviceCode;
-	Data.interval = Interval;
-	CallJS(ImmutablePassportAction::ConfirmCode, UStructToJsonString(Data), ResponseDelegate,
-	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConfirmCodeResponse));
+	CallJS(Action, UStructToJsonString(Data), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConfirmCodeResponse));
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::ConnectPKCE(const FImtblPassportResponseDelegate &ResponseDelegate)
 {
-#if PLATFORM_ANDROID
-	completingPKCE = false;
-#endif
+	// completingPKCE = false;
+	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
 
 	PKCEResponseDelegate = ResponseDelegate;
 	CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""), PKCEResponseDelegate,
@@ -336,15 +345,39 @@ void UImmutablePassport::Setup(const TWeakObjectPtr<UImtblJSConnector> Connector
 	JSConnector = Connector.Get();
 }
 
-bool UImmutablePassport::CheckIsInitialized(const FString& Action,
-                                            const FImtblPassportResponseDelegate& ResponseDelegate) const
+void UImmutablePassport::ReinstateConnection(FImtblJSResponse Response)
 {
-	if (!bIsInitialized)
+	ResetStateFlags(IPS_CONNECTING);
+
+	if (auto ResponseDelegate = GetResponseDelegate(Response))
+	{
+		// currently, this response has to be called only for RELOGIN AND RECONNECT bridge routines
+		const FString CallbackName = (Response.responseFor.Compare(ImmutablePassportAction::RELOGIN, ESearchCase::IgnoreCase) == 0) ? "Relogin" : "Reconnect";
+
+		if (Response.JsonObject->GetBoolField(TEXT("result")))
+		{
+			SetStateFlags(IPS_CONNECTED);
+			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ true, "", Response });
+		}
+		else
+		{
+			CallJS(ImmutablePassportAction::INIT_DEVICE_FLOW, TEXT(""), ResponseDelegate.GetValue(),
+				FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitDeviceFlowResponse));
+		}
+	}
+}
+
+bool UImmutablePassport::CheckIsInitialized(const FString& Action, const FImtblPassportResponseDelegate& ResponseDelegate) const
+{
+	const bool IsInitialized = IsStateFlagSet(IPS_INITIALIZED);
+	
+	if (!IsInitialized)
 	{
 		IMTBL_WARN("Attempting action '%s' before Passport is initialized", *Action)
 		ResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, "Passport is not initialized"});
 	}
-	return bIsInitialized;
+	
+	return IsInitialized;
 }
 
 void UImmutablePassport::CallJS(const FString& Action, const FString& Data,
@@ -378,7 +411,8 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 		FString Msg;
 		if (Response.success)
 		{
-			bIsInitialized = true;
+			// bIsInitialized = true;
+			SetStateFlags(IPS_INITIALIZED);
 			IMTBL_LOG("Passport initialization succeeded.")
 		}
 		else
@@ -390,6 +424,37 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 		}
 
 		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Msg, Response });
+	}
+}
+
+void UImmutablePassport::OnInitDeviceFlowResponse(FImtblJSResponse Response)
+{
+	if (auto ResponseDelegate = GetResponseDelegate(Response))
+	{
+		const auto InitDeviceFlowData = JsonObjectToUStruct<FImmutablePassportInitDeviceFlowData>(Response.JsonObject);
+
+		if (!Response.success || !InitDeviceFlowData || !InitDeviceFlowData->code.Len())
+		{
+			FString Msg;
+			
+			IMTBL_WARN("Login device flow initialization attempt failed.");
+			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
+			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
+			
+			return;
+		}
+		FString Err;
+
+		FPlatformProcess::LaunchURL(*InitDeviceFlowData->url, nullptr, &Err);
+		if (Err.Len())
+		{
+			FString Msg = "Failed to connect to Browser: " + Err;
+			
+			IMTBL_ERR("%s", *Msg);
+			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
+			return;
+		}
+		ConfirmCode(InitDeviceFlowData->deviceCode, InitDeviceFlowData->interval, ResponseDelegate.GetValue());
 	}
 }
 
@@ -406,7 +471,7 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 			if (!Url.IsEmpty())
 			{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-				if (IsPKCEConnected)
+				if (IsStateFlagSet(IPS_PKCE))
 				{
 					OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 #if PLATFORM_ANDROID
@@ -438,7 +503,8 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 			{
 				ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, "Logout Url is empty", Response });
 			}
-			bIsLoggedIn = false;
+			// bIsLoggedIn = false;
+			ResetStateFlags(IPS_CONNECTED);
 		}
 		else
 		{
@@ -448,32 +514,6 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 
 			IMTBL_ERR("Error logging out.")
 		}
-	}
-}
-
-void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		const auto ConnectData = JsonObjectToUStruct<FImmutablePassportConnectData>(Response.JsonObject);
-		if (!Response.success || !ConnectData || !ConnectData->code.Len())
-		{
-			FString Msg;
-			IMTBL_WARN("Connect attempt failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
-			return;
-		}
-		FString Err;
-		FPlatformProcess::LaunchURL(*ConnectData->url, nullptr, &Err);
-		if (Err.Len())
-		{
-			FString Msg = "Failed to connect to Browser: " + Err;
-			IMTBL_ERR("%s", *Msg);
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Msg, Response });
-			return;
-		}
-		ConfirmCode(ConnectData->deviceCode, ConnectData->interval, ResponseDelegate.GetValue());
 	}
 }
 
@@ -560,8 +600,9 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
 		if (Response.success)
 		{
 			IMTBL_LOG("Successfully connected via PKCE")
-			bIsLoggedIn = true;
-			IsPKCEConnected = true;
+			// bIsLoggedIn = true;
+			// IsPKCEConnected = true;
+			SetStateFlags(IPS_CONNECTED | IPS_PKCE);
 		}
 		else
 		{
@@ -637,10 +678,9 @@ void UImmutablePassport::OnGetAddressResponse(FImtblJSResponse Response)
 {
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
-		auto ConnectData = JsonObjectToUStruct<FImmutablePassportConnectData>(Response.JsonObject);
-
 		FString Msg;
 		bool bSuccess = true;
+		
 		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
 		{
 			IMTBL_WARN("Could not fetch address from Passport.");
@@ -738,15 +778,17 @@ void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
 		FString Msg;
-		
+		FString TypeOfConnection = IsStateFlagSet(IPS_IMX) ? TEXT("connect") : TEXT("login");
+
+		ResetStateFlags(IPS_CONNECTING);
 		if (Response.success)
 		{
-			IMTBL_LOG("Log in code confirmed.")
-			bIsLoggedIn = true;
+			IMTBL_LOG("Code confirmed for %s operation.", *TypeOfConnection)
+			SetStateFlags(IPS_CONNECTED);
 		}
 		else
 		{
-			IMTBL_WARN("Login code not confirmed.")
+			IMTBL_LOG("%s code not confirmed.", *TypeOfConnection)
 			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
 		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Msg, Response });
@@ -757,10 +799,9 @@ void UImmutablePassport::OnGetEmailResponse(FImtblJSResponse Response)
 {
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
-		auto ConnectData = JsonObjectToUStruct<FImmutablePassportConnectData>(Response.JsonObject);
-
 		FString Msg;
 		bool bSuccess = true;
+		
 		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
 		{
 			IMTBL_WARN("Connect attempt failed.");
@@ -896,8 +937,9 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 				PKCELogoutResponseDelegate = nullptr;
 			}, TStatId(), nullptr, ENamedThreads::GameThread);
 		}
-		
-		IsPKCEConnected = false;
+
+		ResetStateFlags(IPS_CONNECTED);
+		// IsPKCEConnected = false;
 	}
 	else if (DeepLink.StartsWith(InitData.redirectUri))
 	{
@@ -908,9 +950,11 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 {
 #if PLATFORM_ANDROID
-	completingPKCE = true;
+	// completingPKCE = true;
+	
 #endif
 
+	SetStateFlags(IPS_CONNECTED);
 	// Get code and state from deeplink URL
 	TOptional<FString> Code, State;
 	FString Endpoint, Params;
@@ -953,6 +997,22 @@ void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 			FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse));
 	}
 }
+
+void UImmutablePassport::SetStateFlags(uint8 StateIn)
+{
+	StateFlags |= StateIn;
+}
+
+void UImmutablePassport::ResetStateFlags(uint8 StateIn)
+{
+	StateFlags &= ~StateIn;
+}
+
+bool UImmutablePassport::IsStateFlagSet(uint8 StateIn) const
+{
+	return (StateFlags & StateIn) == StateIn;
+}
+
 #endif
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
