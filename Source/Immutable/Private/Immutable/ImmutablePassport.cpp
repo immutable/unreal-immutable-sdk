@@ -3,6 +3,7 @@
 #include "Immutable/ImmutablePassport.h"
 
 #include "Immutable/Misc/ImtblLogging.h"
+#include "Immutable/ImmutableResponses.h"
 #include "ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
@@ -918,6 +919,20 @@ void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
 	}
 }
 
+void UImmutablePassport::SetStateFlags(uint8 StateIn)
+{
+	StateFlags |= StateIn;
+}
+
+void UImmutablePassport::ResetStateFlags(uint8 StateIn)
+{
+	StateFlags &= ~StateIn;
+}
+
+bool UImmutablePassport::IsStateFlagSet(uint8 StateIn) const
+{
+	return (StateFlags & StateIn) == StateIn;
+}
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
@@ -988,21 +1003,6 @@ void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 		CallJS(IsStateFlagSet(IPS_IMX)? ImmutablePassportAction::CONNECT_PKCE : ImmutablePassportAction::LOGIN_PKCE,
 			UStructToJsonString(Data), PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse));
 	}
-}
-
-void UImmutablePassport::SetStateFlags(uint8 StateIn)
-{
-	StateFlags |= StateIn;
-}
-
-void UImmutablePassport::ResetStateFlags(uint8 StateIn)
-{
-	StateFlags &= ~StateIn;
-}
-
-bool UImmutablePassport::IsStateFlagSet(uint8 StateIn) const
-{
-	return (StateFlags & StateIn) == StateIn;
 }
 
 #endif
