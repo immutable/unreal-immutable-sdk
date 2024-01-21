@@ -164,6 +164,21 @@ void UImmutablePassport::Connect(bool IsConnectImx, bool TryToRelogin, const FIm
 	}
 }
 
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+void UImmutablePassport::ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate &ResponseDelegate)
+{
+	// completingPKCE = false;
+	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
+	if (IsConnectImx)
+	{
+		SetStateFlags(IPS_IMX);
+	}
+	PKCEResponseDelegate = ResponseDelegate;
+	CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""), PKCEResponseDelegate,
+		FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetPKCEAuthUrlResponse));
+}
+#endif
+
 void UImmutablePassport::Logout(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
@@ -218,17 +233,7 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
 	CallJS(Action, UStructToJsonString(Data), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConfirmCodeResponse));
 }
 
-#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-void UImmutablePassport::ConnectPKCE(const FImtblPassportResponseDelegate &ResponseDelegate)
-{
-	// completingPKCE = false;
-	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
 
-	PKCEResponseDelegate = ResponseDelegate;
-	CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""), PKCEResponseDelegate,
-		FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetPKCEAuthUrlResponse));
-}
-#endif
 
 
 void UImmutablePassport::GetIdToken(const FImtblPassportResponseDelegate& ResponseDelegate)
@@ -600,13 +605,12 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
 		if (Response.success)
 		{
 			IMTBL_LOG("Successfully connected via PKCE")
-			// bIsLoggedIn = true;
-			// IsPKCEConnected = true;
-			SetStateFlags(IPS_CONNECTED | IPS_PKCE);
+			SetStateFlags(IPS_CONNECTED);
 		}
 		else
 		{
 			IMTBL_WARN("Connect PKCE attempt failed.");
+			ResetStateFlags(IPS_PKCE);
 			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
 		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
@@ -616,9 +620,6 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
 	{
 		IMTBL_ERR("Unable to return a response for Connect PKCE");
 	}
-#if PLATFORM_ANDROID
-	completingPKCE = false;
-#endif
 }
 #endif
 
@@ -992,9 +993,9 @@ void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 	else
 	{
 		FImmutablePassportConnectPKCEData Data = FImmutablePassportConnectPKCEData{Code.GetValue(), State.GetValue()};
-		
-		CallJS(ImmutablePassportAction::ConnectPKCE, UStructToJsonString(Data), PKCEResponseDelegate,
-			FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse));
+
+		CallJS(IsStateFlagSet(IPS_IMX)? ImmutablePassportAction::CONNECT_PKCE : ImmutablePassportAction::LOGIN_PKCE,
+			UStructToJsonString(Data), PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse));
 	}
 }
 

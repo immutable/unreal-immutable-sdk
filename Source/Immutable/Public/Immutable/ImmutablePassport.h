@@ -67,7 +67,7 @@ public:
 	void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-	void ConnectPKCE(const FImtblPassportResponseDelegate& ResponseDelegate);
+	void ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
 #endif
 
 	/**

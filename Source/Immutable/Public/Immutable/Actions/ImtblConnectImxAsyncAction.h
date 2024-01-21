@@ -20,7 +20,10 @@ class IMMUTABLE_API UImtblConnectionAsyncActions : public UImtblBlueprintAsyncAc
 public:
 	
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject, bool TryToRelogin = false, bool ConnectImx = false);
+	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject, bool WithWalletImx = false, bool TryToRelogin = false);
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblConnectionAsyncActions* LoginPKCE(UObject* WorldContextObject, bool WithWalletImx);
 
 	void Activate() override;
 
@@ -37,5 +40,6 @@ private:
 	FPassportConnectOutputPin Failed;
 
 	bool bIsRelogin = false;
-	bool bIsConnectImx = false;
+	bool bWithWalletImx = false;
+	bool bIsPKCE = false;
 };

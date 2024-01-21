@@ -9,7 +9,7 @@ namespace ImmutablePassportAction
 	const FString LOGIN_CONFIRM_CODE = TEXT("loginConfirmCode");; //+
 	const FString CONNECT_CONFIRM_CODE = TEXT("connectConfirmCode");; //+
 	const FString RECONNECT = TEXT("reconnect");; //+
-	const FString LOGIN_PKCE = TEXT("loginPKCE");; //+
+	
 	
 	const FString Logout = TEXT("logout");
 	const FString Connect = TEXT("connect");
@@ -22,7 +22,8 @@ namespace ImmutablePassportAction
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	const FString GetPKCEAuthUrl = TEXT("getPKCEAuthUrl");
-	const FString ConnectPKCE = TEXT("connectPKCE");
+	const FString LOGIN_PKCE = TEXT("loginPKCE");; //+
+	const FString CONNECT_PKCE = TEXT("connectPKCE");
 #endif
 
 	const FString GetAddress = TEXT("getAddress");
