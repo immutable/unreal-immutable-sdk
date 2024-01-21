@@ -63,12 +63,11 @@ public:
 	void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	void Connect(bool IsConnectImx, bool TryToRelogin, const FImtblPassportResponseDelegate& ResponseDelegate);
-	
-	void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
-
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	void ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
 #endif
+
+	void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
 	 * Initializes the zkEVM provider.
@@ -156,16 +155,10 @@ protected:
 	void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
 	void ReinstateConnection(FImtblJSResponse Response);
 
-private:
-	// bool bIsInitialized = false;
-	// bool bIsLoggedIn = false;
-
 #if PLATFORM_ANDROID
 	DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
   
 	FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
-	
-	bool completingPKCE = false; // Used for the PKCE callback
 #endif
 
 	TWeakObjectPtr<UImtblJSConnector> JSConnector;

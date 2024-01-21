@@ -167,7 +167,6 @@ void UImmutablePassport::Connect(bool IsConnectImx, bool TryToRelogin, const FIm
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate &ResponseDelegate)
 {
-	// completingPKCE = false;
 	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
 	if (IsConnectImx)
 	{
@@ -416,7 +415,6 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 		FString Msg;
 		if (Response.success)
 		{
-			// bIsInitialized = true;
 			SetStateFlags(IPS_INITIALIZED);
 			IMTBL_LOG("Passport initialization succeeded.")
 		}
@@ -508,7 +506,6 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 			{
 				ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, "Logout Url is empty", Response });
 			}
-			// bIsLoggedIn = false;
 			ResetStateFlags(IPS_CONNECTED);
 		}
 		else
@@ -939,8 +936,7 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 			}, TStatId(), nullptr, ENamedThreads::GameThread);
 		}
 
-		ResetStateFlags(IPS_CONNECTED);
-		// IsPKCEConnected = false;
+		ResetStateFlags(IPS_CONNECTED|IPS_PKCE|IPS_IMX);
 	}
 	else if (DeepLink.StartsWith(InitData.redirectUri))
 	{
@@ -950,11 +946,6 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 
 void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 {
-#if PLATFORM_ANDROID
-	// completingPKCE = true;
-	
-#endif
-
 	SetStateFlags(IPS_CONNECTED);
 	// Get code and state from deeplink URL
 	TOptional<FString> Code, State;
