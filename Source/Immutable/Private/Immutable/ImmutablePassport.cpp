@@ -233,9 +233,6 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
 	CallJS(Action, UStructToJsonString(Data), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConfirmCodeResponse));
 }
 
-
-
-
 void UImmutablePassport::GetIdToken(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	CallJS(ImmutablePassportAction::GetIdToken, TEXT(""), ResponseDelegate,

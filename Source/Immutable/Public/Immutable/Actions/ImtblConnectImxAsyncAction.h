@@ -18,12 +18,49 @@ class IMMUTABLE_API UImtblConnectionAsyncActions : public UImtblBlueprintAsyncAc
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportConnectOutputPin, FString, ErrorMessage);
 
 public:
-	
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject, bool WithWalletImx = false, bool TryToRelogin = false);
 
+	/**
+	 * Log into Passport using Device Code Authorisation.
+	 *
+	 * @param	WorldContextObject	World context
+	 * @param	UseCachedSession	Whether to use stored credentials for relogin
+	 *
+	 * @return	A reference to the object represented by this node
+	 */
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* LoginPKCE(UObject* WorldContextObject, bool WithWalletImx);
+	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject, bool UseCachedSession = false);
+
+	/**
+	 * Log into Passport using Device Code Authorisation, initialise the gamer's wallet and instantiate the IMX provider.
+	 *
+	 * @param	WorldContextObject	World context
+	 * @param	UseCachedSession	Whether to use stored credentials for relogin
+	 *
+	 * @return	A reference to the object represented by this node
+	 */
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblConnectionAsyncActions* ConnectImx(UObject* WorldContextObject, bool UseCachedSession = false);
+
+	/**
+	 * Log into Passport using PKCE
+	 *
+	 * @param	WorldContextObject	World context
+	 *
+	 * @return	A reference to the object represented by this node
+	 */
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblConnectionAsyncActions* LoginPKCE(UObject* WorldContextObject);
+
+	/**
+	 * Log into Passport using PKCE, initialise the gamer's wallet and instantiate the IMX provider.
+	 *
+	 * @param	WorldContextObject	World context
+	 *
+	 * @return	A reference to the object represented by this node
+	 */
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblConnectionAsyncActions* ConnectImxPKCE(UObject* WorldContextObject);
+
 
 	void Activate() override;
 
@@ -39,7 +76,7 @@ private:
 	UPROPERTY(BlueprintAssignable)
 	FPassportConnectOutputPin Failed;
 
-	bool bIsRelogin = false;
-	bool bWithWalletImx = false;
+	bool bUseCachedSession = false;
+	bool bIsConnectImx = false;
 	bool bIsPKCE = false;
 };

@@ -7,23 +7,45 @@
 #include "Immutable/Misc/ImtblLogging.h"
 
 
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* WorldContextObject, bool WithWalletImx, bool TryToRelogin)
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* WorldContextObject, bool UseCachedSession)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	PassportInitBlueprintNode->bIsRelogin = TryToRelogin;
-	PassportInitBlueprintNode->bWithWalletImx = WithWalletImx;
+	PassportInitBlueprintNode->bUseCachedSession = UseCachedSession;
+	PassportInitBlueprintNode->bIsConnectImx = false;
 
 	return PassportInitBlueprintNode;
 }
 
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::LoginPKCE(UObject* WorldContextObject, bool WithWalletImx)
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* WorldContextObject, bool UseCachedSession)
+{
+	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
+
+	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->bUseCachedSession = UseCachedSession;
+	PassportInitBlueprintNode->bIsConnectImx = true;
+
+	return PassportInitBlueprintNode;
+}
+
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::LoginPKCE(UObject* WorldContextObject)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 	
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	PassportInitBlueprintNode->bWithWalletImx = WithWalletImx;
+	PassportInitBlueprintNode->bIsConnectImx = false;
+	PassportInitBlueprintNode->bIsPKCE = true;
+	
+	return PassportInitBlueprintNode;
+}
+
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImxPKCE(UObject* WorldContextObject)
+{
+	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
+	
+	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->bIsConnectImx = true;
 	PassportInitBlueprintNode->bIsPKCE = true;
 	
 	return PassportInitBlueprintNode;
@@ -52,13 +74,13 @@ void UImtblConnectionAsyncActions::DoConnect(TWeakObjectPtr<UImtblJSConnector> J
 		if (bIsPKCE)
 		{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-			Passport->ConnectPKCE(bWithWalletImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject
+			Passport->ConnectPKCE(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject
 				(this, &UImtblConnectionAsyncActions::OnConnect));
 #endif
 		}
 		else
 		{
-			Passport->Connect(bWithWalletImx, bIsRelogin, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject
+			Passport->Connect(bIsConnectImx, bUseCachedSession, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject
 				(this, &UImtblConnectionAsyncActions::OnConnect));
 		}
 	}
