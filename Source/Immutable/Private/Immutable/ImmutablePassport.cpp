@@ -989,9 +989,7 @@ void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 		IMTBL_ERR("%s", *ErrorMsg);
 		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, ErrorMsg});
 		PKCEResponseDelegate = nullptr;
-#if PLATFORM_ANDROID
-		completingPKCE = false;
-#endif
+		ResetStateFlags(IPS_PKCE|IPS_CONNECTING);
 	}
 	else
 	{
@@ -1030,7 +1028,7 @@ void UImmutablePassport::HandleOnLoginPKCEDismissed()
 	IMTBL_LOG("Handle On Login PKCE Dismissed");
 	OnPKCEDismissed = nullptr;
 
-	if (!completingPKCE && !bIsLoggedIn)
+	if (IsStateFlagSet(IPS_CONNECTING))
 	{
 		// User hasn't entered all required details (e.g. email address) into
 		// Passport yet
