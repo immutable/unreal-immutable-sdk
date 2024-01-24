@@ -9,7 +9,9 @@
             -dontwarn com.immutable.unreal
             -keep class com.immutable.unreal.** { *; }
             -keep interface com.immutable.unreal.** { *; }
-            -keep public class com.immutable.unreal.ImmutableAndroid.** { public protected *; }
+            -keep public class com.immutable.unreal.ImmutableActivity { public protected *; }
+            -keep public class com.immutable.unreal.CustomTabsController { public protected *; }
+            -keep public class com.immutable.unreal.RedirectActivity { public protected *; }
 
             -dontwarn androidx.**
             -keep class androidx.** { *; }
@@ -22,44 +24,27 @@
                 <action android:name="android.support.customtabs.action.CustomTabsService" />
             </intent>
         </addElements>
+        <addElements tag="application">
+            <activity
+                android:name="com.immutable.unreal.ImmutableActivity"
+                android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboard|keyboardHidden"
+                android:exported="false"
+                android:launchMode="singleTask"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        </addElements>
     </androidManifestUpdates>
-    <gameActivityImportAdditions>
-        <insert>
-            import com.immutable.unreal.ImmutableAndroid;
-        </insert>
-    </gameActivityImportAdditions>
-    <gameActivityImplementsAdditions>
-        <insert>
-            ImmutableAndroid.Callback,
-        </insert>
-    </gameActivityImplementsAdditions>
-    <gameActivityOnCreateAdditions>
-        <insert>
-            Uri uri = getIntent().getData();
-            if (uri != null) {
-                String deeplink = uri.toString();
-                handleDeepLink(uri.toString());
-            }
-        </insert>
-    </gameActivityOnCreateAdditions>
-    <gameActivityOnResumeAdditions>
-        <insert>
-            Uri uri = getIntent().getData();
-            if (uri != null) {
-                String deeplink = uri.toString();
-                handleDeepLink(deeplink);
-            }
-        </insert>
-    </gameActivityOnResumeAdditions>
     <gameActivityClassAdditions>
         <insert>
-            public native void handleDeepLink(String Deeplink);
+            public static native void handleDeepLink(String Deeplink);
 
-            public native void handleOnCustomTabsDismissed(String Url);
+            public static native void handleOnCustomTabsDismissed(String Url);
 
-            @Override
-            public void onCustomTabsDismissed(String Url) {
-                handleOnCustomTabsDismissed(Url);
+            public static void onDeeplinkResult(String url) {
+                handleDeepLink(url);
+            }
+            
+            public static void onCustomTabsDismissed(String url) {
+                handleOnCustomTabsDismissed(url);
             }
         </insert>
     </gameActivityClassAdditions>

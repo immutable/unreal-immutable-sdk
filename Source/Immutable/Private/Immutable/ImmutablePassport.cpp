@@ -981,7 +981,7 @@ void UImmutablePassport::HandleOnLoginPKCEDismissed()
 	IMTBL_LOG("Handle On Login PKCE Dismissed");
 	OnPKCEDismissed = nullptr;
 
-	if (!completingPKCE)
+	if (!completingPKCE && !bIsLoggedIn)
 	{
 		// User hasn't entered all required details (e.g. email address) into
 		// Passport yet
@@ -1023,8 +1023,8 @@ void UImmutablePassport::LaunchAndroidUrl(FString Url)
 	if (JNIEnv *Env = FAndroidApplication::GetJavaEnv())
 	{
 		jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Url));
-		jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass("com/immutable/unreal/ImmutableAndroid");
-		static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(Env, jimmutableAndroidClass, "launchUrl", "(Landroid/app/Activity;Ljava/lang/String;)V", false);
+		jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass("com/immutable/unreal/ImmutableActivity");
+		static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(Env, jimmutableAndroidClass, "startActivity", "(Landroid/app/Activity;Ljava/lang/String;)V", false);
 					
 		CallJniStaticVoidMethod(Env, jimmutableAndroidClass, jlaunchUrl, FJavaWrapper::GameActivityThis, jurl);
 	}
