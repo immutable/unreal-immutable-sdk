@@ -18,6 +18,16 @@
             -keep interface androidx.** { *; }
         </insert>
     </proguardAdditions>
+    <buildGradleAdditions>
+        <insert>
+            android {
+                compileOptions {
+                    sourceCompatibility 1.8
+                    targetCompatibility 1.8
+                }
+            }
+        </insert>
+    </buildGradleAdditions>
     <androidManifestUpdates>
         <addElements tag="queries">
             <intent>
