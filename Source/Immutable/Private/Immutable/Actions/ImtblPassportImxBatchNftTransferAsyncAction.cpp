@@ -4,6 +4,7 @@
 
 #include "Immutable/ImmutablePassport.h"
 #include "Immutable/ImmutableSubsystem.h"
+#include "Immutable/ImmutableResponses.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
 UImmutablePassportImxBatchNftTransferAsyncAction *

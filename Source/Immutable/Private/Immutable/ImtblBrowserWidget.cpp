@@ -164,9 +164,11 @@ void UImtblBrowserWidget::HandleOnLoadCompleted() {
   FString indexUrl = "file:///index.html";
 #endif
 
+#if USING_BUNDLED_CEF
   if (WebBrowserWidget->GetUrl() == indexUrl) {
     JSConnector->SetMobileBridgeReady();
   }
+#endif
 }
 #endif
 
