@@ -239,7 +239,8 @@ private:
 		IPS_CONNECTED		= 1 << 1,
 		IPS_IMX				= 1 << 2,
 		IPS_PKCE			= 1 << 3,
-		IPS_INITIALIZED		= 1 << 4
+		IPS_COMPLETING_PKCE	= 1 << 4,
+		IPS_INITIALIZED		= 1 << 5
 	};
 
 	uint8 StateFlags = IPS_NONE;
