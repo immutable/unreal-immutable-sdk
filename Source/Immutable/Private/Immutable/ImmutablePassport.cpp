@@ -615,6 +615,7 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
 	{
 		IMTBL_ERR("Unable to return a response for Connect PKCE");
 	}
+	ResetStateFlags(IPS_COMPLETING_PKCE);
 }
 #endif
 
@@ -958,7 +959,10 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 
 void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 {
-	SetStateFlags(IPS_CONNECTED);
+	// Required mainly for Android to detect when Chrome Custom tabs is dismissed
+	// See HandleOnLoginPKCEDismissed
+	SetStateFlags(IPS_COMPLETING_PKCE);
+
 	// Get code and state from deeplink URL
 	TOptional<FString> Code, State;
 	FString Endpoint, Params;
@@ -989,7 +993,7 @@ void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 		IMTBL_ERR("%s", *ErrorMsg);
 		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, ErrorMsg});
 		PKCEResponseDelegate = nullptr;
-		ResetStateFlags(IPS_PKCE|IPS_CONNECTING);
+		ResetStateFlags(IPS_PKCE|IPS_CONNECTING|IPS_COMPLETING_PKCE);
 	}
 	else
 	{
@@ -1028,7 +1032,12 @@ void UImmutablePassport::HandleOnLoginPKCEDismissed()
 	IMTBL_LOG("Handle On Login PKCE Dismissed");
 	OnPKCEDismissed = nullptr;
 
-	if (IsStateFlagSet(IPS_CONNECTING))
+	// If the second part of PKCE (CompleteLoginPKCEFlow) has not started yet and custom tabs is dismissed,
+	// this means the user manually dismissed the custom tabs before entering all
+	// all required details (e.g. email address) into Passport
+	// Cannot use IPS_CONNECTING as that is set when PKCE flow is initiated. Here we are checking against the second
+	// half of the PKCE flow.
+	if (!IsStateFlagSet(IPS_COMPLETING_PKCE))
 	{
 		// User hasn't entered all required details (e.g. email address) into
 		// Passport yet
