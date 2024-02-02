@@ -6,6 +6,8 @@
 #include "Immutable/ImmutableResponses.h"
 #include "ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
+#include "Immutable/ImmutableSaveGame.h"
+#include "Kismet/GameplayStatics.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
 
 
@@ -22,6 +24,8 @@
 #include "GenericPlatform/GenericPlatformProcess.h"
 #include "Mac/ImmutableMac.h"
 #endif
+
+#define PASSPORT_SAVE_GAME_SLOT_NAME TEXT("ImmutablePassport")
 
 FString FImmutablePassportInitData::ToJsonString() const
 {
@@ -141,7 +145,7 @@ void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data,
 	check(JSConnector.IsValid());
 
 	InitData = Data;
-	
+
 	CallJS(ImmutablePassportAction::INIT, InitData.ToJsonString(), ResponseDelegate,
 	       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse), false);
 }
@@ -168,7 +172,7 @@ void UImmutablePassport::Connect(bool IsConnectImx, bool TryToRelogin, const FIm
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 void UImmutablePassport::ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate &ResponseDelegate)
 {
-	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
+	SetStateFlags(IPS_CONNECTING|IPS_PKCE);
 	if (IsConnectImx)
 	{
 		SetStateFlags(IPS_IMX);
@@ -182,19 +186,19 @@ void UImmutablePassport::ConnectPKCE(bool IsConnectImx, const FImtblPassportResp
 void UImmutablePassport::Logout(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-	if (IsStateFlagSet(IPS_PKCE))
+	if (IsStateFlagsSet(IPS_PKCE) || bIsPrevConnectedViaPKCEFlow)
 	{
 		PKCELogoutResponseDelegate = ResponseDelegate;
 	}
 #endif
-	if (IsStateFlagSet(IPS_CONNECTED))
+	if (IsStateFlagsSet(IPS_CONNECTED))
 	{
 		CallJS(ImmutablePassportAction::Logout, TEXT(""), ResponseDelegate,
 		   FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnLogoutResponse));
 	}
 	else
 	{
-		IMTBL_ERR("Passport is not connected to execute logout.");
+		IMTBL_WARN("Passport is not connected to execute logout.");
 	}
 }
 
@@ -228,7 +232,7 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
                                      const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	FImmutablePassportCodeConfirmRequestData Data { DeviceCode, Interval };
-	FString Action = IsStateFlagSet(IPS_IMX) ? ImmutablePassportAction::CONNECT_CONFIRM_CODE : ImmutablePassportAction::LOGIN_CONFIRM_CODE;
+	FString Action = IsStateFlagsSet(IPS_IMX) ? ImmutablePassportAction::CONNECT_CONFIRM_CODE : ImmutablePassportAction::LOGIN_CONFIRM_CODE;
 	
 	CallJS(Action, UStructToJsonString(Data), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConfirmCodeResponse));
 }
@@ -371,7 +375,7 @@ void UImmutablePassport::ReinstateConnection(FImtblJSResponse Response)
 
 bool UImmutablePassport::CheckIsInitialized(const FString& Action, const FImtblPassportResponseDelegate& ResponseDelegate) const
 {
-	const bool IsInitialized = IsStateFlagSet(IPS_INITIALIZED);
+	const bool IsInitialized = IsStateFlagsSet(IPS_INITIALIZED);
 	
 	if (!IsInitialized)
 	{
@@ -415,6 +419,8 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 		{
 			SetStateFlags(IPS_INITIALIZED);
 			IMTBL_LOG("Passport initialization succeeded.")
+			// we load settings in case if player has not logged out properly
+			LoadPassportSettings();
 		}
 		else
 		{
@@ -472,7 +478,7 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 			if (!Url.IsEmpty())
 			{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-				if (IsStateFlagSet(IPS_PKCE))
+				if (IsStateFlagsSet(IPS_PKCE) || bIsPrevConnectedViaPKCEFlow)
 				{
 					OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 #if PLATFORM_ANDROID
@@ -610,6 +616,11 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
 		}
 		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
 		PKCEResponseDelegate = nullptr;
+
+		// we save passport state for PKCE flow in case if we decide to close a game
+		// and reopen it later with Passport is still being connected and we decided to logout.
+		// In this case, we logout using PKCE flow
+		SavePassportSettings();
 	}
 	else
 	{
@@ -775,7 +786,7 @@ void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
 		FString Msg;
-		FString TypeOfConnection = IsStateFlagSet(IPS_IMX) ? TEXT("connect") : TEXT("login");
+		FString TypeOfConnection = IsStateFlagsSet(IPS_IMX) ? TEXT("connect") : TEXT("login");
 
 		ResetStateFlags(IPS_CONNECTING);
 		if (Response.success)
@@ -927,9 +938,33 @@ void UImmutablePassport::ResetStateFlags(uint8 StateIn)
 	StateFlags &= ~StateIn;
 }
 
-bool UImmutablePassport::IsStateFlagSet(uint8 StateIn) const
+bool UImmutablePassport::IsStateFlagsSet(uint8 StateIn) const
 {
 	return (StateFlags & StateIn) == StateIn;
+}
+
+void UImmutablePassport::SavePassportSettings()
+{
+	UImmutableSaveGame* SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::CreateSaveGameObject(UImmutableSaveGame::StaticClass()));
+
+	SaveGameInstance->bWasConnectedViaPKCEFlow = IsStateFlagsSet(IPS_PKCE|IPS_CONNECTED);
+	
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, PASSPORT_SAVE_GAME_SLOT_NAME, 0);
+}
+
+void UImmutablePassport::LoadPassportSettings()
+{
+	UImmutableSaveGame* SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::CreateSaveGameObject(UImmutableSaveGame::StaticClass()));
+	
+	SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::LoadGameFromSlot(PASSPORT_SAVE_GAME_SLOT_NAME, 0));
+
+	if (!SaveGameInstance)
+	{
+		IMTBL_ERR("Could not find Immutable save game to load")
+		return;
+	}
+
+	bIsPrevConnectedViaPKCEFlow = SaveGameInstance->bWasConnectedViaPKCEFlow;
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
@@ -939,17 +974,17 @@ void UImmutablePassport::OnDeepLinkActivated(FString DeepLink)
 	OnHandleDeepLink = nullptr;
 	if (DeepLink.StartsWith(InitData.logoutRedirectUri))
 	{
-        // execute on game thread
+        // execute on game thread to prevent call to Passport instance from another thread
 		if (FTaskGraphInterface::IsRunning())
 		{
 			FGraphEventRef GameThreadTask = FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
 			{
 				PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ true, "Logged out" });
 				PKCELogoutResponseDelegate = nullptr;
+				ResetStateFlags(IPS_CONNECTED|IPS_PKCE|IPS_IMX);
+				SavePassportSettings();
 			}, TStatId(), nullptr, ENamedThreads::GameThread);
 		}
-
-		ResetStateFlags(IPS_CONNECTED|IPS_PKCE|IPS_IMX);
 	}
 	else if (DeepLink.StartsWith(InitData.redirectUri))
 	{
@@ -994,12 +1029,13 @@ void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, ErrorMsg});
 		PKCEResponseDelegate = nullptr;
 		ResetStateFlags(IPS_PKCE|IPS_CONNECTING|IPS_COMPLETING_PKCE);
+		SavePassportSettings();
 	}
 	else
 	{
 		FImmutablePassportConnectPKCEData Data = FImmutablePassportConnectPKCEData{Code.GetValue(), State.GetValue()};
 
-		CallJS(IsStateFlagSet(IPS_IMX)? ImmutablePassportAction::CONNECT_PKCE : ImmutablePassportAction::LOGIN_PKCE,
+		CallJS(IsStateFlagsSet(IPS_IMX)? ImmutablePassportAction::CONNECT_PKCE : ImmutablePassportAction::LOGIN_PKCE,
 			UStructToJsonString(Data), PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectPKCEResponse));
 	}
 }
@@ -1037,7 +1073,7 @@ void UImmutablePassport::HandleOnLoginPKCEDismissed()
 	// all required details (e.g. email address) into Passport
 	// Cannot use IPS_CONNECTING as that is set when PKCE flow is initiated. Here we are checking against the second
 	// half of the PKCE flow.
-	if (!IsStateFlagSet(IPS_COMPLETING_PKCE))
+	if (!IsStateFlagsSet(IPS_COMPLETING_PKCE))
 	{
 		// User hasn't entered all required details (e.g. email address) into
 		// Passport yet
