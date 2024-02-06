@@ -93,6 +93,7 @@ ASWebAuthenticationSession *_authSession;
                   passport->HandleDeepLink(callbackURL.absoluteString);
                 }
               } else {
+              	IMTBL_ERR("callbackURL is empty");
                 return;
               }
             }];

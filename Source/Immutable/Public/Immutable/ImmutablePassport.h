@@ -40,7 +40,7 @@ template <typename UStructType> TOptional<UStructType> JsonObjectToUStruct(const
 }
 
 /**
- *
+ * Immutable sdk Passport object
  */
 UCLASS()
 class IMMUTABLE_API UImmutablePassport : public UObject
@@ -228,8 +228,13 @@ protected:
 
 	void SetStateFlags(uint8 StateIn);
 	void ResetStateFlags(uint8 StateIn);
-	bool IsStateFlagSet(uint8 StateIn) const;
+	bool IsStateFlagsSet(uint8 StateIn) const;
 
+private:
+
+	void SavePassportSettings();
+	void LoadPassportSettings();
+	
 private:
 
 	enum EImmutablePassportStateFlags : uint8
@@ -244,4 +249,6 @@ private:
 	};
 
 	uint8 StateFlags = IPS_NONE;
+	bool bIsPrevConnectedViaPKCEFlow = false;
+	
 };
