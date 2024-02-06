@@ -21,7 +21,7 @@ void UImtblPassportImxRegisterOffchainAsyncAction::Activate()
 	{
 		FString Err = "RegisterOffchain failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Err)
-		OnFailure.Broadcast(Err);
+		OnFailure.Broadcast(TEXT(""), Err);
 		return;
 	}
 
@@ -44,11 +44,11 @@ void UImtblPassportImxRegisterOffchainAsyncAction::OnImxRegisterOffchainResponse
 	{
 		if (auto ResponseData = JsonObjectToUStruct<FImxRegisterOffchainResponse>(Result.Response.JsonObject))
 		{
-			OnSuccess.Broadcast(ResponseData->tx_hash);
+			OnSuccess.Broadcast(ResponseData->tx_hash, TEXT(""));
 			return;
 		}
 	} 
 
-	OnFailure.Broadcast(Result.Message);
+	OnFailure.Broadcast(TEXT(""), Result.Message);
 }
 

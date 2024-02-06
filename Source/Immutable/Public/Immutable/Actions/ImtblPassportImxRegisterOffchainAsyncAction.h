@@ -12,8 +12,7 @@ class IMMUTABLE_API UImtblPassportImxRegisterOffchainAsyncAction : public UImtbl
 {
 	GENERATED_BODY()
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSuccessOutputPin, FString, TxHash);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFailureOutputPin, FString, ErrorMessage);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOutputPin, FString, TxHash, FString, ErrorMessage);
 
 public:
 	
@@ -28,8 +27,8 @@ private:
     void OnImxRegisterOffchainResponse(struct FImmutablePassportResult Result);
 
 	UPROPERTY(BlueprintAssignable)
-	FOnSuccessOutputPin OnSuccess;
+	FOutputPin OnSuccess;
 	UPROPERTY(BlueprintAssignable)
-	FOnFailureOutputPin OnFailure;
+	FOutputPin OnFailure;
 
 };
