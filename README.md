@@ -20,12 +20,8 @@
 ### Prerequisites
 
 - git
-- Epic Games Launcher
-- Unreal Engine installed from the Epic Games Launcher; you will need every version that the plugin supports (currently 4.27, 5.0, 5.1, 5.2)
-- Visual Studio 2022 with C++ support
-- JetBrains Rider IDE (recommended for working with Unreal Engine C++ code)
-
-If not Rider, Visual Studio is fine and even better with the Resharper plugin.
+- Unreal Engine installed from the Epic Games Launcher or source code; Prior please check what Unreal Engine versions currently supported.
+- Microsoft Visual Studio. It's important that a compatible Visual Studio version should be installed. Please refer to Unreal Engine official documentations.
 
 ### Getting Started
 
@@ -53,17 +49,12 @@ Next, launch the game and then open a separate Chrome/Chromium browser and navig
 
 ## Release Blui Plugin for UE4
 
-For UE4 we are using Blui as the in built browser does not work.
+For UE 4.26 and 4.27 we are using Blui as the in built browser does not work.
 
-1. Download this release supporting UE 4.27 and 4.26 https://github.com/getnamo/BLUI-Unreal/releases/tag/4.2.0
-2. Download the CEF 90 Browser from https://github.com/getnamo/BLUI-Unreal/releases/tag/v4.6.0 (`BluBrowserCEF....7z`)
-3. Delete the Thirdparty/cef/Win folder from the BLUI plugin
-4. Place the Win folder from the `BluBrowserCEF...7z` into Thirdparty/cef
-5. Disable cefdebug settings in `Blu.cpp`, following line
-    ```
-    // BluManager::Settings.remote_debugging_port = 7777;
-    ```
-6. Zip the Blui plugin folder and upload to the GitHub release.
+1. Download Blui release from https://github.com/immutable/BLUI-Unreal/tree/Imtbl4.2
+2. Download CEF Browser from https://github.com/getnamo/BLUI-Unreal/releases/tag/v4.6.0 (`BluBrowserCEF....7z`)
+3. Place the Win folder from the `BluBrowserCEF...7z` into the BLUI plugin `Thirdparty/cef`
+4. Zip the Blui plugin folder and upload to the GitHub release.
 
 ## How to Add Game Bridge Asset to Packaged Resources
 
