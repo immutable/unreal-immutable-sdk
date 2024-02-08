@@ -20,7 +20,7 @@
 ### Prerequisites
 
 - git
-- Unreal Engine installed from the Epic Games Launcher or source code; Prior please check what Unreal Engine versions currently supported.
+- Unreal Engine installed from the Epic Games Launcher or built from the source code. Make sure to check the list of currently supported Unreal Engine versions.
 - Microsoft Visual Studio. It's important that a compatible Visual Studio version should be installed. Please refer to Unreal Engine official documentations.
 
 ### Getting Started
