@@ -367,8 +367,20 @@ void UImmutablePassport::ReinstateConnection(FImtblJSResponse Response)
 		}
 		else
 		{
-			CallJS(ImmutablePassportAction::INIT_DEVICE_FLOW, TEXT(""), ResponseDelegate.GetValue(),
-				FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitDeviceFlowResponse));
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+			if (bIsPrevConnectedViaPKCEFlow)
+			{
+				SetStateFlags(IPS_PKCE);
+				PKCEResponseDelegate = ResponseDelegate.GetValue();
+				CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""), PKCEResponseDelegate,
+					FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetPKCEAuthUrlResponse));
+			}
+			else
+#endif
+			{
+				CallJS(ImmutablePassportAction::INIT_DEVICE_FLOW, TEXT(""), ResponseDelegate.GetValue(),
+					FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitDeviceFlowResponse));
+			}
 		}
 	}
 }
