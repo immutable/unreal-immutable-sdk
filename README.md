@@ -21,7 +21,7 @@
 
 - git
 - Unreal Engine installed from the Epic Games Launcher or built from the source code. Make sure to check the list of currently supported Unreal Engine versions.
-- Microsoft Visual Studio. It's important that a compatible Visual Studio version should be installed. Please refer to Unreal Engine official documentations.
+- Microsoft Visual Studio. It is crucial to have a compatible version of Visual Studio installed. Please refer to the official documentation of Unreal Engine.
 
 ### Getting Started
 
