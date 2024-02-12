@@ -150,3 +150,13 @@ void UImtblBlui::Init() {
   JSConnector->Init(!BluEye->IsBrowserLoading());
 #endif
 }
+
+#if USING_BLUI_CEF
+void UImtblBlui::StopBluiEventLoop()
+{
+	if (UBluEye* BluEye = GetBluEye())
+	{
+		BluEye->SetShouldTickEventLoop(false);
+	}
+}
+#endif

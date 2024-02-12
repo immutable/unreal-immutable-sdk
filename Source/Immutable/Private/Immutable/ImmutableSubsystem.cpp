@@ -34,11 +34,14 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase &Collection) {
       this, &UImmutableSubsystem::WorldTickStart);
 }
 
-void UImmutableSubsystem::Deinitialize() {
-  IMTBL_LOG_FUNCSIG
-  BrowserWidget = nullptr;
-  ImtblBlui = nullptr;
-  Passport = nullptr;
+void UImmutableSubsystem::Deinitialize()
+{
+	IMTBL_LOG_FUNCSIG
+	BrowserWidget = nullptr;
+	IMTBL_LOG("Stopped BLUI event loop");
+	ImtblBlui->StopBluiEventLoop();
+	ImtblBlui = nullptr;
+	Passport = nullptr;
 #if PLATFORM_ANDROID | PLATFORM_IOS
   UGameViewportClient::OnViewportCreated().Remove(EngineInitCompleteHandle);
 #else

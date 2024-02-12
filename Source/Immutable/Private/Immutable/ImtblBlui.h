@@ -28,6 +28,10 @@ public:
   void BeginDestroy() override;
   void Init();
 
+#if USING_BLUI_CEF
+  void StopBluiEventLoop();
+#endif
+
 private:
   UPROPERTY()
   UObject *BluEyePtr = nullptr;
