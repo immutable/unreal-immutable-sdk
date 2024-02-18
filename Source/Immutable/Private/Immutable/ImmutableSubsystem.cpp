@@ -38,8 +38,10 @@ void UImmutableSubsystem::Deinitialize()
 {
 	IMTBL_LOG_FUNCSIG
 	BrowserWidget = nullptr;
+#if USING_BLUI_CEF
 	IMTBL_LOG("Stopped BLUI event loop");
 	ImtblBlui->StopBluiEventLoop();
+#endif
 	ImtblBlui = nullptr;
 	Passport = nullptr;
 #if PLATFORM_ANDROID | PLATFORM_IOS
