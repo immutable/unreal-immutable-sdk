@@ -1090,11 +1090,17 @@ void UImmutablePassport::HandleOnLoginPKCEDismissed()
 		// User hasn't entered all required details (e.g. email address) into
 		// Passport yet
 		IMTBL_LOG("Login PKCE dismissed before completing the flow");
-		if (!PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ false, "Cancelled" }))
+		if (FTaskGraphInterface::IsRunning())
 		{
-			IMTBL_WARN("Login PKCEResponseDelegate delegate was not called");
+			FGraphEventRef GameThreadTask = FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
+				{
+					if (!PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{ false, "Cancelled" }))
+					{
+						IMTBL_WARN("Login PKCEResponseDelegate delegate was not called");
+					}
+					PKCEResponseDelegate = nullptr;
+				}, TStatId(), nullptr, ENamedThreads::GameThread);
 		}
-		PKCEResponseDelegate = nullptr;
 	}
 	else
 	{
