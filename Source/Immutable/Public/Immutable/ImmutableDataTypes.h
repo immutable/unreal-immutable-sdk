@@ -26,6 +26,10 @@ struct FImmutableEngineVersionData
 	// cannot have spaces
 	UPROPERTY()
 	FString platformVersion = FPlatformMisc::GetOSVersion().Replace(TEXT(" "), TEXT("_"));
+
+	// Information on device. Examples of expected results: Apple|Apple M3 Max, GenuineIntel|13th Gen Intel(R) Core(TM) i7-13700H, Apple|iPhone15&#44;4. 
+	UPROPERTY()
+	FString deviceModel = FGenericPlatformMisc::GetDeviceMakeAndModel();
 };
 
 USTRUCT()
