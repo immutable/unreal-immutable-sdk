@@ -15,18 +15,15 @@ class IMMUTABLE_API UImtblPassportImxIsRegisteredOffchainAsyncAction : public UI
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompleteOutputPin, bool, IsRegistered);
 
 public:
-	
-    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-    static UImtblPassportImxIsRegisteredOffchainAsyncAction* IsRegisteredOffchain(UObject* WorldContextObject);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblPassportImxIsRegisteredOffchainAsyncAction* IsRegisteredOffchain(UObject* WorldContextObject);
 
-    virtual void Activate() override;
+	virtual void Activate() override;
 
 private:
-	
-    void DoImxIsRegisteredOffchain(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
-    void OnImxIsRegisteredOffchainResponse(struct FImmutablePassportResult Result);
+	void DoImxIsRegisteredOffchain(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
+	void OnImxIsRegisteredOffchainResponse(struct FImmutablePassportResult Result);
 
-    UPROPERTY(BlueprintAssignable)
-    FOnCompleteOutputPin OnComplete;
-
+	UPROPERTY(BlueprintAssignable)
+	FOnCompleteOutputPin OnComplete;
 };

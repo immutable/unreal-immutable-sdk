@@ -32,22 +32,22 @@ UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* 
 UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::LoginPKCE(UObject* WorldContextObject)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
-	
+
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bIsConnectImx = false;
 	PassportInitBlueprintNode->bIsPKCE = true;
-	
+
 	return PassportInitBlueprintNode;
 }
 
 UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImxPKCE(UObject* WorldContextObject)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
-	
+
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bIsConnectImx = true;
 	PassportInitBlueprintNode->bIsPKCE = true;
-	
+
 	return PassportInitBlueprintNode;
 }
 
@@ -58,7 +58,7 @@ void UImtblConnectionAsyncActions::Activate()
 		FString Error = "Connect failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Error)
 		Failed.Broadcast(Error);
-		
+
 		return;
 	}
 
@@ -74,14 +74,12 @@ void UImtblConnectionAsyncActions::DoConnect(TWeakObjectPtr<UImtblJSConnector> J
 		if (bIsPKCE)
 		{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-			Passport->ConnectPKCE(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject
-				(this, &UImtblConnectionAsyncActions::OnConnect));
+			Passport->ConnectPKCE(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect));
 #endif
 		}
 		else
 		{
-			Passport->Connect(bIsConnectImx, bUseCachedSession, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject
-				(this, &UImtblConnectionAsyncActions::OnConnect));
+			Passport->Connect(bIsConnectImx, bUseCachedSession, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect));
 		}
 	}
 	else

@@ -15,14 +15,16 @@
 #include "ImmutablePassport.generated.h"
 
 
-template <typename UStructType> FString UStructToJsonString(const UStructType& InStruct)
+template <typename UStructType>
+FString UStructToJsonString(const UStructType& InStruct)
 {
 	FString OutString;
 	FJsonObjectConverter::UStructToJsonObjectString(InStruct, OutString, 0, 0, 0, nullptr, false);
 	return OutString;
 }
 
-template <typename UStructType> TOptional<UStructType> JsonObjectToUStruct(const TSharedPtr<FJsonObject>& JsonObject)
+template <typename UStructType>
+TOptional<UStructType> JsonObjectToUStruct(const TSharedPtr<FJsonObject>& JsonObject)
 {
 	if (!JsonObject.IsValid())
 	{
@@ -101,8 +103,7 @@ public:
 	 * @param ResponseDelegate The response delegate of type
 	 * FImtblPassportResponseDelegate to call on response from JS.
 	 */
-	void ZkEvmSendTransaction(const FImtblTransactionRequest& Request,
-							  const FImtblPassportResponseDelegate& ResponseDelegate);
+	void ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
 	void GetIdToken(const FImtblPassportResponseDelegate& ResponseDelegate);
 	void GetAccessToken(const FImtblPassportResponseDelegate& ResponseDelegate);
 	void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -125,8 +126,7 @@ public:
 	 * @param ResponseDelegate The response delegate of type
 	 * FImtblPassportResponseDelegate to call on response from JS.
 	 */
-	void ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData,
-							 const FImtblPassportResponseDelegate& ResponseDelegate);
+	void ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
 	 *
@@ -151,7 +151,6 @@ public:
 	void HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 protected:
-	
 	void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
 	void ReinstateConnection(FImtblJSResponse Response);
 
@@ -167,7 +166,7 @@ protected:
 	TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
-  
+
 	FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
 	// Since the second part of PKCE is triggered by deep links, saving the
 	// response delegate here so it's easier to get
@@ -180,18 +179,15 @@ protected:
 	bool CheckIsInitialized(const FString& Action, const FImtblPassportResponseDelegate& ResponseDelegate) const;
 	// Calls JS with the given Action and Data, and registers the given
 	// ResponseDelegate to be called when JS responds
-	void CallJS(const FString& Action, const FString& Data,
-				const FImtblPassportResponseDelegate& ClientResponseDelegate,
-				const FImtblJSResponseDelegate& HandleJSResponse, const bool bCheckInitialized = true);
+	void CallJS(const FString& Action, const FString& Data, const FImtblPassportResponseDelegate& ClientResponseDelegate, const FImtblJSResponseDelegate& HandleJSResponse, const bool bCheckInitialized = true);
 	// Pulls the ResponseDelegate from the ResponseDelegates map and returns it
 	TOptional<FImtblPassportResponseDelegate> GetResponseDelegate(const FImtblJSResponse& Response);
-	void ConfirmCode(const FString& DeviceCode, const float Interval,
-					 const FImtblPassportResponseDelegate& ResponseDelegate);
+	void ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	void OnInitializeResponse(FImtblJSResponse Response);
 
 	void OnInitDeviceFlowResponse(FImtblJSResponse Response);
-	
+
 	void OnLogoutResponse(FImtblJSResponse Response);
 	void OnConnectResponse(FImtblJSResponse Response);
 	void OnConnectSilentResponse(FImtblJSResponse Response);
@@ -231,24 +227,21 @@ protected:
 	bool IsStateFlagsSet(uint8 StateIn) const;
 
 private:
-
 	void SavePassportSettings();
 	void LoadPassportSettings();
-	
-private:
 
+private:
 	enum EImmutablePassportStateFlags : uint8
 	{
-		IPS_NONE			= 0,
-		IPS_CONNECTING		= 1 << 0,
-		IPS_CONNECTED		= 1 << 1,
-		IPS_IMX				= 1 << 2,
-		IPS_PKCE			= 1 << 3,
-		IPS_COMPLETING_PKCE	= 1 << 4,
-		IPS_INITIALIZED		= 1 << 5
+		IPS_NONE = 0,
+		IPS_CONNECTING = 1 << 0,
+		IPS_CONNECTED = 1 << 1,
+		IPS_IMX = 1 << 2,
+		IPS_PKCE = 1 << 3,
+		IPS_COMPLETING_PKCE = 1 << 4,
+		IPS_INITIALIZED = 1 << 5
 	};
 
 	uint8 StateFlags = IPS_NONE;
 	bool bIsPrevConnectedViaPKCEFlow = false;
-	
 };

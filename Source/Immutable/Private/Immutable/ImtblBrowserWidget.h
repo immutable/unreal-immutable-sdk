@@ -10,67 +10,63 @@
 #include "ImtblBrowserWidget.generated.h"
 
 UCLASS()
-class IMMUTABLE_API UImtblBrowserWidget : public UWidget {
-  GENERATED_BODY()
+class IMMUTABLE_API UImtblBrowserWidget : public UWidget
+{
+	GENERATED_BODY()
 
-  friend class UImtblJSConnector;
+	friend class UImtblJSConnector;
 
 public:
-  // Sets default values for this actor's properties
-  UImtblBrowserWidget();
+	// Sets default values for this actor's properties
+	UImtblBrowserWidget();
 
-  // Get a pointer to the JSConnector
-  TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
+	// Get a pointer to the JSConnector
+	TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
 
-  bool IsPageLoaded() const;
+	bool IsPageLoaded() const;
 
 protected:
-  void ExecuteJS(const FString &ScriptText) const;
+	void ExecuteJS(const FString& ScriptText) const;
 
 private:
-  DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnConsoleMessage,
-                                                 const FString &, Message,
-                                                 const FString &, Source, int32,
-                                                 Line);
-  FOnConsoleMessage OnConsoleMessage;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnConsoleMessage, const FString &, Message, const FString &, Source, int32, Line);
+
+	FOnConsoleMessage OnConsoleMessage;
 
 #if USING_BUNDLED_CEF
-  TSharedPtr<class SWebBrowser> WebBrowserWidget;
+	TSharedPtr<class SWebBrowser> WebBrowserWidget;
 #endif
-  /** URL that the browser will initially navigate to. The URL should include
-   * the protocol, eg http:// */
-  FString InitialURL;
-  /** Should the browser window support transparency. */
-  bool bSupportsTransparency = true;
-  bool bShowInitialThrobber = false;
+	/** URL that the browser will initially navigate to. The URL should include
+	 * the protocol, eg http:// */
+	FString InitialURL;
+	/** Should the browser window support transparency. */
+	bool bSupportsTransparency = true;
+	bool bShowInitialThrobber = false;
 
-  UPROPERTY()
-  class UImtblJSConnector *JSConnector = nullptr;
+	UPROPERTY()
+	class UImtblJSConnector* JSConnector = nullptr;
 
-  void SetBrowserContent();
+	void SetBrowserContent();
 
-  bool BindUObject(const FString &Name, UObject *Object,
-                   bool bIsPermanent = true) const;
-  // Bind the JSConnector to the browser window
-  void BindConnector();
+	bool BindUObject(const FString& Name, UObject* Object, bool bIsPermanent = true) const;
+	// Bind the JSConnector to the browser window
+	void BindConnector();
 
 #if PLATFORM_ANDROID | PLATFORM_IOS
   void HandleOnLoadCompleted();
 #endif
 
 #if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 1
-  void HandleOnConsoleMessage(const FString &Message, const FString &Source,
-                              int32 Line,
-                              EWebBrowserConsoleLogSeverity Severity);
+	void HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
 #endif
 
-  /**
-   * UWidget interface
-   */
+	/**
+	 * UWidget interface
+	 */
 public:
-  void ReleaseSlateResources(bool bReleaseChildren) override;
+	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 
 protected:
-  TSharedRef<SWidget> RebuildWidget() override;
-  void OnWidgetRebuilt() override;
+	virtual TSharedRef<SWidget> RebuildWidget() override;
+	virtual void OnWidgetRebuilt() override;
 };

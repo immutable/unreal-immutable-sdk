@@ -33,7 +33,7 @@ void UImtblPassportHasStoredCredentialsAsyncAction::DoHasStoredCredentials(TWeak
 
 	if (Passport.IsValid())
 	{
-		Passport->HasStoredCredentials(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportHasStoredCredentialsAsyncAction::OnHasStoredCredentialsResponse));	
+		Passport->HasStoredCredentials(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportHasStoredCredentialsAsyncAction::OnHasStoredCredentialsResponse));
 	}
 }
 

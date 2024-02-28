@@ -17,22 +17,18 @@ class IMMUTABLE_API UImtblPassportLogoutAsyncAction : public UImtblBlueprintAsyn
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportLogoutOutPin, FString, Message);
 
 public:
-	
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
 	static UImtblPassportLogoutAsyncAction* Logout(UObject* WorldContextObject);
 
 	virtual void Activate() override;
 
 private:
-
 	void DoLogout(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
 	void OnLogoutResponse(FImmutablePassportResult Result) const;
 
 private:
-
 	UPROPERTY(BlueprintAssignable)
 	FPassportLogoutOutPin OnSuccess;
 	UPROPERTY(BlueprintAssignable)
 	FPassportLogoutOutPin OnFailure;
-	
 };

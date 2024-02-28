@@ -82,7 +82,6 @@ struct FImtblUserProfile
 	FString nickname;
 	UPROPERTY()
 	FString sub;
-	
 };
 
 USTRUCT()
@@ -95,8 +94,7 @@ struct FImmutablePassportZkEvmRequestAccountsData
 
 	FString ToJsonString() const;
 	static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonString(const FString& JsonObjectString);
-	static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonObject(
-		const TSharedPtr<FJsonObject>& JsonObject);
+	static TOptional<FImmutablePassportZkEvmRequestAccountsData> FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject);
 };
 
 USTRUCT()

@@ -11,30 +11,24 @@
  *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportGetAccessTokenAsyncAction
-    : public UImtblBlueprintAsyncAction {
-  GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportGetAccessTokenAsyncAction : public UImtblBlueprintAsyncAction
+{
+	GENERATED_BODY()
 
-  DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportGetAccessTokenOutputPin,
-                                               FString, ErrorMessage, FString,
-                                               AccessToken);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportGetAccessTokenOutputPin, FString, ErrorMessage, FString, AccessToken);
 
 public:
-  UFUNCTION(BlueprintCallable,
-            meta = (WorldContext = "WorldContextObject",
-                    BlueprintInternalUseOnly = "true"),
-            Category = "Immutable")
-  static UImtblPassportGetAccessTokenAsyncAction *
-  GetAccessToken(UObject *WorldContextObject);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblPassportGetAccessTokenAsyncAction* GetAccessToken(UObject* WorldContextObject);
 
-  void Activate() override;
+	virtual void Activate() override;
 
 private:
-  void DoGetAccessToken(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
-  void OnGetAccessTokenResponse(FImmutablePassportResult Result);
+	void DoGetAccessToken(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
+	void OnGetAccessTokenResponse(FImmutablePassportResult Result);
 
-  UPROPERTY(BlueprintAssignable)
-  FPassportGetAccessTokenOutputPin GotAccessToken;
-  UPROPERTY(BlueprintAssignable)
-  FPassportGetAccessTokenOutputPin Failed;
+	UPROPERTY(BlueprintAssignable)
+	FPassportGetAccessTokenOutputPin GotAccessToken;
+	UPROPERTY(BlueprintAssignable)
+	FPassportGetAccessTokenOutputPin Failed;
 };

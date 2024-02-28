@@ -7,23 +7,25 @@
 #include "ImtblBrowserUserWidget.generated.h"
 
 UCLASS()
-class IMMUTABLE_API UImtblBrowserUserWidget : public UUserWidget {
-  GENERATED_BODY()
-public:
-  TSharedRef<SWidget> RebuildWidget() override;
-  void BeginDestroy() override;
-  void RemoveFromParent() override;
-  void OnWidgetRebuilt() override;
+class IMMUTABLE_API UImtblBrowserUserWidget : public UUserWidget
+{
+	GENERATED_BODY()
 
-  TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
+public:
+	virtual TSharedRef<SWidget> RebuildWidget() override;
+	virtual void BeginDestroy() override;
+	virtual void RemoveFromParent() override;
+	virtual void OnWidgetRebuilt() override;
+
+	TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
 
 private:
-  UPROPERTY()
-  class UImtblBrowserWidget *Browser = nullptr;
+	UPROPERTY()
+	class UImtblBrowserWidget* Browser = nullptr;
 
-  bool bIsBrowserAppInitialized = false;
+	bool bIsBrowserAppInitialized = false;
 
-  FTimerHandle Timer;
+	FTimerHandle Timer;
 
-  FMargin DefaultOffsets = FMargin(150, 150, 150, 150);
+	FMargin DefaultOffsets = FMargin(150, 150, 150, 150);
 };

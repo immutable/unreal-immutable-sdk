@@ -10,7 +10,7 @@ UImtblPassportImxIsRegisteredOffchainAsyncAction* UImtblPassportImxIsRegisteredO
 	UImtblPassportImxIsRegisteredOffchainAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportImxIsRegisteredOffchainAsyncAction>();
 
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	
+
 	return PassportInitBlueprintNode;
 }
 
@@ -24,21 +24,20 @@ void UImtblPassportImxIsRegisteredOffchainAsyncAction::Activate()
 		return;
 	}
 
-	GetSubsystem()->WhenReady(this, &UImtblPassportImxIsRegisteredOffchainAsyncAction::DoImxIsRegisteredOffchain);//, /* timoutSec */ 15.0f);
+	GetSubsystem()->WhenReady(this, &UImtblPassportImxIsRegisteredOffchainAsyncAction::DoImxIsRegisteredOffchain); //, /* timoutSec */ 15.0f);
 }
 
 void UImtblPassportImxIsRegisteredOffchainAsyncAction::DoImxIsRegisteredOffchain(TWeakObjectPtr<UImtblJSConnector> JSConnector)
 {
 	const auto Passport = GetSubsystem()->GetPassport();
-	
+
 	if (Passport.IsValid())
 	{
-		Passport->ImxIsRegisteredOffchain(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportImxIsRegisteredOffchainAsyncAction::OnImxIsRegisteredOffchainResponse));	
+		Passport->ImxIsRegisteredOffchain(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportImxIsRegisteredOffchainAsyncAction::OnImxIsRegisteredOffchainResponse));
 	}
 }
 
 void UImtblPassportImxIsRegisteredOffchainAsyncAction::OnImxIsRegisteredOffchainResponse(FImmutablePassportResult Result)
 {
-	 OnComplete.Broadcast(Result.Success);
+	OnComplete.Broadcast(Result.Success);
 }
-
