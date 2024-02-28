@@ -12,80 +12,86 @@
 #include "ImtblBrowserWidget.h"
 #include "ImtblJSConnector.h"
 
-TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget() {
-  // RebuildWidget is not called until the widget is first added to the
-  // viewport.
+TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
+{
+	// RebuildWidget is not called until the widget is first added to the
+	// viewport.
 
-  UPanelWidget *RootWidget = Cast<UPanelWidget>(GetRootWidget());
+	UPanelWidget* RootWidget = Cast<UPanelWidget>(GetRootWidget());
 
-  if (!RootWidget) {
-    RootWidget = WidgetTree->ConstructWidget<UCanvasPanel>(
-        UCanvasPanel::StaticClass(), TEXT("RootWidget"));
-    if (UCanvasPanelSlot *RootWidgetSlot =
-            Cast<UCanvasPanelSlot>(RootWidget->Slot)) {
-      // Format root widget
-    }
-    WidgetTree->RootWidget = RootWidget;
-  }
+	if (!RootWidget)
+	{
+		RootWidget = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("RootWidget"));
+		if (UCanvasPanelSlot* RootWidgetSlot = Cast<UCanvasPanelSlot>(RootWidget->Slot))
+		{
+			// Format root widget
+		}
+		WidgetTree->RootWidget = RootWidget;
+	}
 
-  if (RootWidget) {
-    UScaleBox *ScaleBox = WidgetTree->ConstructWidget<UScaleBox>(
-        UScaleBox::StaticClass(), TEXT("ScaleBox"));
-    RootWidget->AddChild(ScaleBox);
-    if (ScaleBox) {
-      Browser = WidgetTree->ConstructWidget<UImtblBrowserWidget>(
-          UImtblBrowserWidget::StaticClass(), TEXT("ImmutableBrowserWidget"));
-      ScaleBox->AddChild(Browser);
-      if (UCanvasPanelSlot *RootWidgetSlot =
-              Cast<UCanvasPanelSlot>(ScaleBox->Slot)) {
+	if (RootWidget)
+	{
+		UScaleBox* ScaleBox = WidgetTree->ConstructWidget<UScaleBox>(UScaleBox::StaticClass(), TEXT("ScaleBox"));
+		RootWidget->AddChild(ScaleBox);
+		if (ScaleBox)
+		{
+			Browser = WidgetTree->ConstructWidget<UImtblBrowserWidget>(UImtblBrowserWidget::StaticClass(), TEXT("ImmutableBrowserWidget"));
+			ScaleBox->AddChild(Browser);
+			if (UCanvasPanelSlot* RootWidgetSlot = Cast<UCanvasPanelSlot>(ScaleBox->Slot))
+			{
 #if PLATFORM_ANDROID | PLATFORM_IOS
         // Android webview needs to be at least 1px to 1px big to work
         // but it can be off screen
         RootWidgetSlot->SetAnchors(FAnchors(0, 0, 0, 0));
         RootWidgetSlot->SetOffsets(FMargin(-1, -1, 1, 1));
 #else
-        RootWidgetSlot->SetAnchors(FAnchors(0, 0, 1, 1));
-        RootWidgetSlot->SetOffsets(DefaultOffsets);
+				RootWidgetSlot->SetAnchors(FAnchors(0, 0, 1, 1));
+				RootWidgetSlot->SetOffsets(DefaultOffsets);
 #endif
-      }
-      if (UScaleBoxSlot *ScaleBoxSlot = Cast<UScaleBoxSlot>(Browser->Slot)) {
-        ScaleBoxSlot->SetHorizontalAlignment(HAlign_Fill);
-        ScaleBoxSlot->SetVerticalAlignment(VAlign_Fill);
-      }
-    }
-  }
+			}
+			if (UScaleBoxSlot* ScaleBoxSlot = Cast<UScaleBoxSlot>(Browser->Slot))
+			{
+				ScaleBoxSlot->SetHorizontalAlignment(HAlign_Fill);
+				ScaleBoxSlot->SetVerticalAlignment(VAlign_Fill);
+			}
+		}
+	}
 
-  return Super::RebuildWidget();
+	return Super::RebuildWidget();
 }
 
 void UImtblBrowserUserWidget::BeginDestroy() { Super::BeginDestroy(); }
 
-void UImtblBrowserUserWidget::RemoveFromParent() {
+void UImtblBrowserUserWidget::RemoveFromParent()
+{
 #if !PLATFORM_ANDROID
-  // This is all that is needed to persist the widget state outside throughout
-  // level/world changes. Super::RemoveFromParent();
+	// This is all that is needed to persist the widget state outside throughout
+	// level/world changes. Super::RemoveFromParent();
 
-  if (UPanelWidget *CurrentParent = GetParent()) {
-    CurrentParent->RemoveChild(this);
-  }
+	if (UPanelWidget* CurrentParent = GetParent())
+	{
+		CurrentParent->RemoveChild(this);
+	}
 #endif
 }
 
-void UImtblBrowserUserWidget::OnWidgetRebuilt() {
+void UImtblBrowserUserWidget::OnWidgetRebuilt()
+{
 #if PLATFORM_ANDROID | PLATFORM_IOS
-  // Mobile webview needs to be visible to work
+	// Mobile webview needs to be visible to work
 #else
-  SetVisibility(ESlateVisibility::Collapsed);
+	SetVisibility(ESlateVisibility::Collapsed);
 #endif
-  Super::OnWidgetRebuilt();
+	Super::OnWidgetRebuilt();
 }
 
-TWeakObjectPtr<class UImtblJSConnector>
-UImtblBrowserUserWidget::GetJSConnector() const {
-  if (!Browser) {
-    IMTBL_WARN("JSConnector requested before Browser was initialized");
-    return nullptr;
-  }
+TWeakObjectPtr<class UImtblJSConnector> UImtblBrowserUserWidget::GetJSConnector() const
+{
+	if (!Browser)
+	{
+		IMTBL_WARN("JSConnector requested before Browser was initialized");
+		return nullptr;
+	}
 
-  return Browser->GetJSConnector();
+	return Browser->GetJSConnector();
 }

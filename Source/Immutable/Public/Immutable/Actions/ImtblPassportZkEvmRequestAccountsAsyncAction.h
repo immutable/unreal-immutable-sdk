@@ -11,33 +11,26 @@
  *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportZkEvmRequestAccountsAsyncAction
-    : public UImtblBlueprintAsyncAction {
-  GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportZkEvmRequestAccountsAsyncAction : public UImtblBlueprintAsyncAction
+{
+	GENERATED_BODY()
 
-  DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
-      FPassportZkEvmRequestAccountsOutputPin, FString, ErrorMessage,
-      const TArray<FString> &, Accounts);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportZkEvmRequestAccountsOutputPin, FString, ErrorMessage, const TArray<FString> &, Accounts);
 
 public:
-  UFUNCTION(BlueprintCallable,
-            meta = (WorldContext = "WorldContextObject",
-                    BlueprintInternalUseOnly = "true"),
-            Category = "Immutable")
-  static UImtblPassportZkEvmRequestAccountsAsyncAction *
-  RequestAccounts(UObject *WorldContextObject);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblPassportZkEvmRequestAccountsAsyncAction* RequestAccounts(UObject* WorldContextObject);
 
-  void Activate() override;
+	virtual void Activate() override;
 
 private:
-  FImmutablePassportZkEvmRequestAccountsData RequestAccountsData;
+	FImmutablePassportZkEvmRequestAccountsData RequestAccountsData;
 
-  void
-  DoRequestAccounts(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
-  void OnRequestAccountsResponse(FImmutablePassportResult Result);
+	void DoRequestAccounts(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
+	void OnRequestAccountsResponse(FImmutablePassportResult Result);
 
-  UPROPERTY(BlueprintAssignable)
-  FPassportZkEvmRequestAccountsOutputPin Failed;
-  UPROPERTY(BlueprintAssignable)
-  FPassportZkEvmRequestAccountsOutputPin GotAccounts;
+	UPROPERTY(BlueprintAssignable)
+	FPassportZkEvmRequestAccountsOutputPin Failed;
+	UPROPERTY(BlueprintAssignable)
+	FPassportZkEvmRequestAccountsOutputPin GotAccounts;
 };

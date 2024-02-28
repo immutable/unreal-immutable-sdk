@@ -2,10 +2,11 @@
 
 #include "Immutable/Actions/ImtblBlueprintAsyncAction.h"
 
-UImmutableSubsystem *UImtblBlueprintAsyncAction::GetSubsystem() const {
-  if (!WorldContextObject || !WorldContextObject->GetWorld())
-    return nullptr;
-  return WorldContextObject->GetWorld()
-      ->GetGameInstance()
-      ->GetSubsystem<UImmutableSubsystem>();
+UImmutableSubsystem* UImtblBlueprintAsyncAction::GetSubsystem() const
+{
+	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	{
+		return nullptr;
+	}
+	return WorldContextObject->GetWorld()->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
 }

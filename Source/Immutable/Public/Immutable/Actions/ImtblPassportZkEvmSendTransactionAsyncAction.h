@@ -11,34 +11,26 @@
  *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportZkEvmSendTransactionAsyncAction
-    : public UImtblBlueprintAsyncAction {
-  GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportZkEvmSendTransactionAsyncAction : public UImtblBlueprintAsyncAction
+{
+	GENERATED_BODY()
 
-  DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
-      FPassportZkEvmSendTransactionOutputPin, FString, ErrorMessage, FString,
-      Transaction);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportZkEvmSendTransactionOutputPin, FString, ErrorMessage, FString, Transaction);
 
 public:
-  UFUNCTION(BlueprintCallable,
-            meta = (WorldContext = "WorldContextObject",
-                    BlueprintInternalUseOnly = "true"),
-            Category = "Immutable")
-  static UImtblPassportZkEvmSendTransactionAsyncAction *
-  ZkEvmSendTransaction(UObject *WorldContextObject,
-                       const FImtblTransactionRequest &Request);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblPassportZkEvmSendTransactionAsyncAction* ZkEvmSendTransaction(UObject* WorldContextObject, const FImtblTransactionRequest& Request);
 
-  void Activate() override;
+	virtual void Activate() override;
 
 private:
-  FImtblTransactionRequest TransactionRequest;
+	FImtblTransactionRequest TransactionRequest;
 
-  UPROPERTY(BlueprintAssignable)
-  FPassportZkEvmSendTransactionOutputPin TransactionSent;
-  UPROPERTY(BlueprintAssignable)
-  FPassportZkEvmSendTransactionOutputPin Failed;
+	UPROPERTY(BlueprintAssignable)
+	FPassportZkEvmSendTransactionOutputPin TransactionSent;
+	UPROPERTY(BlueprintAssignable)
+	FPassportZkEvmSendTransactionOutputPin Failed;
 
-  void DoZkEvmSendTransaction(
-      TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
-  void OnZkEvmSendTransactionResponse(FImmutablePassportResult Result);
+	void DoZkEvmSendTransaction(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
+	void OnZkEvmSendTransactionResponse(FImmutablePassportResult Result);
 };

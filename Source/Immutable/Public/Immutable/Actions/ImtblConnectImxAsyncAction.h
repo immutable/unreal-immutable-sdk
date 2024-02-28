@@ -18,7 +18,6 @@ class IMMUTABLE_API UImtblConnectionAsyncActions : public UImtblBlueprintAsyncAc
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPassportConnectOutputPin, FString, ErrorMessage);
 
 public:
-
 	/**
 	 * Log into Passport using Device Code Authorisation.
 	 *
@@ -62,10 +61,9 @@ public:
 	static UImtblConnectionAsyncActions* ConnectImxPKCE(UObject* WorldContextObject);
 
 
-	void Activate() override;
+	virtual void Activate() override;
 
 private:
-
 	FImmutablePassportInitDeviceFlowData InitDeviceFlowData;
 
 	void DoConnect(TWeakObjectPtr<class UImtblJSConnector> JSConnector);

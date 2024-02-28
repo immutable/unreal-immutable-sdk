@@ -10,9 +10,11 @@ IMMUTABLE_API DECLARE_LOG_CATEGORY_EXTERN(LogImmutable, Log, All);
 IMMUTABLE_API DECLARE_LOG_CATEGORY_EXTERN(LogClean, Log, All);
 #else
 // Direct implementation of the DECLARE_LOG_CATEGORY_EXTERN macro
-IMMUTABLE_API extern struct FLogCategoryLogClean
-    : public FLogCategory<ELogVerbosity::Log, ELogVerbosity::All> {
-  FORCEINLINE FLogCategoryLogClean() : FLogCategory(TEXT("")) {}
+IMMUTABLE_API extern struct FLogCategoryLogClean : public FLogCategory<ELogVerbosity::Log, ELogVerbosity::All>
+{
+	FORCEINLINE FLogCategoryLogClean() : FLogCategory(TEXT(""))
+	{
+	}
 } LogClean;
 #endif
 

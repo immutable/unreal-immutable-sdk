@@ -10,8 +10,9 @@
 #include "BluEye.h"
 #endif
 
-UImtblBlui::UImtblBlui() {
-  IMTBL_LOG_FUNCSIG
+UImtblBlui::UImtblBlui()
+{
+	IMTBL_LOG_FUNCSIG
 #if USING_BLUI_CEF
   if (!BluEyePtr) {
     IMTBL_LOG("Creating BluEye")
@@ -19,21 +20,21 @@ UImtblBlui::UImtblBlui() {
   }
 #endif
 
-  JSConnector = NewObject<UImtblJSConnector>(this, "JSConnector");
-  JSConnector->ExecuteJs =
-      UImtblJSConnector::FOnExecuteJsDelegate::CreateUObject(
-          this, &UImtblBlui::ExecuteJS);
+	JSConnector = NewObject<UImtblJSConnector>(this, "JSConnector");
+	JSConnector->ExecuteJs = UImtblJSConnector::FOnExecuteJsDelegate::CreateUObject(this, &UImtblBlui::ExecuteJS);
 }
 
 #if USING_BLUI_CEF
 UBluEye *UImtblBlui::GetBluEye() const { return Cast<UBluEye>(BluEyePtr); }
 #endif
 
-void UImtblBlui::OnLogEvent(const FString &LogText) {
-  IMTBL_LOG_FUNC("LogEvent: %s", *LogText);
+void UImtblBlui::OnLogEvent(const FString& LogText)
+{
+	IMTBL_LOG_FUNC("LogEvent: %s", *LogText);
 }
 
-void UImtblBlui::WorldTickStart(UWorld *World, ELevelTick LevelTick, float X) {
+void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
+{
 #if USING_BLUI_CEF
   if (GetBluEye()->IsBrowserLoading()) {
     IMTBL_LOG("Waiting for Browser to load...");
@@ -56,28 +57,31 @@ void UImtblBlui::WorldTickStart(UWorld *World, ELevelTick LevelTick, float X) {
 #endif
 }
 
-void UImtblBlui::BeginDestroy() {
-  IMTBL_LOG_FUNCSIG
+void UImtblBlui::BeginDestroy()
+{
+	IMTBL_LOG_FUNCSIG
 #if USING_BLUI_CEF
   if (GetBluEye()) {
     GetBluEye()->CloseBrowser();
   }
   BluEyePtr = nullptr;
 #endif
-  Super::BeginDestroy();
+	Super::BeginDestroy();
 }
 
-void UImtblBlui::OnScriptEvent(const FString &EventName,
-                               const FString &EventMessage) {
-  IMTBL_LOG_FUNC("EventName: %s, EventMessage: %s", *EventName, *EventMessage);
-  JSConnector->SendToGame(EventMessage);
+void UImtblBlui::OnScriptEvent(const FString& EventName, const FString& EventMessage)
+{
+	IMTBL_LOG_FUNC("EventName: %s, EventMessage: %s", *EventName, *EventMessage);
+	JSConnector->SendToGame(EventMessage);
 }
 
-TWeakObjectPtr<UImtblJSConnector> UImtblBlui::GetJSConnector() const {
-  return JSConnector;
+TWeakObjectPtr<UImtblJSConnector> UImtblBlui::GetJSConnector() const
+{
+	return JSConnector;
 }
 
-void UImtblBlui::ExecuteJS(const FString &ScriptText) const {
+void UImtblBlui::ExecuteJS(const FString& ScriptText) const
+{
 #if USING_BLUI_CEF
   if (GetBluEye()) {
     GetBluEye()->ExecuteJS(ScriptText);
@@ -85,8 +89,9 @@ void UImtblBlui::ExecuteJS(const FString &ScriptText) const {
 #endif
 }
 
-void UImtblBlui::Init() {
-  IMTBL_LOG_FUNCSIG
+void UImtblBlui::Init()
+{
+	IMTBL_LOG_FUNCSIG
 
 #if USING_BLUI_CEF
   // Todo: Add comment here why GetBluEye

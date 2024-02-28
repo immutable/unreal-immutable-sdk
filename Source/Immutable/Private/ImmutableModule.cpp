@@ -13,9 +13,10 @@
 
 #define LOCTEXT_NAMESPACE "FImmutableModule"
 
-void FImmutableModule::StartupModule() {
-  // This code will execute after your module is loaded into memory; the exact
-  // timing is specified in the .uplugin file per-module
+void FImmutableModule::StartupModule()
+{
+	// This code will execute after your module is loaded into memory; the exact
+	// timing is specified in the .uplugin file per-module
 
 #if USING_BLUI_CEF
   if (IPluginManager::Get().FindPlugin("WebBrowserWidget") != nullptr &&

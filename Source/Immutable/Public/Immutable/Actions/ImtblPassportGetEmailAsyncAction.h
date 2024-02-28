@@ -11,30 +11,24 @@
  *
  */
 UCLASS()
-class IMMUTABLE_API UImtblPassportGetEmailAsyncAction
-    : public UImtblBlueprintAsyncAction {
-  GENERATED_BODY()
+class IMMUTABLE_API UImtblPassportGetEmailAsyncAction : public UImtblBlueprintAsyncAction
+{
+	GENERATED_BODY()
 
-  DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportGetEmailOutputPin,
-                                               FString, ErrorMessage, FString,
-                                               Email);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPassportGetEmailOutputPin, FString, ErrorMessage, FString, Email);
 
 public:
-  UFUNCTION(BlueprintCallable,
-            meta = (WorldContext = "WorldContextObject",
-                    BlueprintInternalUseOnly = "true"),
-            Category = "Immutable")
-  static UImtblPassportGetEmailAsyncAction *
-  GetEmail(UObject *WorldContextObject);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
+	static UImtblPassportGetEmailAsyncAction* GetEmail(UObject* WorldContextObject);
 
-  void Activate() override;
+	virtual void Activate() override;
 
 private:
-  void DoGetEmail(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
-  void OnGetEmailResponse(FImmutablePassportResult Result);
+	void DoGetEmail(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
+	void OnGetEmailResponse(FImmutablePassportResult Result);
 
-  UPROPERTY(BlueprintAssignable)
-  FPassportGetEmailOutputPin GotEmail;
-  UPROPERTY(BlueprintAssignable)
-  FPassportGetEmailOutputPin Failed;
+	UPROPERTY(BlueprintAssignable)
+	FPassportGetEmailOutputPin GotEmail;
+	UPROPERTY(BlueprintAssignable)
+	FPassportGetEmailOutputPin Failed;
 };
