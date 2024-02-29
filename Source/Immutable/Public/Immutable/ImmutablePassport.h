@@ -69,7 +69,7 @@ public:
 	void ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
 #endif
 
-	void Logout(const FImtblPassportResponseDelegate& ResponseDelegate);
+	void Logout(bool DoHardLogout, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
 	 * Initializes the zkEVM provider.
@@ -239,7 +239,8 @@ private:
 		IPS_IMX = 1 << 2,
 		IPS_PKCE = 1 << 3,
 		IPS_COMPLETING_PKCE = 1 << 4,
-		IPS_INITIALIZED = 1 << 5
+		IPS_INITIALIZED = 1 << 5,
+		IPS_HARDLOGOUT = 1 << 6
 	};
 
 	uint8 StateFlags = IPS_NONE;
