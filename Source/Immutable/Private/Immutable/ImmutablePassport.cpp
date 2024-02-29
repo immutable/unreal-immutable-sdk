@@ -174,7 +174,7 @@ void UImmutablePassport::ConnectPKCE(bool IsConnectImx, const FImtblPassportResp
 }
 #endif
 
-void UImmutablePassport::Logout(const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::Logout(bool DoHardLogout, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	if (IsStateFlagsSet(IPS_PKCE) || bIsPrevConnectedViaPKCEFlow)
@@ -184,6 +184,10 @@ void UImmutablePassport::Logout(const FImtblPassportResponseDelegate& ResponseDe
 #endif
 	if (IsStateFlagsSet(IPS_CONNECTED))
 	{
+		if (DoHardLogout)
+		{
+			SetStateFlags(IPS_HARDLOGOUT);
+		}
 		CallJS(ImmutablePassportAction::Logout, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnLogoutResponse));
 	}
 	else
@@ -428,60 +432,79 @@ void UImmutablePassport::OnInitDeviceFlowResponse(FImtblJSResponse Response)
 
 void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 {
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
+	auto ResponseDelegate = GetResponseDelegate(Response);
+	
+	if (!ResponseDelegate)
 	{
-		if (Response.success)
-		{
-			FString Url;
-			FString Err;
+		return;
+	}
 
-			Response.JsonObject->TryGetStringField(TEXT("result"), Url);
-			if (!Url.IsEmpty())
-			{
+	FString Message;
+
+	if (!Response.success)
+	{
+		Message = Response.Error.IsSet() ? Response.Error->ToString() : Response.JsonObject->GetStringField(TEXT("error"));
+
+		IMTBL_ERR("%s", *Message)
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Message, Response });
+
+		return;
+	}
+
+	if (!IsStateFlagsSet(IPS_HARDLOGOUT))
+	{
+		Message = "Logged out without clearing browser session";
+
+		IMTBL_LOG("%s", *Message)
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ true, Message });
+		
+		return;
+	}
+	
+	FString Url;
+	FString ErrorMessage;
+
+	ResetStateFlags(IPS_HARDLOGOUT);
+	Response.JsonObject->TryGetStringField(TEXT("result"), Url);
+	if (!Url.IsEmpty())
+	{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-				if (IsStateFlagsSet(IPS_PKCE) || bIsPrevConnectedViaPKCEFlow)
-				{
-					OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
+		if (IsStateFlagsSet(IPS_PKCE) || bIsPrevConnectedViaPKCEFlow)
+		{
+			OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 #if PLATFORM_ANDROID
-					LaunchAndroidUrl(Url);
+			LaunchAndroidUrl(Url);
 #elif PLATFORM_IOS
-					[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Url)];
+			[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Url)];
 #elif PLATFORM_MAC
-					[[ImmutableMac instance] launchUrl:TCHAR_TO_ANSI(*Url) forRedirectUri:TCHAR_TO_ANSI(*InitData.logoutRedirectUri)];
+			[[ImmutableMac instance] launchUrl:TCHAR_TO_ANSI(*Url) forRedirectUri:TCHAR_TO_ANSI(*InitData.logoutRedirectUri)];
 #endif
-				}
-				else
-				{
-#endif
-					FPlatformProcess::LaunchURL(*Url, nullptr, &Err);
-					if (Err.Len())
-					{
-						FString Msg = "Failed to connect to Browser: " + Err;
-						IMTBL_ERR("%s", *Msg);
-						ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
-						return;
-					}
-					IMTBL_LOG("Logged out.")
-					ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, "Logged out"});
-#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-				}
-#endif
-			}
-			else
-			{
-				ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, "Logout Url is empty", Response});
-			}
-			ResetStateFlags(IPS_CONNECTED);
 		}
 		else
 		{
-			FString Msg = Response.Error.IsSet() ? Response.Error->ToString() : Response.JsonObject->GetStringField(TEXT("error"));
+#endif
+			FPlatformProcess::LaunchURL(*Url, nullptr, &ErrorMessage);
+			if (ErrorMessage.Len())
+			{
+				Message = "Failed to connect to Browser: " + ErrorMessage;
+				
+				IMTBL_ERR("%s", *Message);
+				ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Message, Response });
 
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
-
-			IMTBL_ERR("Error logging out.")
+				return;
+			}
+			Message = "Logged out";
+			IMTBL_LOG("%s", *Message)
+			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Message });
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 		}
+#endif
 	}
+	else
+	{
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, "Logout Url is empty", Response});
+	}
+	ResetStateFlags(IPS_CONNECTED);
 }
 
 void UImmutablePassport::OnConnectSilentResponse(FImtblJSResponse Response)

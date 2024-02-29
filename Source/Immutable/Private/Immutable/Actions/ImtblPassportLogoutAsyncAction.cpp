@@ -6,11 +6,12 @@
 #include "Immutable/ImmutableSubsystem.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
-UImtblPassportLogoutAsyncAction* UImtblPassportLogoutAsyncAction::Logout(UObject* WorldContextObject)
+UImtblPassportLogoutAsyncAction* UImtblPassportLogoutAsyncAction::Logout(UObject* WorldContextObject, bool DoHardLogout)
 {
 	UImtblPassportLogoutAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportLogoutAsyncAction>();
 
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->bDoHardLogout = DoHardLogout;
 
 	return PassportInitBlueprintNode;
 }
@@ -19,21 +20,22 @@ void UImtblPassportLogoutAsyncAction::Activate()
 {
 	if (!WorldContextObject || !WorldContextObject->GetWorld())
 	{
-		FString Err = "Logout failed due to missing world or world context object.";
-		IMTBL_WARN("%s", *Err)
-		OnFailure.Broadcast(Err);
+		const FString ErrorMessage = "Logout failed due to missing world or world context object.";
+		
+		IMTBL_WARN("%s", *ErrorMessage)
+		OnFailure.Broadcast(ErrorMessage);
+		
 		return;
 	}
 
-	GetSubsystem()->WhenReady(this, &UImtblPassportLogoutAsyncAction::DoLogout); //, /* timoutSec */ 15.0f);
+	GetSubsystem()->WhenReady(this, &UImtblPassportLogoutAsyncAction::DoLogout);
 }
 
 void UImtblPassportLogoutAsyncAction::DoLogout(TWeakObjectPtr<UImtblJSConnector> JSConnector)
 {
-	// Get Passport
 	auto Passport = GetSubsystem()->GetPassport();
-	// Run Logout
-	Passport->Logout(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportLogoutAsyncAction::OnLogoutResponse));
+	
+	Passport->Logout(bDoHardLogout, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportLogoutAsyncAction::OnLogoutResponse));
 }
 
 void UImtblPassportLogoutAsyncAction::OnLogoutResponse(FImmutablePassportResult Result) const

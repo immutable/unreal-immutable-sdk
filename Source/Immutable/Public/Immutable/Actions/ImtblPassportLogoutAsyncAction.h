@@ -18,7 +18,7 @@ class IMMUTABLE_API UImtblPassportLogoutAsyncAction : public UImtblBlueprintAsyn
 
 public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblPassportLogoutAsyncAction* Logout(UObject* WorldContextObject);
+	static UImtblPassportLogoutAsyncAction* Logout(UObject* WorldContextObject, bool DoHardLogout = true);
 
 	virtual void Activate() override;
 
@@ -27,6 +27,8 @@ private:
 	void OnLogoutResponse(FImmutablePassportResult Result) const;
 
 private:
+	bool bDoHardLogout = true;
+	
 	UPROPERTY(BlueprintAssignable)
 	FPassportLogoutOutPin OnSuccess;
 	UPROPERTY(BlueprintAssignable)
