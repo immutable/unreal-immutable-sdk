@@ -144,7 +144,6 @@ struct FImmutablePassportConnectPKCEData
 	FString state;
 };
 
-
 USTRUCT()
 struct FImmutablePassportResult
 {
@@ -158,7 +157,6 @@ struct FImmutablePassportResult
 
 	FImtblJSResponse Response;
 };
-
 
 USTRUCT(BlueprintType)
 struct FImtblAccessListItem
