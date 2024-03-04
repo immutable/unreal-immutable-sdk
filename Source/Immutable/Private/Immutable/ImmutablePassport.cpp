@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
 
+
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #include "GenericPlatform/GenericPlatformHttp.h"
 #endif
@@ -24,20 +25,119 @@
 #include "Mac/ImmutableMac.h"
 #endif
 
-#define PASSPORT_SAVE_GAME_SLOT_NAME TEXT("Immutable")
+#define PASSPORT_SAVE_GAME_SLOT_NAME TEXT("ImmutablePassport")
+
+FString FImmutablePassportInitData::ToJsonString() const
+{
+	FString OutString;
+
+	FJsonObjectWrapper Wrapper;
+	Wrapper.JsonObject = MakeShared<FJsonObject>();
+	FJsonObjectConverter::UStructToJsonObject(StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+
+	if (!Wrapper.JsonObject.IsValid())
+	{
+		IMTBL_ERR("Could not convert FImmutablePassportInitData to JSON")
+		return "";
+	}
+	// Remove redirectUri field if it's empty so that the bridge doesn't try to
+	// use it
+	if (Wrapper.JsonObject->HasField("redirectUri") && Wrapper.JsonObject->GetStringField("redirectUri").IsEmpty())
+	{
+		Wrapper.JsonObject->RemoveField("redirectUri");
+	}
+	Wrapper.JsonObjectToString(OutString);
+
+	return OutString;
+}
+
+FString FImxBatchNftTransferRequest::ToJsonString() const
+{
+	FString OutString;
+	FJsonObjectWrapper Wrapper;
+	Wrapper.JsonObject = MakeShared<FJsonObject>();
+	FJsonObjectConverter::UStructToJsonObject(StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+
+	if (!Wrapper.JsonObject.IsValid())
+	{
+		IMTBL_ERR("Could not convert FImxBatchNftTransferRequest to JSON")
+		return "";
+	}
+
+	if (Wrapper.JsonObject->HasField("nftTransferDetails"))
+	{
+		const auto Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutString);
+		FJsonSerializer::Serialize(Wrapper.JsonObject->GetArrayField("nftTransferDetails"), Writer);
+		IMTBL_LOG("FImxBatchNftTransferRequest Serialised: %s", *OutString);
+		Writer->Close();
+	}
+	return OutString;
+}
+
+TOptional<FImmutablePassportInitDeviceFlowData> FImmutablePassportInitDeviceFlowData::FromJsonString(const FString& JsonObjectString)
+{
+	FImmutablePassportInitDeviceFlowData PassportConnect;
+	if (!FJsonObjectConverter::JsonObjectStringToUStruct(JsonObjectString, &PassportConnect, 0, 0))
+	{
+		IMTBL_WARN("Could not parse response from JavaScript into the expected " "Passport connect format")
+		return TOptional<FImmutablePassportInitDeviceFlowData>();
+	}
+	return PassportConnect;
+}
+
+FString FImmutablePassportZkEvmRequestAccountsData::ToJsonString() const
+{
+	FString OutString;
+	FJsonObjectConverter::UStructToJsonObjectString(*this, OutString, 0, 0, 0, nullptr, false);
+	return OutString;
+}
+
+TOptional<FImmutablePassportZkEvmRequestAccountsData> FImmutablePassportZkEvmRequestAccountsData::FromJsonString(const FString& JsonObjectString)
+{
+	FImmutablePassportZkEvmRequestAccountsData RequestAccounts;
+	if (!FJsonObjectConverter::JsonObjectStringToUStruct(JsonObjectString, &RequestAccounts, 0, 0))
+	{
+		IMTBL_WARN("Could not parse response from JavaScript into the expected " "Passport ZkEvm request accounts format")
+		return TOptional<FImmutablePassportZkEvmRequestAccountsData>();
+	}
+	return RequestAccounts;
+}
+
+TOptional<FImmutablePassportZkEvmRequestAccountsData> FImmutablePassportZkEvmRequestAccountsData::FromJsonObject(const TSharedPtr<FJsonObject>& JsonObject)
+{
+	if (!JsonObject.IsValid()) { return TOptional<FImmutablePassportZkEvmRequestAccountsData>(); }
+
+	// Parse the JSON
+	FImmutablePassportZkEvmRequestAccountsData RequestAccounts;
+	if (!FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &RequestAccounts, 0, 0))
+	{
+		IMTBL_ERR("Could not parse response from JavaScript into the expected " "Passport ZkEvm request accounts format")
+		return TOptional<FImmutablePassportZkEvmRequestAccountsData>();
+	}
+	return RequestAccounts;
+}
+
+FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
+{
+	FString OutString;
+
+	FJsonObjectWrapper Wrapper;
+	Wrapper.JsonObject = MakeShared<FJsonObject>();
+	FJsonObjectConverter::UStructToJsonObject(StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+
+	if (!Wrapper.JsonObject.IsValid())
+	{
+		IMTBL_ERR("Could not convert FImmutablePassportZkEvmGetBalanceData to JSON")
+		return "";
+	}
+	Wrapper.JsonObjectToString(OutString);
+
+	return OutString;
+}
 
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	check(JSConnector.IsValid());
-	
-	LoadPassportSettings();
-	// we check saved settings in case if player has not logged out properly
-	if (Data.logoutRedirectUri.IsEmpty() && IsStateFlagsSet(IPS_PKCE))
-	{
-		IMTBL_ERR("Logout URI is empty. Previously logged in via PKCE.")
-		ResetStateFlags(IPS_PKCE);
-		SavePassportSettings();
-	}
 
 	InitData = Data;
 
@@ -77,7 +177,7 @@ void UImmutablePassport::ConnectPKCE(bool IsConnectImx, const FImtblPassportResp
 void UImmutablePassport::Logout(bool DoHardLogout, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-	if (IsStateFlagsSet(IPS_PKCE))
+	if (IsStateFlagsSet(IPS_PKCE) || bIsPrevConnectedViaPKCEFlow)
 	{
 		PKCELogoutResponseDelegate = ResponseDelegate;
 	}
@@ -205,7 +305,7 @@ void UImmutablePassport::Setup(const TWeakObjectPtr<UImtblJSConnector> Connector
 
 	if (!Connector.IsValid())
 	{
-		IMTBL_ERR("Invalid JSConnector passed to UImmutablePassport::Initialize.")
+		IMTBL_ERR("Invalid JSConnector passed to UImmutablePassport::Initialize")
 		return;
 	}
 
@@ -229,8 +329,9 @@ void UImmutablePassport::ReinstateConnection(FImtblJSResponse Response)
 		else
 		{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-			if (IsStateFlagsSet(IPS_PKCE))
+			if (bIsPrevConnectedViaPKCEFlow)
 			{
+				SetStateFlags(IPS_PKCE);
 				PKCEResponseDelegate = ResponseDelegate.GetValue();
 				CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""), PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetPKCEAuthUrlResponse));
 			}
@@ -285,6 +386,8 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 		{
 			SetStateFlags(IPS_INITIALIZED);
 			IMTBL_LOG("Passport initialization succeeded.")
+			// we load settings in case if player has not logged out properly
+			LoadPassportSettings();
 		}
 		else
 		{
@@ -366,7 +469,7 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 	if (!Url.IsEmpty())
 	{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
-		if (IsStateFlagsSet(IPS_PKCE))
+		if (IsStateFlagsSet(IPS_PKCE) || bIsPrevConnectedViaPKCEFlow)
 		{
 			OnHandleDeepLink = FImtblPassportHandleDeepLinkDelegate::CreateUObject(this, &UImmutablePassport::OnDeepLinkActivated);
 #if PLATFORM_ANDROID
@@ -472,7 +575,7 @@ void UImmutablePassport::OnGetPKCEAuthUrlResponse(FImtblJSResponse Response)
 	}
 	else
 	{
-		IMTBL_ERR("Unable to return a response for Connect PKCE.");
+		IMTBL_ERR("Unable to return a response for Connect PKCE");
 	}
 }
 
@@ -503,7 +606,7 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
 	}
 	else
 	{
-		IMTBL_ERR("Unable to return a response for Connect PKCE.");
+		IMTBL_ERR("Unable to return a response for Connect PKCE");
 	}
 	ResetStateFlags(IPS_COMPLETING_PKCE);
 }
@@ -808,12 +911,17 @@ void UImmutablePassport::SavePassportSettings()
 
 void UImmutablePassport::LoadPassportSettings()
 {
-	UImmutableSaveGame* SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::LoadGameFromSlot(PASSPORT_SAVE_GAME_SLOT_NAME, 0));
-	
-	if (SaveGameInstance)
+	UImmutableSaveGame* SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::CreateSaveGameObject(UImmutableSaveGame::StaticClass()));
+
+	SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::LoadGameFromSlot(PASSPORT_SAVE_GAME_SLOT_NAME, 0));
+
+	if (!SaveGameInstance)
 	{
-		SaveGameInstance->bWasConnectedViaPKCEFlow ? SetStateFlags(IPS_PKCE) : ResetStateFlags(IPS_PKCE);
+		IMTBL_ERR("Could not find Immutable save game to load")
+		return;
 	}
+
+	bIsPrevConnectedViaPKCEFlow = SaveGameInstance->bWasConnectedViaPKCEFlow;
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC

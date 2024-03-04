@@ -62,13 +62,10 @@ struct FImmutablePassportInitDeviceFlowData
 
 	UPROPERTY()
 	FString code;
-	
 	UPROPERTY()
 	FString deviceCode;
-	
 	UPROPERTY()
 	FString url;
-	
 	UPROPERTY()
 	float interval = 0;
 
@@ -79,13 +76,10 @@ USTRUCT()
 struct FImtblUserProfile
 {
 	GENERATED_BODY()
-	
 	UPROPERTY()
 	FString email;
-	
 	UPROPERTY()
 	FString nickname;
-	
 	UPROPERTY()
 	FString sub;
 };
@@ -117,6 +111,108 @@ struct FImmutablePassportZkEvmGetBalanceData
 	FString ToJsonString() const;
 };
 
+
+/**
+ * Key Value wrappers for converting to JSON
+ */
+USTRUCT()
+struct FStringCustomData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString key;
+
+	UPROPERTY()
+	FString value;
+};
+
+USTRUCT()
+struct FInt64CustomData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString key;
+
+	UPROPERTY()
+	int64 value;
+};
+
+USTRUCT()
+struct FFloatCustomData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString key;
+
+	UPROPERTY()
+	float value;
+};
+
+USTRUCT()
+struct FBoolCustomData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString key;
+
+	UPROPERTY()
+	bool value;
+};
+
+UENUM(BlueprintType)
+enum EImtblCustomDataType { String, Int64, Float, Bool };
+
+/**
+ * Blueprint doesn't support any sort of generics or polymorphism. To workaround
+ * this select the primitive type for this custom data item and set the
+ * corresponding value. This will later be mapped to the proper API structure.
+ */
+USTRUCT(BlueprintType)
+struct FImtblCustomData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString key;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString stringValue;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int64 intValue;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float floatValue;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool boolValue;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TEnumAsByte<EImtblCustomDataType> type;
+
+	/**
+	 * Convert from blueprint structure to the expected API data structure
+	 */
+	TSharedPtr<FJsonObject> ToJsonObject() const
+	{
+		switch (type)
+		{
+		case String: return FJsonObjectConverter::UStructToJsonObject<FStringCustomData>({key, stringValue});
+		case Int64: return FJsonObjectConverter::UStructToJsonObject<FInt64CustomData>({key, intValue});
+		case Float: return FJsonObjectConverter::UStructToJsonObject<FFloatCustomData>({key, floatValue});
+		case Bool: return FJsonObjectConverter::UStructToJsonObject<FBoolCustomData>({key, boolValue});
+		default:
+			{
+			}
+		}
+		return {};
+	}
+};
+
 USTRUCT()
 struct FImmutablePassportCodeConfirmRequestData
 {
@@ -124,10 +220,8 @@ struct FImmutablePassportCodeConfirmRequestData
 
 	UPROPERTY()
 	FString deviceCode;
-	
 	UPROPERTY()
 	float interval = 5;
-
 	UPROPERTY()
 	float timeoutMs = 15 * 60 * 1000;
 };
@@ -144,6 +238,7 @@ struct FImmutablePassportConnectPKCEData
 	FString state;
 };
 
+
 USTRUCT()
 struct FImmutablePassportResult
 {
@@ -151,12 +246,12 @@ struct FImmutablePassportResult
 
 	UPROPERTY()
 	bool Success = false;
-	
 	UPROPERTY()
 	FString Message;
 
 	FImtblJSResponse Response;
 };
+
 
 USTRUCT(BlueprintType)
 struct FImtblAccessListItem

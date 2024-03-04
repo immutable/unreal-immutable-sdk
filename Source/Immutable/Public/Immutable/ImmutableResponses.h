@@ -15,10 +15,10 @@ struct FImxTransferResponse
 	FString status;
 
 	UPROPERTY()
-	float time = 0.0f;
+	float time;
 
 	UPROPERTY()
-	unsigned transferId = 0;
+	unsigned transferId;
 };
 
 USTRUCT()
