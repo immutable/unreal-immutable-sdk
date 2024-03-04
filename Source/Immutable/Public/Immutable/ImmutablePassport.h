@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Immutable/ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
 #include "Misc/EngineVersion.h"
 #include "Runtime/Core/Public/HAL/Platform.h"
 #include "UObject/Object.h"
-
+#include "Immutable/ImtblJSConnector.h"
 #include "Immutable/ImmutableDataTypes.h"
 #include "Immutable/ImmutableRequests.h"
 
@@ -236,7 +235,7 @@ private:
 		IPS_NONE = 0,
 		IPS_CONNECTING = 1 << 0,
 		IPS_CONNECTED = 1 << 1,
-		IPS_IMX = 1 << 2,
+		IPS_IMX = 1 << 2, // if set player used "connect" instead of "login"
 		IPS_PKCE = 1 << 3,
 		IPS_COMPLETING_PKCE = 1 << 4,
 		IPS_INITIALIZED = 1 << 5,
@@ -244,5 +243,4 @@ private:
 	};
 
 	uint8 StateFlags = IPS_NONE;
-	bool bIsPrevConnectedViaPKCEFlow = false;
 };
