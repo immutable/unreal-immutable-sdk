@@ -36,13 +36,16 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 void UImmutableSubsystem::Deinitialize()
 {
 	IMTBL_LOG_FUNCSIG
+	
 	BrowserWidget = nullptr;
+	
 #if USING_BLUI_CEF
-	IMTBL_LOG("Stopped BLUI event loop");
-	ImtblBlui->StopBluiEventLoop();
-#endif
+	ImtblBlui->ConditionalBeginDestroy();
 	ImtblBlui = nullptr;
+#endif
+	
 	Passport = nullptr;
+	
 #if PLATFORM_ANDROID | PLATFORM_IOS
   UGameViewportClient::OnViewportCreated().Remove(EngineInitCompleteHandle);
 #else

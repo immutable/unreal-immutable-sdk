@@ -36,13 +36,13 @@ void UImtblBlui::OnLogEvent(const FString& LogText)
 void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 {
 #if USING_BLUI_CEF
-  if (GetBluEye()->IsBrowserLoading()) {
-    IMTBL_LOG("Waiting for Browser to load...");
-  } else if (!bLoadedIndexJS) {
-    bLoadedIndexJS = true;
+  if (!GetBluEye()->IsBrowserLoading() && !bLoadedIndexJS) {
     const FSoftObjectPath AssetRef(
-        TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/"
-             "index.index'"));
+    TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/"
+         "index.index'"));
+         
+    IMTBL_LOG("Browser loaded");
+    bLoadedIndexJS = true;
     if (UObject *LoadedAsset = AssetRef.TryLoad()) {
       if (const auto Resource = Cast<UImtblSDKResource>(LoadedAsset)) {
         GetBluEye()->ExecuteJS(Resource->Js);
@@ -136,7 +136,7 @@ void UImtblBlui::Init()
       const FString CustomContentMethod(TEXT("X-GET-CUSTOM-CONTENT"));
 
       const auto Request = CefRequest::Create();
-      Request->Set("file://Immutable/index.html", *CustomContentMethod,
+      Request->Set("file:///Immutable/index.html", *CustomContentMethod,
                    PostData, HeaderMap);
 
       GetBluEye()->Browser->GetMainFrame()->LoadRequest(Request);
@@ -144,6 +144,7 @@ void UImtblBlui::Init()
 
       WorldTickHandle = FWorldDelegates::OnWorldTickStart.AddUObject(
           this, &UImtblBlui::WorldTickStart);
+      IMTBL_LOG("Waiting for Browser to load...");
     }
   }
   else
