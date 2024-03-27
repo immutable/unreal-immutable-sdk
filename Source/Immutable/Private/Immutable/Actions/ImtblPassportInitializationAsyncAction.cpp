@@ -14,14 +14,14 @@ UImtblPassportInitializationAsyncAction* UImtblPassportInitializationAsyncAction
 	PassportInitBlueprintNode->RedirectUri = RedirectUri;
 	PassportInitBlueprintNode->LogoutUri = LogoutUri;
 	PassportInitBlueprintNode->Environment = Environment;
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 
 	return PassportInitBlueprintNode;
 }
 
 void UImtblPassportInitializationAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		Failed.Broadcast("Initialization failed due to missing world or world context object.");
 		return;

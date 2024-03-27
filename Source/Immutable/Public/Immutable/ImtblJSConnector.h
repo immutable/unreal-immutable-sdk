@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ImtblJSMessages.h"
 #include "UObject/Object.h"
+
 // clang-format off
 #include "ImtblJSConnector.generated.h"
 // clang-format on

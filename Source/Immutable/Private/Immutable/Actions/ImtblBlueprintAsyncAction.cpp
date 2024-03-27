@@ -1,12 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Immutable/Actions/ImtblBlueprintAsyncAction.h"
+#include "Immutable/ImmutableSubsystem.h"
+
 
 UImmutableSubsystem* UImtblBlueprintAsyncAction::GetSubsystem() const
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		return nullptr;
 	}
-	return WorldContextObject->GetWorld()->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
+	return SavedWorldContextObject->GetWorld()->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
 }

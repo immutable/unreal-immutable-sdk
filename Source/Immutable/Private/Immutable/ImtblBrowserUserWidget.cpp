@@ -10,7 +10,7 @@
 #include "Components/ScaleBoxSlot.h"
 #include "Immutable/Misc/ImtblLogging.h"
 #include "ImtblBrowserWidget.h"
-#include "ImtblJSConnector.h"
+#include "Immutable/ImtblJSConnector.h"
 
 TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 {

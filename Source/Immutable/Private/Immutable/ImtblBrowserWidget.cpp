@@ -3,7 +3,7 @@
 #include "ImtblBrowserWidget.h"
 
 #include "Immutable/Misc/ImtblLogging.h"
-#include "ImtblJSConnector.h"
+#include "Immutable/ImtblJSConnector.h"
 #if USING_BUNDLED_CEF
 #include "SWebBrowser.h"
 #endif

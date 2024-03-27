@@ -11,7 +11,7 @@ UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* World
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bUseCachedSession = UseCachedSession;
 	PassportInitBlueprintNode->bIsConnectImx = false;
 
@@ -22,7 +22,7 @@ UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* 
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bUseCachedSession = UseCachedSession;
 	PassportInitBlueprintNode->bIsConnectImx = true;
 
@@ -33,7 +33,7 @@ UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::LoginPKCE(UObject* W
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bIsConnectImx = false;
 	PassportInitBlueprintNode->bIsPKCE = true;
 
@@ -44,7 +44,7 @@ UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImxPKCE(UObje
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bIsConnectImx = true;
 	PassportInitBlueprintNode->bIsPKCE = true;
 
@@ -53,7 +53,7 @@ UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImxPKCE(UObje
 
 void UImtblConnectionAsyncActions::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		FString Error = "Connect failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Error)

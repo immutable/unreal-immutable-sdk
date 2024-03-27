@@ -1,5 +1,5 @@
 #pragma once
-
+#include "ImmutableDataTypes.h"
 
 #include "ImmutableRequests.generated.h"
 

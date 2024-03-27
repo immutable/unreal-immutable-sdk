@@ -9,13 +9,13 @@
 UImtblPassportGetAddressAsyncAction* UImtblPassportGetAddressAsyncAction::GetAddress(UObject* WorldContextObject)
 {
 	UImtblPassportGetAddressAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportGetAddressAsyncAction>();
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	return PassportInitBlueprintNode;
 }
 
 void UImtblPassportGetAddressAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		FString Err = "GetAddress failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Err)
