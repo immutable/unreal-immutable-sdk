@@ -9,14 +9,14 @@
 UImtblPassportZkEvmSendTransactionAsyncAction* UImtblPassportZkEvmSendTransactionAsyncAction::ZkEvmSendTransaction(UObject* WorldContextObject, const FImtblTransactionRequest& Request)
 {
 	UImtblPassportZkEvmSendTransactionAsyncAction* PassportZkEvmSendTransactionBlueprintNode = NewObject<UImtblPassportZkEvmSendTransactionAsyncAction>();
-	PassportZkEvmSendTransactionBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportZkEvmSendTransactionBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	PassportZkEvmSendTransactionBlueprintNode->TransactionRequest = Request;
 	return PassportZkEvmSendTransactionBlueprintNode;
 }
 
 void UImtblPassportZkEvmSendTransactionAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		FString Err = "ZkEvmSendTransaction failed due to missing world or world " "context object.";
 		IMTBL_WARN("%s", *Err)

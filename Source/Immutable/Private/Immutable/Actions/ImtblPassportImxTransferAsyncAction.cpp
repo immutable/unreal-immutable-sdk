@@ -3,13 +3,14 @@
 #include "Immutable/Actions/ImtblPassportImxTransferAsyncAction.h"
 
 #include "Immutable/ImmutablePassport.h"
+#include "Immutable/ImmutableResponses.h"
 #include "Immutable/ImmutableSubsystem.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
 UImmutablePassportImxTransferAsyncAction* UImmutablePassportImxTransferAsyncAction::ImxTransfer(UObject* WorldContextObject, const FString& Receiver, const FString& Type, const FString& Amount, const FString& TokenId, const FString& TokenAddress)
 {
 	UImmutablePassportImxTransferAsyncAction* BlueprintNode = NewObject<UImmutablePassportImxTransferAsyncAction>();
-	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->SavedWorldContextObject = WorldContextObject;
 	BlueprintNode->Receiver = Receiver;
 	BlueprintNode->Type = Type;
 	BlueprintNode->Amount = Amount;
@@ -20,7 +21,7 @@ UImmutablePassportImxTransferAsyncAction* UImmutablePassportImxTransferAsyncActi
 
 void UImmutablePassportImxTransferAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		const FString Err = "Transfer failed due to missing world or world context object.";
 		IMTBL_WARN("Error: %s", *Err)

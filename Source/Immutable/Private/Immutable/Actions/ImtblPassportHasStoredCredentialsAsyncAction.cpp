@@ -9,14 +9,14 @@ UImtblPassportHasStoredCredentialsAsyncAction* UImtblPassportHasStoredCredential
 {
 	UImtblPassportHasStoredCredentialsAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportHasStoredCredentialsAsyncAction>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 
 	return PassportInitBlueprintNode;
 }
 
 void UImtblPassportHasStoredCredentialsAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		FString Err = "HasStoredCredentials failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Err)

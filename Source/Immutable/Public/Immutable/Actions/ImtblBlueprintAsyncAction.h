@@ -7,8 +7,10 @@
 
 #include "ImtblBlueprintAsyncAction.generated.h"
 
+class UImmutableSubsystem;
+
 /**
- 
+
  * base class for asynchronous actions
  */
 UCLASS()
@@ -17,8 +19,9 @@ class IMMUTABLE_API UImtblBlueprintAsyncAction : public UBlueprintAsyncActionBas
 	GENERATED_BODY()
 
 protected:
-	UObject* WorldContextObject;
+	UPROPERTY(Transient)
+	UObject* SavedWorldContextObject = nullptr;
 
 	// Get subsystem
-	class UImmutableSubsystem* GetSubsystem() const;
+	UImmutableSubsystem* GetSubsystem() const;
 };

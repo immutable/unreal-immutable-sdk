@@ -9,14 +9,14 @@ UImtblPassportImxIsRegisteredOffchainAsyncAction* UImtblPassportImxIsRegisteredO
 {
 	UImtblPassportImxIsRegisteredOffchainAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportImxIsRegisteredOffchainAsyncAction>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 
 	return PassportInitBlueprintNode;
 }
 
 void UImtblPassportImxIsRegisteredOffchainAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		FString Err = "IsRegisteredOffchain failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Err)

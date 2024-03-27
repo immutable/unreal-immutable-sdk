@@ -10,14 +10,14 @@
 UImmutablePassportImxBatchNftTransferAsyncAction* UImmutablePassportImxBatchNftTransferAsyncAction::ImxBatchNftTransfer(UObject* WorldContextObject, const TArray<FNftTransferDetails>& NftTransferDetails)
 {
 	UImmutablePassportImxBatchNftTransferAsyncAction* BlueprintNode = NewObject<UImmutablePassportImxBatchNftTransferAsyncAction>();
-	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->SavedWorldContextObject = WorldContextObject;
 	BlueprintNode->NftTransferDetails = NftTransferDetails;
 	return BlueprintNode;
 }
 
 void UImmutablePassportImxBatchNftTransferAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		const FString Err = "BatchNftTransfer failed due to missing world or world context object.";
 		IMTBL_WARN("Error: %s", *Err)

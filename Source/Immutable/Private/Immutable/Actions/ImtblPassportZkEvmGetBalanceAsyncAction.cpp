@@ -9,7 +9,7 @@
 UImtblPassportZkEvmGetBalanceAsyncAction* UImtblPassportZkEvmGetBalanceAsyncAction::ZkEvmGetBalance(UObject* WorldContextObject, const FString& Address, const FString& BlockNumberOrTag)
 {
 	UImtblPassportZkEvmGetBalanceAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportZkEvmGetBalanceAsyncAction>();
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->Address = Address;
 	PassportInitBlueprintNode->BlockNumberOrTag = BlockNumberOrTag;
 	return PassportInitBlueprintNode;
@@ -17,7 +17,7 @@ UImtblPassportZkEvmGetBalanceAsyncAction* UImtblPassportZkEvmGetBalanceAsyncActi
 
 void UImtblPassportZkEvmGetBalanceAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		FString Err = "ZkEvmGetBalance failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Err)

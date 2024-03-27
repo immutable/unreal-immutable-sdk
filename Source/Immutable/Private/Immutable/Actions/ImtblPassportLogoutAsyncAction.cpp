@@ -10,7 +10,7 @@ UImtblPassportLogoutAsyncAction* UImtblPassportLogoutAsyncAction::Logout(UObject
 {
 	UImtblPassportLogoutAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportLogoutAsyncAction>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bDoHardLogout = DoHardLogout;
 
 	return PassportInitBlueprintNode;
@@ -18,7 +18,7 @@ UImtblPassportLogoutAsyncAction* UImtblPassportLogoutAsyncAction::Logout(UObject
 
 void UImtblPassportLogoutAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		const FString ErrorMessage = "Logout failed due to missing world or world context object.";
 		

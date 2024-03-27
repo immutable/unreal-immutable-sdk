@@ -9,13 +9,13 @@
 UImtblPassportGetIdTokenAsyncAction* UImtblPassportGetIdTokenAsyncAction::GetIdToken(UObject* WorldContextObject)
 {
 	UImtblPassportGetIdTokenAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportGetIdTokenAsyncAction>();
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->SavedWorldContextObject = WorldContextObject;
 	return PassportInitBlueprintNode;
 }
 
 void UImtblPassportGetIdTokenAsyncAction::Activate()
 {
-	if (!WorldContextObject || !WorldContextObject->GetWorld())
+	if (!SavedWorldContextObject || !SavedWorldContextObject->GetWorld())
 	{
 		FString Err = "GetIdToken failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Err)

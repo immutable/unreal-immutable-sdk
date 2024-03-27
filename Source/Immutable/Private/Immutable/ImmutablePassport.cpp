@@ -4,11 +4,10 @@
 
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Immutable/ImmutableResponses.h"
-#include "ImtblJSConnector.h"
+#include "Immutable/ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
 #include "Immutable/ImmutableSaveGame.h"
 #include "Kismet/GameplayStatics.h"
-#include "Policies/CondensedJsonPrintPolicy.h"
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #include "GenericPlatform/GenericPlatformHttp.h"
@@ -29,7 +28,7 @@
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	check(JSConnector.IsValid());
-	
+
 	LoadPassportSettings();
 	// we check saved settings in case if player has not logged out properly
 	if (Data.logoutRedirectUri.IsEmpty() && IsStateFlagsSet(IPS_PKCE))
@@ -330,7 +329,7 @@ void UImmutablePassport::OnInitDeviceFlowResponse(FImtblJSResponse Response)
 void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 {
 	auto ResponseDelegate = GetResponseDelegate(Response);
-	
+
 	if (!ResponseDelegate)
 	{
 		return;
@@ -354,10 +353,10 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 
 		IMTBL_LOG("%s", *Message)
 		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ true, Message });
-		
+
 		return;
 	}
-	
+
 	FString Url;
 	FString ErrorMessage;
 
@@ -384,7 +383,7 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 			if (ErrorMessage.Len())
 			{
 				Message = "Failed to connect to Browser: " + ErrorMessage;
-				
+
 				IMTBL_ERR("%s", *Message);
 				ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ false, Message, Response });
 
@@ -809,7 +808,7 @@ void UImmutablePassport::SavePassportSettings()
 void UImmutablePassport::LoadPassportSettings()
 {
 	UImmutableSaveGame* SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::LoadGameFromSlot(PASSPORT_SAVE_GAME_SLOT_NAME, 0));
-	
+
 	if (SaveGameInstance)
 	{
 		SaveGameInstance->bWasConnectedViaPKCEFlow ? SetStateFlags(IPS_PKCE) : ResetStateFlags(IPS_PKCE);
@@ -972,7 +971,7 @@ void UImmutablePassport::LaunchAndroidUrl(FString Url)
 		jstring jurl = Env->NewStringUTF(TCHAR_TO_UTF8(*Url));
 		jclass jimmutableAndroidClass = FAndroidApplication::FindJavaClass("com/immutable/unreal/ImmutableActivity");
 		static jmethodID jlaunchUrl = FJavaWrapper::FindStaticMethod(Env, jimmutableAndroidClass, "startActivity", "(Landroid/app/Activity;Ljava/lang/String;)V", false);
-					
+
 		CallJniStaticVoidMethod(Env, jimmutableAndroidClass, jlaunchUrl, FJavaWrapper::GameActivityThis, jurl);
 	}
 }

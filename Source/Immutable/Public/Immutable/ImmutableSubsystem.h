@@ -4,11 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "ImmutablePassport.h"
+
 // clang-format off
 #include "ImmutableSubsystem.generated.h"
 // clang-format on
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FImmutableSubsystemReadyDelegate, TWeakObjectPtr<class UImtblJSConnector>);
+
+class UImtblBrowserUserWidget;
+class UImtblBlui;
 
 /**
  *
@@ -24,7 +29,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	TWeakObjectPtr<class UImmutablePassport> GetPassport() const
+	TWeakObjectPtr<UImmutablePassport> GetPassport() const
 	{
 		return MakeWeakObjectPtr(Passport);
 	}
@@ -44,13 +49,13 @@ public:
 
 private:
 	UPROPERTY()
-	class UImtblBrowserUserWidget* BrowserWidget = nullptr;
+	UImtblBrowserUserWidget* BrowserWidget = nullptr;
 
 	UPROPERTY()
-	class UImtblBlui* ImtblBlui = nullptr;
+	UImtblBlui* ImtblBlui = nullptr;
 
 	UPROPERTY()
-	class UImmutablePassport* Passport = nullptr;
+	UImmutablePassport* Passport = nullptr;
 
 	bool bHasSetupGameBridge = false;
 	bool bIsReady = false;

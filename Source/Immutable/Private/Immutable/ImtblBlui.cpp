@@ -1,9 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ImtblBlui.h"
-#include "Immutable/Assets/ImtblSDKResource.h"
 #include "Immutable/Misc/ImtblLogging.h"
-#include "ImtblJSConnector.h"
+#include "Immutable/ImtblJSConnector.h"
 #include <utility>
 
 #if USING_BLUI_CEF
@@ -40,7 +39,7 @@ void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
     const FSoftObjectPath AssetRef(
     TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/PackagedResources/"
          "index.index'"));
-         
+
     IMTBL_LOG("Browser loaded");
     bLoadedIndexJS = true;
     if (UObject *LoadedAsset = AssetRef.TryLoad()) {
