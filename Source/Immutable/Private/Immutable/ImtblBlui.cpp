@@ -3,7 +3,7 @@
 #include "ImtblBlui.h"
 #include "Immutable/Assets/ImtblSDKResource.h"
 #include "Immutable/Misc/ImtblLogging.h"
-#include "ImtblJSConnector.h"
+#include "Immutable/ImtblJSConnector.h"
 #include <utility>
 
 #if USING_BLUI_CEF

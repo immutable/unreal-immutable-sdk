@@ -33,7 +33,7 @@ struct FImmutableEngineVersionData
 };
 
 USTRUCT()
-struct FImmutablePassportInitData
+struct IMMUTABLE_API FImmutablePassportInitData
 {
 	GENERATED_BODY()
 
@@ -104,7 +104,7 @@ struct FImmutablePassportZkEvmRequestAccountsData
 };
 
 USTRUCT()
-struct FImmutablePassportZkEvmGetBalanceData
+struct IMMUTABLE_API FImmutablePassportZkEvmGetBalanceData
 {
 	GENERATED_BODY()
 
@@ -145,7 +145,7 @@ struct FImmutablePassportConnectPKCEData
 };
 
 USTRUCT()
-struct FImmutablePassportResult
+struct IMMUTABLE_API FImmutablePassportResult
 {
 	GENERATED_BODY()
 

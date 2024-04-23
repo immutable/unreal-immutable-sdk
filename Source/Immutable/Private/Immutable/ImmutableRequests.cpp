@@ -8,6 +8,24 @@
 #include "Policies/CondensedJsonPrintPolicy.h"
 
 
+FString FImxTransferRequest::ToJsonString() const
+{
+	FString OutString;
+	FJsonObjectWrapper Wrapper;
+	Wrapper.JsonObject = MakeShared<FJsonObject>();
+	FJsonObjectConverter::UStructToJsonObject(StaticStruct(), this, Wrapper.JsonObject.ToSharedRef(), 0, 0);
+
+	if (!Wrapper.JsonObject.IsValid())
+	{
+		IMTBL_ERR("Could not convert FImxTransferRequest to JSON")
+		return "";
+	}
+
+	Wrapper.JsonObjectToString(OutString);
+	
+	return OutString;
+}
+
 FString FImxBatchNftTransferRequest::ToJsonString() const
 {
 	FString OutString;

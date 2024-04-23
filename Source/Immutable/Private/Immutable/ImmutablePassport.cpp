@@ -4,7 +4,7 @@
 
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Immutable/ImmutableResponses.h"
-#include "ImtblJSConnector.h"
+#include "Immutable/ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
 #include "Immutable/ImmutableSaveGame.h"
 #include "Kismet/GameplayStatics.h"

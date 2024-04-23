@@ -34,6 +34,7 @@ public class Immutable : ModuleRules
             new string[]
             {
                 "Core",
+                "JsonUtilities",
 				// ... add other public dependencies that you statically link with here ...
 			}
         );
@@ -47,7 +48,6 @@ public class Immutable : ModuleRules
                 "Slate",
                 "SlateCore",
                 "Json",
-                "JsonUtilities",
                 "UMG",
                 "Projects", 
 				// ... add private dependencies that you statically link with here ...
