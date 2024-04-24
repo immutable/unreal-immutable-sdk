@@ -5,7 +5,7 @@
 
 
 USTRUCT(BlueprintType)
-struct FImtblTransactionRequest
+struct IMMUTABLE_API FImtblTransactionRequest
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,7 @@ struct FImtblTransactionRequest
 };
 
 USTRUCT()
-struct FImxTransferRequest
+struct IMMUTABLE_API FImxTransferRequest
 {
 	GENERATED_BODY()
 
@@ -43,7 +43,7 @@ struct FImxTransferRequest
 };
 
 USTRUCT()
-struct FImxBatchNftTransferRequest
+struct IMMUTABLE_API FImxBatchNftTransferRequest
 {
 	GENERATED_BODY()
 

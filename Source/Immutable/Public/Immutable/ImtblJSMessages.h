@@ -25,7 +25,7 @@ enum class EImtblPassportError : int8
 };
 
 USTRUCT()
-struct FImtblResponseError
+struct IMMUTABLE_API FImtblResponseError
 {
 	GENERATED_BODY()
 
@@ -43,7 +43,7 @@ struct FImtblResponseError
 };
 
 USTRUCT()
-struct FImtblJSRequest
+struct IMMUTABLE_API FImtblJSRequest
 {
 	GENERATED_BODY()
 
