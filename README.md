@@ -63,7 +63,7 @@ For UE 4.26 and 4.27 we are using Blui as the in built browser does not work.
 3. Navigate to Plugins -> Immutable Content -> Packages Resources
 4. Delete the existing imported `index.uasset`
 5. Right click and import the `index.js` file
-   ![Import Asset](Docs/ImportAsset.png)
+   ![Import Asset](ImportAsset.png)
 
 ## Contributing
 
