@@ -63,13 +63,17 @@ For UE 4.26 and 4.27 we are using Blui as the in built browser does not work.
 3. Navigate to Plugins -> Immutable Content -> Packages Resources
 4. Delete the existing imported `index.uasset`
 5. Right click and import the `index.js` file
-   ![Import Asset](Docs/ImportAsset.png)
+   ![Import Asset](ImportAsset.png)
 
 ## Contributing
+Thank you for your interest in contributing to our project! Here's a quick guide on how you can get started:
 
-If you would like to contribute, please read the following:
-
-- We use the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/#specification) when writing our commit messages. Why use Conventional Commits? Read [here](https://www.conventionalcommits.org/en/v1.0.0/#why-use-conventional-commits).
+1. **Fork this Repository**: Fork the repository to your GitHub account by clicking the "Fork" button at the top right of the repository page.
+2. **Create a Branch**: Once you've forked the repository, create a new branch in your forked repository where you'll be making your changes. Branch naming convention is enforced [according to patterns here](https://github.com/deepakputhraya/action-branch-name).
+3. **Make Changes**: Make the necessary changes in your branch. Ensure that your changes are clear, well-documented, and aligned with the project's guidelines.
+4. **Commit Changes**: Commit your changes with clear and descriptive messages following [commit message pattern here](https://github.com/conventional-changelog/commitlint?tab=readme-ov-file#what-is-commitlint). It follows [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/#specification), which helps maintain a consistent and informative commit history. Read [here](https://www.conventionalcommits.org/en/v1.0.0/#why-use-conventional-commits) to learn more about the benefits of Conventional Commits.
+5. **Create a Pull Request (PR)**: After you've made and committed your changes, create a PR against the original repository. Provide a clear description of the changes you've made in the PR.
+6. **Example Contribution**: Refer to [this contribution](https://github.com/immutable/unity-immutable-sdk/pull/182) as an example.
 
 ## Getting Help
 
