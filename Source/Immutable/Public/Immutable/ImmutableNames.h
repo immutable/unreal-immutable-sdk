@@ -14,6 +14,7 @@ namespace ImmutablePassportAction
 	const FString ZkEvmRequestAccounts = TEXT("zkEvmRequestAccounts");
 	const FString ZkEvmGetBalance = TEXT("zkEvmGetBalance");
 	const FString ZkEvmSendTransaction = TEXT("zkEvmSendTransaction");
+	const FString ZkEvmGetTransactionReceipt = TEXT("zkEvmGetTransactionReceipt");
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	const FString GetPKCEAuthUrl = TEXT("getPKCEAuthUrl");
