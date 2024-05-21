@@ -245,15 +245,13 @@ struct IMMUTABLE_API FZkEvmTransactionReceipt
 	UPROPERTY()
 	FString gasUsed;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TArray<FZkEvmTransactionReceiptLog> logs;
 
 	UPROPERTY()
 	FString logsBloom;
 
-	/// <summary>
-	///     Either 1 (success) or 0 (failure) encoded as a hexadecimal.
-	/// </summary>
+	// Either 1 (success) or 0 (failure) encoded as a hexadecimal.
 	UPROPERTY()
 	FString status;
 

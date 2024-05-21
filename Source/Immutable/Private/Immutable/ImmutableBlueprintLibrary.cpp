@@ -1,7 +1,5 @@
 #include "Immutable/ImmutableBlueprintLibrary.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(ImmutableBlueprintLibrary)
-
 
 void UImmutableBlueprintLibrary::BreakFZkEvmTransactionReceiptLog(FZkEvmTransactionReceiptLog Log, FString& Address, FString& Data,
 	FString& BlockNumber, FString& TransactionHash, FString& TransactionIndex, FString& BlockHash, FString& LogIndex, bool& Removed,

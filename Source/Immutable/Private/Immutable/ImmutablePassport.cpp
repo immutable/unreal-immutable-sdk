@@ -659,7 +659,7 @@ void UImmutablePassport::OnZkEvmGetTransactionReceiptResponse(FImtblJSResponse R
 		FString Msg;
 		bool bSuccess = true;
 		
-		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::Object>(TEXT("result")))
+		if (!Response.success)
 		{
 			IMTBL_WARN("zkEVM transaction receipt retrieval failed.");
 			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
