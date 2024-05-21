@@ -52,8 +52,8 @@ void UImtblPassportZkEvmGetTransactionReceiptAA::OnZkEvmGetTransactionReceiptRes
 		}
 		else
 		{
-			IMTBL_LOG("ZkEvmGetTransactionReceipt failed due to JSON object casting issues")
-			Failed.Broadcast(Result.Message, FZkEvmTransactionReceipt());
+			IMTBL_LOG("ZkEvm Transaction Receipt is not provided")
+			Success.Broadcast(TEXT(""), FZkEvmTransactionReceipt());
 		}
 	}
 	else
