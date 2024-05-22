@@ -32,4 +32,6 @@ namespace ImmutablePassportAction
 	const FString EnvProduction = TEXT("production");
 	const FString ImxIsRegisteredOffchain = TEXT("isRegisteredOffchain");
 	const FString ImxRegisterOffchain = TEXT("registerOffchain");
+
+	const FString TRACK = TEXT("track");
 } // namespace ImmutablePassportAction

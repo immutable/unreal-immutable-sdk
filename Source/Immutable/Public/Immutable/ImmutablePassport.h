@@ -254,4 +254,8 @@ private:
 	};
 
 	uint8 StateFlags = IPS_NONE;
+
+	UPROPERTY()
+	class UImmutableAnalytics* Analytics = nullptr;
+
 };
