@@ -184,3 +184,86 @@ struct FNftTransferDetails
 	UPROPERTY(BlueprintReadWrite)
 	FString tokenAddress;
 };
+
+
+USTRUCT(BlueprintType, meta = (HasNativeBreak = "/Script/Immutable.ImmutableBlueprintLibrary.BreakFZkEvmTransactionReceiptLog"))
+struct IMMUTABLE_API FZkEvmTransactionReceiptLog
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString address;
+
+	UPROPERTY()
+	TArray<FString> topics;
+
+	UPROPERTY()
+	FString data;
+
+	UPROPERTY()
+	FString blockNumber;
+
+	UPROPERTY()
+	FString transactionHash;
+
+	UPROPERTY()
+	FString transactionIndex;
+
+	UPROPERTY()
+	FString blockHash;
+
+	UPROPERTY()
+	FString logIndex;
+
+	UPROPERTY()
+	bool removed;
+};
+
+USTRUCT(BlueprintType, meta = (HasNativeBreak = "/Script/Immutable.ImmutableBlueprintLibrary.BreakZkEvmTransactionReceipt"))
+struct IMMUTABLE_API FZkEvmTransactionReceipt
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString blockHash;
+
+	UPROPERTY()
+	FString blockNumber;
+
+	UPROPERTY()
+	FString contractAddress;
+
+	UPROPERTY()
+	FString cumulativeGasUsed;
+
+	UPROPERTY()
+	FString effectiveGasPrice;
+
+	UPROPERTY()
+	FString from;
+
+	UPROPERTY()
+	FString gasUsed;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FZkEvmTransactionReceiptLog> logs;
+
+	UPROPERTY()
+	FString logsBloom;
+
+	// Either 1 (success) or 0 (failure) encoded as a hexadecimal.
+	UPROPERTY()
+	FString status;
+
+	UPROPERTY()
+	FString to;
+
+	UPROPERTY()
+	FString transactionHash;
+
+	UPROPERTY()
+	FString transactionIndex;
+
+	UPROPERTY()
+	FString type;
+};
