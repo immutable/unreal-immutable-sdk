@@ -27,6 +27,7 @@ class IMMUTABLE_API UImtblJSConnector : public UObject
 	GENERATED_BODY()
 
 	friend class UImmutablePassport;
+	friend class UImmutableAnalytics;
 
 public:
 	DECLARE_MULTICAST_DELEGATE(FOnBridgeReadyDelegate);
