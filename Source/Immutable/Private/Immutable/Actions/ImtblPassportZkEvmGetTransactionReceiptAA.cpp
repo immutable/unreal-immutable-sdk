@@ -20,7 +20,7 @@ void UImtblPassportZkEvmGetTransactionReceiptAA::Activate()
 {
 	if (!WorldContextObject || !WorldContextObject->GetWorld())
 	{
-		const FString ErrorMessage = "ZkEvmSendTransaction failed due to missing world or world " "context object.";
+		const FString ErrorMessage = "ZkEvmSendTransaction failed due to missing world context object.";
 		IMTBL_WARN("%s", *ErrorMessage)
 		Failed.Broadcast(ErrorMessage, FZkEvmTransactionReceipt());
 		return;
@@ -47,18 +47,18 @@ void UImtblPassportZkEvmGetTransactionReceiptAA::OnZkEvmGetTransactionReceiptRes
 		
 		if (Receipt.IsSet())
 		{
-			IMTBL_LOG("ZkEvmGetTransactionReceipt success")
+			IMTBL_LOG("zkEVM Transaction Receipt retrival is sucessful")
 			Success.Broadcast(TEXT(""), Receipt.GetValue());	
 		}
 		else
 		{
-			IMTBL_LOG("ZkEvm Transaction Receipt is not provided")
+			IMTBL_LOG("zkEVM Transaction Receipt is not provided")
 			Success.Broadcast(TEXT(""), FZkEvmTransactionReceipt());
 		}
 	}
 	else
 	{
-		IMTBL_LOG("ZkEvmGetTransactionReceipt failed")
+		IMTBL_LOG("zkEVM Transaction Receipt retrival failed")
 		Failed.Broadcast(Result.Message, FZkEvmTransactionReceipt());
 	}
 }

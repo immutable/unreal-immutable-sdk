@@ -104,6 +104,8 @@ public:
 	 */
 	void ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
 
+	void ZkEvmSendTransactionWithConfirmation(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
+
 	/**
 	 * Retrieves the transaction information of a given transaction hash. This function uses the Ethereum JSON-RPC 
 	 * <c>eth_getTransactionReceipt</c> method. Response will contain the receipt of the transaction or null if it is still processing.
@@ -204,6 +206,7 @@ protected:
 	void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
 	void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
 	void OnZkEvmSendTransactionResponse(FImtblJSResponse Response);
+	void OnZkEvmSendTransactionWithConfirmationResponse(FImtblJSResponse Response);
 	void OnZkEvmGetTransactionReceiptResponse(FImtblJSResponse Response);
 	void OnConfirmCodeResponse(FImtblJSResponse Response);
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
