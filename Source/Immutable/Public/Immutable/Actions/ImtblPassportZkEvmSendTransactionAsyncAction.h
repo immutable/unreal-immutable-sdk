@@ -8,7 +8,7 @@
 #include "ImtblPassportZkEvmSendTransactionAsyncAction.generated.h"
 
 /**
- *
+ * Async action blueprint node for zkEVM Send Transaction
  */
 UCLASS()
 class IMMUTABLE_API UImtblPassportZkEvmSendTransactionAsyncAction : public UImtblBlueprintAsyncAction
@@ -37,7 +37,8 @@ private:
 
 
 /**
- *
+ * Async action blueprint node for zkEVM Send Transaction with confirmation.
+ * Allows bypassing the need to call 'get transaction receipt' in order to confirm the transaction.
  */
 UCLASS()
 class IMMUTABLE_API UImtblPassportZkEvmSendTransactionWithConfirmationAA : public UImtblBlueprintAsyncAction

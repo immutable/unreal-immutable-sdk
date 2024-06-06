@@ -104,6 +104,15 @@ public:
 	 */
 	void ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
 
+	/**
+	* Similar to ZkEvmSendTransaction. Creates new message call transaction or a contract creation, if the data field contains code, 
+	* and signs it using the account specified in from. Additionally, it also resolves to the TransactionReceiptResponse once the transaction has 
+	* been included in the chain for confirms blocks. If confirms is 0, and the transaction has not been mined, null is returned.
+	* The callback responce data may contain the receipt of the transaction or null if it is still processing.
+	* @param Request The request data to perform the transaction.
+	* @param ResponseDelegate The response delegate of type
+	* FImtblPassportResponseDelegate to call on response from JS.
+	*/
 	void ZkEvmSendTransactionWithConfirmation(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
