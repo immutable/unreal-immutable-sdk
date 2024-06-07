@@ -20,7 +20,7 @@ void UImtblPassportZkEvmGetTransactionReceiptAA::Activate()
 {
 	if (!WorldContextObject || !WorldContextObject->GetWorld())
 	{
-		const FString ErrorMessage = "ZkEvmSendTransaction failed due to missing world context object.";
+		const FString ErrorMessage = "zkEVM Transaction Receipt failed due to missing world context object.";
 		IMTBL_WARN("%s", *ErrorMessage)
 		Failed.Broadcast(ErrorMessage, FZkEvmTransactionReceipt());
 		return;

@@ -18,7 +18,7 @@ void UImtblPassportZkEvmSendTransactionAsyncAction::Activate()
 {
 	if (!WorldContextObject || !WorldContextObject->GetWorld())
 	{
-		FString Err = "ZkEvmSendTransaction failed due to missing world or world " "context object.";
+		FString Err = "zkEVM Send Transaction failed due to missing world or world " "context object.";
 		IMTBL_WARN("%s", *Err)
 		Failed.Broadcast(Err, TEXT(""));
 		return;
@@ -39,12 +39,12 @@ void UImtblPassportZkEvmSendTransactionAsyncAction::OnZkEvmSendTransactionRespon
 {
 	if (Result.Success)
 	{
-		IMTBL_LOG("ZkEvmSendTransaction success")
+		IMTBL_LOG("zkEVM Send Transaction success")
 		TransactionSent.Broadcast(TEXT(""), Result.Message);
 	}
 	else
 	{
-		IMTBL_LOG("ZkEvmSendTransaction failed")
+		IMTBL_LOG("zkEVM Send Transaction failed")
 		Failed.Broadcast(Result.Message, TEXT(""));
 	}
 }
