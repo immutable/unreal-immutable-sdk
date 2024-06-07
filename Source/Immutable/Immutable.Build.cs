@@ -97,7 +97,7 @@ public class Immutable : ModuleRules
         {
             PrivateDependencyModuleNames.AddRange(new string[] { "Launch" });
 
-            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private", "IOS") });
+            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private/Immutable", "IOS") });
 
             PublicFrameworks.AddRange(
                 new string[]
@@ -110,7 +110,7 @@ public class Immutable : ModuleRules
 
         if (Target.Platform == UnrealTargetPlatform.Mac)
         {
-            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private", "Mac") });
+            PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private/Immutable", "Mac") });
 
             PublicFrameworks.AddRange(
                 new string[]
