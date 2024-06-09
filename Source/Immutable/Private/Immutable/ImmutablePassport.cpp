@@ -119,6 +119,12 @@ void UImmutablePassport::ZkEvmSendTransaction(const FImtblTransactionRequest& Re
 	CallJS(ImmutablePassportAction::ZkEvmSendTransaction, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmSendTransactionResponse));
 }
 
+void UImmutablePassport::ZkEvmSendTransactionWithConfirmation(const FImtblTransactionRequest& Request,
+	const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+	CallJS(ImmutablePassportAction::zkEvmSendTransactionWithConfirmation, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmSendTransactionWithConfirmationResponse));
+}
+
 void UImmutablePassport::ZkEvmGetTransactionReceipt(const FZkEvmTransactionReceiptRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	CallJS(ImmutablePassportAction::ZkEvmGetTransactionReceipt, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmGetTransactionReceiptResponse));
@@ -662,6 +668,23 @@ void UImmutablePassport::OnZkEvmSendTransactionResponse(FImtblJSResponse Respons
 			Msg = Response.JsonObject->GetStringField(TEXT("result"));
 		}
 		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
+	}
+}
+
+void UImmutablePassport::OnZkEvmSendTransactionWithConfirmationResponse(FImtblJSResponse Response)
+{
+	if (auto ResponseDelegate = GetResponseDelegate(Response))
+	{
+		FString Msg;
+		bool bSuccess = true;
+		
+		if (!Response.success)
+		{
+			IMTBL_WARN("zkEVM send transaction with confirmation failed.");
+			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
+			bSuccess = false;
+		}
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
 	}
 }
 

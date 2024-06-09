@@ -155,17 +155,19 @@ TSharedRef<SWidget> UImtblBrowserWidget::RebuildWidget()
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS
-void UImtblBrowserWidget::HandleOnLoadCompleted() {
-#if PLATFORM_ANDROID
-  FString indexUrl = "file://immutable/index.html";
-#else
-  FString indexUrl = "file:///index.html";
-#endif
+void UImtblBrowserWidget::HandleOnLoadCompleted() 
+{
+	FString indexUrl = "file:///immutable/index.html";
 
 #if USING_BUNDLED_CEF
-  if (WebBrowserWidget->GetUrl() == indexUrl) {
-    JSConnector->SetMobileBridgeReady();
-  }
+	if (WebBrowserWidget->GetUrl() == indexUrl)
+	{
+		JSConnector->SetMobileBridgeReady();
+	}
+	else
+	{
+		IMTBL_ERR("Immutable Browser Widget Url don't match: (loaded : %s, required: %s)", *WebBrowserWidget->GetUrl(), *indexUrl);
+	}
 #endif
 }
 #endif

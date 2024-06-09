@@ -216,7 +216,7 @@ struct IMMUTABLE_API FZkEvmTransactionReceiptLog
 	FString logIndex;
 
 	UPROPERTY()
-	bool removed;
+	bool removed = false;
 };
 
 USTRUCT(BlueprintType, meta = (HasNativeBreak = "/Script/Immutable.ImmutableBlueprintLibrary.BreakZkEvmTransactionReceipt"))
