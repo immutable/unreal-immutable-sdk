@@ -1,5 +1,5 @@
 ---
-  name: "Update SDK engine version in Immutable Data Types"
+  name: "Update engine SDK version in Immutable Data Types"
   
   on:
     workflow_dispatch:
