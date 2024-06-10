@@ -1,0 +1,32 @@
+---
+  name: "Update engine SDK version in Immutable Data Types"
+  
+  on:
+    workflow_dispatch:
+      inputs:
+        version:
+          description: 'Version to update to (e.g. 1.20.0)'
+          required: true
+  
+  jobs:
+    update:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # - name: Check team membership
+      #   id: check_team
+      #   run: |
+      #     IS_MEMBER=$(./.github/scripts/check_team_membership.sh "${{ github.actor }}" "${{ secrets.GITHUB_TOKEN }}")
+      #     if [[ "$IS_MEMBER" != "true" ]]; then
+      #       echo "Not a member of the SDK team, skipping update"
+      #       exit 1
+      #     fi
+  
+      - name: Replace engine sdk version string
+        id: replace_engine_sdk_version
+        run: |
+          FILE=./Source/Immutable/Public/Immutable/ImmutableDataTypes.h
+          VERSION=${{ github.event.inputs.version }}
+          sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+\"\)/#define ENGINE_SDK_VERSION TEXT(\"$VERSION\")/g" $FILE
