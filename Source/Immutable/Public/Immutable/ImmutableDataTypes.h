@@ -6,6 +6,9 @@
 
 #include "ImmutableDataTypes.generated.h"
 
+// This is the version of the SDK that is being used. This is not the version of the engine.
+// This hardcoded value will be updated by a workflow during the release process.
+#define ENGINE_SDK_VERSION TEXT("1.2.4")
 
 USTRUCT()
 struct FImmutableEngineVersionData
@@ -14,6 +17,9 @@ struct FImmutableEngineVersionData
 
 	UPROPERTY()
 	FString engine = TEXT("unreal");
+
+	UPROPERTY()
+	FString engineSdkVersion = ENGINE_SDK_VERSION;
 
 	// cannot have spaces
 	UPROPERTY()
