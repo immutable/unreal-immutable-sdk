@@ -120,6 +120,7 @@ public:
 	void GetAccessToken(const FImtblPassportResponseDelegate& ResponseDelegate);
 	void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
 	void GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate);
+	void GetLinkedAddresses(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
 	 * Create a new imx transfer request.
@@ -164,6 +165,7 @@ public:
 
 	static FString GetResponseResultAsString(const FImtblJSResponse& Response);
 	static bool GetResponseResultAsBool(const FImtblJSResponse& Response);
+	static TArray<FString> GetResponseResultAsStringArray(const FImtblJSResponse& Response);
 	
 #if PLATFORM_ANDROID
 	void HandleDeepLink(FString DeepLink) const;

@@ -27,6 +27,7 @@ namespace ImmutablePassportAction
 	const FString GetEmail = TEXT("getEmail");
 	const FString GetAccessToken = TEXT("getAccessToken");
 	const FString GetIdToken = TEXT("getIdToken");
+	const FString GetLinkedAddresses = TEXT("getLinkedAddresses");
 	const FString ImxTransfer = TEXT("imxTransfer");
 	const FString ImxBatchNftTransfer = TEXT("imxBatchNftTransfer");
 	const FString EnvSandbox = TEXT("sandbox");
