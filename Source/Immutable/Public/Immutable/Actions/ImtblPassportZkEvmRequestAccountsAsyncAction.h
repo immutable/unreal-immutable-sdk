@@ -24,8 +24,6 @@ public:
 	virtual void Activate() override;
 
 private:
-	FImmutablePassportZkEvmRequestAccountsData RequestAccountsData;
-
 	void DoRequestAccounts(TWeakObjectPtr<class UImtblJSConnector> JSGetConnector);
 	void OnRequestAccountsResponse(FImmutablePassportResult Result);
 

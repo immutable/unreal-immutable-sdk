@@ -49,5 +49,5 @@ void UImtblPassportImxRegisterOffchainAsyncAction::OnImxRegisterOffchainResponse
 		}
 	}
 
-	OnFailure.Broadcast(TEXT(""), Result.Message);
+	OnFailure.Broadcast(TEXT(""), Result.Error);
 }

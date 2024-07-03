@@ -39,5 +39,5 @@ void UImtblPassportImxIsRegisteredOffchainAsyncAction::DoImxIsRegisteredOffchain
 
 void UImtblPassportImxIsRegisteredOffchainAsyncAction::OnImxIsRegisteredOffchainResponse(FImmutablePassportResult Result)
 {
-	OnComplete.Broadcast(Result.Success);
+	OnComplete.Broadcast(UImmutablePassport::GetResponseResultAsBool(Result.Response));
 }

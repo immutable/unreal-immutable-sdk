@@ -96,6 +96,6 @@ void UImtblConnectionAsyncActions::OnConnect(FImmutablePassportResult Result)
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message);
+		Failed.Broadcast(Result.Error);
 	}
 }

@@ -39,10 +39,10 @@ void UImtblPassportGetEmailAsyncAction::OnGetEmailResponse(FImmutablePassportRes
 {
 	if (Result.Success)
 	{
-		GotEmail.Broadcast(TEXT(""), Result.Message);
+		GotEmail.Broadcast(TEXT(""), UImmutablePassport::GetResponseResultAsString(Result.Response));
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message, TEXT(""));
+		Failed.Broadcast(Result.Error, TEXT(""));
 	}
 }

@@ -42,10 +42,10 @@ void UImtblPassportInitializationAsyncAction::OnInitialized(FImmutablePassportRe
 {
 	if (Result.Success)
 	{
-		Initialized.Broadcast(Result.Message);
+		Initialized.Broadcast("");
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message);
+		Failed.Broadcast(Result.Error);
 	}
 }

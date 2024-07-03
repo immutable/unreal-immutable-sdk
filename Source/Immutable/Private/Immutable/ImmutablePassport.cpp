@@ -101,33 +101,33 @@ void UImmutablePassport::Logout(bool DoHardLogout, const FImtblPassportResponseD
 
 void UImmutablePassport::ConnectEvm(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ConnectEvm, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectEvmResponse));
+	CallJS(ImmutablePassportAction::ConnectEvm, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ZkEvmRequestAccounts(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ZkEvmRequestAccounts, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmRequestAccountsResponse));
+	CallJS(ImmutablePassportAction::ZkEvmRequestAccounts, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ZkEvmGetBalance(const FImmutablePassportZkEvmGetBalanceData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ZkEvmGetBalance, Data.ToJsonString(), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmGetBalanceResponse));
+	CallJS(ImmutablePassportAction::ZkEvmGetBalance, Data.ToJsonString(), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ZkEvmSendTransaction(const FImtblTransactionRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ZkEvmSendTransaction, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmSendTransactionResponse));
+	CallJS(ImmutablePassportAction::ZkEvmSendTransaction, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ZkEvmSendTransactionWithConfirmation(const FImtblTransactionRequest& Request,
 	const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::zkEvmSendTransactionWithConfirmation, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmSendTransactionWithConfirmationResponse));
+	CallJS(ImmutablePassportAction::zkEvmSendTransactionWithConfirmation, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ZkEvmGetTransactionReceipt(const FZkEvmTransactionReceiptRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ZkEvmGetTransactionReceipt, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnZkEvmGetTransactionReceiptResponse));
+	CallJS(ImmutablePassportAction::ZkEvmGetTransactionReceipt, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate)
@@ -140,43 +140,43 @@ void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Inte
 
 void UImmutablePassport::GetIdToken(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::GetIdToken, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetIdTokenResponse));
+	CallJS(ImmutablePassportAction::GetIdToken, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::GetAccessToken(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::GetAccessToken, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetAccessTokenResponse));
+	CallJS(ImmutablePassportAction::GetAccessToken, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::GetAddress, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetAddressResponse));
+	CallJS(ImmutablePassportAction::GetAddress, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::GetEmail, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetEmailResponse));
+	CallJS(ImmutablePassportAction::GetEmail, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ImxTransfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	IMTBL_LOG("Tranfer Request: %s", *UStructToJsonString(RequestData))
-	CallJS(ImmutablePassportAction::ImxTransfer, UStructToJsonString(RequestData), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnTransferResponse));
+	CallJS(ImmutablePassportAction::ImxTransfer, UStructToJsonString(RequestData), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ImxBatchNftTransfer, RequestData.ToJsonString(), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBatchNftTransferResponse));
+	CallJS(ImmutablePassportAction::ImxBatchNftTransfer, RequestData.ToJsonString(), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ImxIsRegisteredOffchain(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ImxIsRegisteredOffchain, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnImxIsRegisteredOffchain));
+	CallJS(ImmutablePassportAction::ImxIsRegisteredOffchain, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ImxRegisterOffchain(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
-	CallJS(ImmutablePassportAction::ImxRegisterOffchain, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnImxRegisterOffchain));
+	CallJS(ImmutablePassportAction::ImxRegisterOffchain, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate)
@@ -213,6 +213,32 @@ void UImmutablePassport::HasStoredCredentials(const FImtblPassportResponseDelega
 	}));
 }
 
+FString UImmutablePassport::GetResponseResultAsString(const FImtblJSResponse& Response)
+{
+	if (!Response.JsonObject.IsValid())
+	{
+		IMTBL_ERR("Response JSON data for %s is not valid", *Response.responseFor)
+		
+		return "";	
+	}
+
+	return Response.JsonObject->GetStringField(TEXT("result"));
+	
+}
+
+bool UImmutablePassport::GetResponseResultAsBool(const FImtblJSResponse& Response)
+{
+	if (!Response.JsonObject.IsValid())
+	{
+		IMTBL_ERR("Response JSON data for %s is not valid", *Response.responseFor)
+		
+		return false;	
+	}
+
+	return Response.JsonObject->GetBoolField(TEXT("result"));
+}
+
+
 void UImmutablePassport::Setup(const TWeakObjectPtr<UImtblJSConnector> Connector)
 {
 	IMTBL_LOG_FUNCSIG
@@ -241,7 +267,7 @@ void UImmutablePassport::ReinstateConnection(FImtblJSResponse Response)
 		const FString CallbackName = IsRelogin ? "Relogin" : "Reconnect";
 		UImmutableAnalytics::EEventName EventName = IsRelogin ? UImmutableAnalytics::EEventName::COMPLETE_RELOGIN : UImmutableAnalytics::EEventName::COMPLETE_RECONNECT;
 
-		if (Response.JsonObject->GetBoolField(TEXT("result")))
+		if (Response.success)
 		{
 			SetStateFlags(IPS_CONNECTED);
 			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, "", Response});
@@ -302,7 +328,8 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 {
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
 	{
-		FString Msg;
+		FString Error;
+		
 		if (Response.success)
 		{
 			SetStateFlags(IPS_INITIALIZED);
@@ -311,10 +338,10 @@ void UImmutablePassport::OnInitializeResponse(FImtblJSResponse Response)
 		else
 		{
 			IMTBL_ERR("Passport initialization failed.")
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
+			Response.Error.IsSet() ? Error = Response.Error->ToString() : Error = Response.JsonObject->GetStringField(TEXT("error"));
 		}
 		Analytics->Track(UImmutableAnalytics::EEventName::INIT_PASSPORT, Response.success);
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult { Response.success, Error, Response });
 	}
 }
 
@@ -372,10 +399,8 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 
 	if (!IsStateFlagsSet(IPS_HARDLOGOUT))
 	{
-		Message = "Logged out without clearing browser session";
-
-		IMTBL_LOG("%s", *Message)
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ true, Message });
+		IMTBL_LOG("Logged out without clearing browser session")
+		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ true });
 		
 		return;
 	}
@@ -413,9 +438,8 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 				return;
 			}
 			Analytics->Track(UImmutableAnalytics::EEventName::COMPLETE_LOGOUT);
-			Message = "Logged out";
-			IMTBL_LOG("%s", *Message)
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Message });
+			IMTBL_LOG("Logged out")
+			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success });
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 		}
 #endif
@@ -425,44 +449,6 @@ void UImmutablePassport::OnLogoutResponse(FImtblJSResponse Response)
 		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, "Logout Url is empty", Response});
 	}
 	ResetStateFlags(IPS_CONNECTED);
-}
-
-void UImmutablePassport::OnConnectSilentResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-
-		if (Response.success)
-		{
-			IMTBL_LOG("Reconnected.")
-		}
-		else
-		{
-			IMTBL_ERR("Failed to reconnect.")
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-		}
-
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
-	}
-}
-
-void UImmutablePassport::OnConnectEvmResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-		if (Response.success)
-		{
-			IMTBL_LOG("Connected to Evm.")
-		}
-		else
-		{
-			IMTBL_WARN("Error connecting to Evm.")
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
-	}
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
@@ -533,178 +519,6 @@ void UImmutablePassport::OnConnectPKCEResponse(FImtblJSResponse Response)
 }
 #endif
 
-void UImmutablePassport::OnGetIdTokenResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString IdToken;
-
-		Response.JsonObject->TryGetStringField(TEXT("result"), IdToken);
-
-		if (!Response.success || IdToken.IsEmpty())
-		{
-			IMTBL_LOG("Failed to retrieve Id Token.");
-
-			const FString Msg = Response.JsonObject->HasField(TEXT("error")) ? Response.JsonObject->GetStringField(TEXT("error")) : "Failed to retrieve Id Token.";
-
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
-		}
-		else
-		{
-			IMTBL_LOG("Retrieved Id Token.");
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, IdToken});
-		}
-	}
-}
-
-void UImmutablePassport::OnGetAccessTokenResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString AccessToken;
-
-		Response.JsonObject->TryGetStringField(TEXT("result"), AccessToken);
-
-		if (!Response.success || AccessToken.IsEmpty())
-		{
-			IMTBL_LOG("Failed to retrieve Access Token");
-
-			const FString Msg = Response.JsonObject->HasField(TEXT("error")) ? Response.JsonObject->GetStringField(TEXT("error")) : "Failed to retrieve Access Token.";
-
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{false, Msg, Response});
-		}
-		else
-		{
-			IMTBL_LOG("Retrieved Access Token.");
-			ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{true, AccessToken});
-		}
-	}
-}
-
-void UImmutablePassport::OnGetAddressResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-		bool bSuccess = true;
-
-		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
-		{
-			IMTBL_WARN("Could not fetch address from Passport.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		else
-		{
-			Msg = Response.JsonObject->GetStringField(TEXT("result"));
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
-	}
-}
-
-void UImmutablePassport::OnZkEvmRequestAccountsResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		const auto RequestAccountstData = FImmutablePassportZkEvmRequestAccountsData::FromJsonObject(Response.JsonObject);
-		FString Msg;
-		bool bSuccess = true;
-		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::Array>(TEXT("accounts")))
-		{
-			IMTBL_WARN("Error requesting zkevm accounts.")
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		else
-		{
-			const auto size = RequestAccountstData->accounts.Num();
-			for (int32 Index = 0; Index != size; ++Index)
-			{
-				Msg += RequestAccountstData->accounts[Index];
-				if (Index < size - 1)
-				{
-					Msg += TEXT(",");
-				}
-			}
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
-	}
-}
-
-void UImmutablePassport::OnZkEvmGetBalanceResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-		bool bSuccess = true;
-		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
-		{
-			IMTBL_WARN("Could not get balance.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		else
-		{
-			Msg = Response.JsonObject->GetStringField(TEXT("result"));
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
-	}
-}
-
-void UImmutablePassport::OnZkEvmSendTransactionResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-		bool bSuccess = true;
-		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
-		{
-			IMTBL_WARN("Could not fetch send transaction.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		else
-		{
-			Msg = Response.JsonObject->GetStringField(TEXT("result"));
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg});
-	}
-}
-
-void UImmutablePassport::OnZkEvmSendTransactionWithConfirmationResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-		bool bSuccess = true;
-		
-		if (!Response.success)
-		{
-			IMTBL_WARN("zkEVM send transaction with confirmation failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
-	}
-}
-
-void UImmutablePassport::OnZkEvmGetTransactionReceiptResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-		bool bSuccess = true;
-		
-		if (!Response.success)
-		{
-			IMTBL_WARN("zkEVM transaction receipt retrieval failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
-	}
-}
-
 void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
 {
 	if (auto ResponseDelegate = GetResponseDelegate(Response))
@@ -729,117 +543,26 @@ void UImmutablePassport::OnConfirmCodeResponse(FImtblJSResponse Response)
 	}
 }
 
-void UImmutablePassport::OnGetEmailResponse(FImtblJSResponse Response)
+void UImmutablePassport::OnBridgeCallbackResponse(FImtblJSResponse Response)
 {
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
+	auto ResponseDelegate = GetResponseDelegate(Response);
+
+	if (!ResponseDelegate)
 	{
-		FString Msg;
-		bool bSuccess = true;
-
-		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::String>(TEXT("result")))
-		{
-			IMTBL_WARN("Connect attempt failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		else
-		{
-			Msg = Response.JsonObject->GetStringField(TEXT("result"));
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
+		IMTBL_ERR("Response delegate is not assigned for %s", *Response.responseFor);
+		return;
 	}
-}
 
-void UImmutablePassport::OnTransferResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
+	if (!Response.success)
 	{
-		FString Msg;
-		bool bSuccess = true;
-		if (!Response.success)
-		{
-			IMTBL_WARN("ImxTransfer failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		else
-		{
-			Msg = Response.JsonObject->GetStringField(TEXT("status"));
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
+		IMTBL_LOG_FUNC("Response for %s is unsuccessfull", *Response.responseFor);
 	}
-}
 
-void UImmutablePassport::OnBatchNftTransferResponse(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		auto BatchNftTransferResponse = JsonObjectToUStruct<FImxBatchNftTransferResponse>(Response.JsonObject);
+	FString Error;
 
-		FString Msg;
-		bool bSuccess = true;
-		if (!Response.success || !Response.JsonObject->HasTypedField<EJson::Object>(TEXT("result")))
-		{
-			IMTBL_WARN("ImxBatchNftTransfer failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-			bSuccess = false;
-		}
-		else
-		{
-			Msg = UStructToJsonString(*BatchNftTransferResponse);
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bSuccess, Msg, Response});
-	}
-}
+	Response.JsonObject->TryGetStringField(TEXT("error"), Error);
 
-void UImmutablePassport::OnImxIsRegisteredOffchain(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-		bool bResult = false;
-
-		if (!Response.success)
-		{
-			IMTBL_WARN("ImxIsRegisteredOffchain failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-		}
-		else
-		{
-			bResult = Response.JsonObject->GetBoolField(TEXT("result"));
-		}
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{bResult, Msg, Response});
-	}
-}
-
-void UImmutablePassport::OnImxRegisterOffchain(FImtblJSResponse Response)
-{
-	if (auto ResponseDelegate = GetResponseDelegate(Response))
-	{
-		FString Msg;
-
-		if (!Response.success)
-		{
-			IMTBL_WARN("ImxRegisterOffchain failed.");
-			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-		}
-
-		ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
-	}
-}
-
-void UImmutablePassport::LogAndIgnoreResponse(FImtblJSResponse Response)
-{
-	if (Response.success && !Response.Error)
-	{
-		IMTBL_LOG("Received success response from Passport for action %s", *Response.responseFor);
-	}
-	else
-	{
-		FString Msg;
-		Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
-		IMTBL_WARN("Received error response from Passport for action %s -- %s", *Response.responseFor, *Msg);
-	}
+	ResponseDelegate->ExecuteIfBound(FImmutablePassportResult{ Response.success, Error, Response });
 }
 
 void UImmutablePassport::SetStateFlags(uint8 StateIn)
@@ -958,6 +681,7 @@ void UImmutablePassport::CompleteLoginPKCEFlow(FString Url)
 void UImmutablePassport::HandleDeepLink(FString DeepLink) const
 {
 #elif PLATFORM_IOS | PLATFORM_MAC
+
 // Called from iOS Objective C
 void UImmutablePassport::HandleDeepLink(NSString* sDeepLink) const
 {

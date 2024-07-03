@@ -38,10 +38,10 @@ void UImtblPassportGetAccessTokenAsyncAction::OnGetAccessTokenResponse(FImmutabl
 {
 	if (Result.Success)
 	{
-		GotAccessToken.Broadcast(TEXT(""), Result.Message);
+		GotAccessToken.Broadcast(TEXT(""), UImmutablePassport::GetResponseResultAsString(Result.Response));
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message, TEXT(""));
+		Failed.Broadcast(Result.Error, TEXT(""));
 	}
 }

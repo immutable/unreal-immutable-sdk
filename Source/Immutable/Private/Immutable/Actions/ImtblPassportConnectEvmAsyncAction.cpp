@@ -38,10 +38,10 @@ void UImtblPassportConnectEvmAsyncAction::OnConnectEvm(FImmutablePassportResult 
 {
 	if (Result.Success)
 	{
-		Success.Broadcast(Result.Message);
+		Success.Broadcast("");
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message);
+		Failed.Broadcast(Result.Error);
 	}
 }

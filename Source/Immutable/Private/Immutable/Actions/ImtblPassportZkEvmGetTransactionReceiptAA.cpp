@@ -59,6 +59,6 @@ void UImtblPassportZkEvmGetTransactionReceiptAA::OnZkEvmGetTransactionReceiptRes
 	else
 	{
 		IMTBL_LOG("zkEVM Transaction Receipt retrival failed")
-		Failed.Broadcast(Result.Message, FZkEvmTransactionReceipt());
+		Failed.Broadcast(Result.Error, FZkEvmTransactionReceipt());
 	}
 }

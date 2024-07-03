@@ -54,15 +54,7 @@ public:
 
 	DECLARE_DELEGATE_OneParam(FImtblPassportResponseDelegate, FImmutablePassportResult);
 
-#if PLATFORM_ANDROID
-	void HandleDeepLink(FString DeepLink) const;
-	void HandleCustomTabsDismissed(FString Url);
-#elif PLATFORM_IOS | PLATFORM_MAC
-	void HandleDeepLink(NSString* sDeepLink) const;
-#endif
-
 	void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
-
 	void Connect(bool IsConnectImx, bool TryToRelogin, const FImtblPassportResponseDelegate& ResponseDelegate);
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	void ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
@@ -170,72 +162,51 @@ public:
 	 */
 	void HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate);
 
+	static FString GetResponseResultAsString(const FImtblJSResponse& Response);
+	static bool GetResponseResultAsBool(const FImtblJSResponse& Response);
+	
+#if PLATFORM_ANDROID
+	void HandleDeepLink(FString DeepLink) const;
+	void HandleCustomTabsDismissed(FString Url);
+#elif PLATFORM_IOS | PLATFORM_MAC
+	void HandleDeepLink(NSString* sDeepLink) const;
+#endif
+	
 protected:
-	void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
-	void ReinstateConnection(FImtblJSResponse Response);
-
 #if PLATFORM_ANDROID
 	DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
-  
-	FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
 #endif
 
-	TWeakObjectPtr<UImtblJSConnector> JSConnector;
-	FImmutablePassportInitData InitData;
-	FDelegateHandle BridgeReadyHandle;
-	TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
-
-	FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
-	// Since the second part of PKCE is triggered by deep links, saving the
-	// response delegate here so it's easier to get
-	FImtblPassportResponseDelegate PKCEResponseDelegate;
-	FImtblPassportResponseDelegate PKCELogoutResponseDelegate;
-	// bool IsPKCEConnected = false;
 #endif
-
+	
+	// Calls JS with the given Action and Data, and registers the given
+    // ResponseDelegate to be called when JS responds
+    void CallJS(const FString& Action, const FString& Data, const FImtblPassportResponseDelegate& ClientResponseDelegate, const FImtblJSResponseDelegate& HandleJSResponse, const bool bCheckInitialized = true);
+	
+	void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
+	void ReinstateConnection(FImtblJSResponse Response);
 	// Ensures that Passport has been initialized before calling JS
 	bool CheckIsInitialized(const FString& Action, const FImtblPassportResponseDelegate& ResponseDelegate) const;
-	// Calls JS with the given Action and Data, and registers the given
-	// ResponseDelegate to be called when JS responds
-	void CallJS(const FString& Action, const FString& Data, const FImtblPassportResponseDelegate& ClientResponseDelegate, const FImtblJSResponseDelegate& HandleJSResponse, const bool bCheckInitialized = true);
 	// Pulls the ResponseDelegate from the ResponseDelegates map and returns it
 	TOptional<FImtblPassportResponseDelegate> GetResponseDelegate(const FImtblJSResponse& Response);
 	void ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate);
 
+	// common response callback
+	void OnBridgeCallbackResponse(FImtblJSResponse Response);
+	// callbacks with custom response manipulations  
 	void OnInitializeResponse(FImtblJSResponse Response);
-
 	void OnInitDeviceFlowResponse(FImtblJSResponse Response);
-
 	void OnLogoutResponse(FImtblJSResponse Response);
-	void OnConnectResponse(FImtblJSResponse Response);
-	void OnConnectSilentResponse(FImtblJSResponse Response);
-	void OnConnectEvmResponse(FImtblJSResponse Response);
-	void OnZkEvmRequestAccountsResponse(FImtblJSResponse Response);
-	void OnZkEvmGetBalanceResponse(FImtblJSResponse Response);
-	void OnZkEvmSendTransactionResponse(FImtblJSResponse Response);
-	void OnZkEvmSendTransactionWithConfirmationResponse(FImtblJSResponse Response);
-	void OnZkEvmGetTransactionReceiptResponse(FImtblJSResponse Response);
 	void OnConfirmCodeResponse(FImtblJSResponse Response);
+
+	// mobile platform callbacks
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	void OnGetPKCEAuthUrlResponse(FImtblJSResponse Response);
 	void OnConnectPKCEResponse(FImtblJSResponse Response);
-#endif
-	void OnGetIdTokenResponse(FImtblJSResponse Response);
-	void OnGetAccessTokenResponse(FImtblJSResponse Response);
-	void OnGetAddressResponse(FImtblJSResponse Response);
-	void OnGetEmailResponse(FImtblJSResponse Response);
-	void OnTransferResponse(FImtblJSResponse Response);
-	void OnBatchNftTransferResponse(FImtblJSResponse Response);
-	void OnImxIsRegisteredOffchain(FImtblJSResponse Response);
-	void OnImxRegisterOffchain(FImtblJSResponse Response);
-
-	void LogAndIgnoreResponse(FImtblJSResponse Response);
-
-#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 	void OnDeepLinkActivated(FString DeepLink);
-	void CompleteLoginPKCEFlow(FString Url);
+    void CompleteLoginPKCEFlow(FString Url);
 #endif
 
 #if PLATFORM_ANDROID
@@ -247,6 +218,26 @@ protected:
 	void SetStateFlags(uint8 StateIn);
 	void ResetStateFlags(uint8 StateIn);
 	bool IsStateFlagsSet(uint8 StateIn) const;
+
+protected:
+	TWeakObjectPtr<UImtblJSConnector> JSConnector;
+	FImmutablePassportInitData InitData;
+	FDelegateHandle BridgeReadyHandle;
+	TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
+
+#if PLATFORM_ANDROID
+	FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
+#endif
+
+#if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+	FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
+	// Since the second part of PKCE is triggered by deep links, saving the
+	// response delegate here so it's easier to get
+	FImtblPassportResponseDelegate PKCEResponseDelegate;
+	FImtblPassportResponseDelegate PKCELogoutResponseDelegate;
+	// bool IsPKCEConnected = false;
+#endif
+
 
 private:
 	void SavePassportSettings();
