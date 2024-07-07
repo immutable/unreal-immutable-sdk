@@ -42,10 +42,10 @@ void UImtblPassportLogoutAsyncAction::OnLogoutResponse(FImmutablePassportResult 
 {
 	if (Result.Success)
 	{
-		OnSuccess.Broadcast(Result.Message);
+		OnSuccess.Broadcast("");
 	}
 	else
 	{
-		OnFailure.Broadcast(Result.Message);
+		OnFailure.Broadcast(Result.Error);
 	}
 }

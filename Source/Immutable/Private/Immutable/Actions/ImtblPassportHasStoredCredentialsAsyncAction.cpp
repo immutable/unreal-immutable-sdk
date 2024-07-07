@@ -45,6 +45,6 @@ void UImtblPassportHasStoredCredentialsAsyncAction::OnHasStoredCredentialsRespon
 	}
 	else
 	{
-		OnFalse.Broadcast(Result.Message);
+		OnFalse.Broadcast(Result.Error);
 	}
 }

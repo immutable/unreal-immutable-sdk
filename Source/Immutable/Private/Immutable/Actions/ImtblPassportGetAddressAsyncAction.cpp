@@ -39,10 +39,10 @@ void UImtblPassportGetAddressAsyncAction::OnGetAddressResponse(FImmutablePasspor
 {
 	if (Result.Success)
 	{
-		GotAddress.Broadcast(TEXT(""), Result.Message);
+		GotAddress.Broadcast(TEXT(""), UImmutablePassport::GetResponseResultAsString(Result.Response));
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message, TEXT(""));
+		Failed.Broadcast(Result.Error, TEXT(""));
 	}
 }

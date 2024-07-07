@@ -29,22 +29,24 @@ void UImtblPassportZkEvmRequestAccountsAsyncAction::Activate()
 
 void UImtblPassportZkEvmRequestAccountsAsyncAction::DoRequestAccounts(TWeakObjectPtr<UImtblJSConnector> JSConnector)
 {
-	// Get Passport
 	auto Passport = GetSubsystem()->GetPassport();
-	// Run ZkEvmRequestAccounts
-	Passport->ZkEvmRequestAccounts(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmRequestAccountsAsyncAction::OnRequestAccountsResponse));
+
+	if (Passport.IsValid())
+	{
+		Passport->ZkEvmRequestAccounts(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmRequestAccountsAsyncAction::OnRequestAccountsResponse));
+	}
 }
 
 void UImtblPassportZkEvmRequestAccountsAsyncAction::OnRequestAccountsResponse(FImmutablePassportResult Result)
 {
-	TArray<FString> StrArr;
 	if (Result.Success)
 	{
-		Result.Message.ParseIntoArray(StrArr, TEXT(","));
-		GotAccounts.Broadcast(TEXT(""), StrArr);
+		const auto RequestAccountsData = FImmutablePassportZkEvmRequestAccountsData::FromJsonObject(Result.Response.JsonObject);
+
+		GotAccounts.Broadcast(TEXT(""), RequestAccountsData->accounts);
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message, StrArr);
+		Failed.Broadcast(Result.Error, TArray<FString>());
 	}
 }

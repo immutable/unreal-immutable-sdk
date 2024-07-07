@@ -3,6 +3,7 @@
 #include "Immutable/Actions/ImtblPassportImxTransferAsyncAction.h"
 
 #include "Immutable/ImmutablePassport.h"
+#include "Immutable/ImmutableResponses.h"
 #include "Immutable/ImmutableSubsystem.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
@@ -57,6 +58,6 @@ void UImmutablePassportImxTransferAsyncAction::OnTransferResponse(FImmutablePass
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message, TEXT(""));
+		Failed.Broadcast(Result.Error, TEXT(""));
 	}
 }

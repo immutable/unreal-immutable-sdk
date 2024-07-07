@@ -38,10 +38,10 @@ void UImtblPassportGetIdTokenAsyncAction::OnGetIdTokenResponse(FImmutablePasspor
 {
 	if (Result.Success)
 	{
-		GotIdToken.Broadcast(TEXT(""), Result.Message);
+		GotIdToken.Broadcast(TEXT(""), UImmutablePassport::GetResponseResultAsString(Result.Response));
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message, TEXT(""));
+		Failed.Broadcast(Result.Error, TEXT(""));
 	}
 }

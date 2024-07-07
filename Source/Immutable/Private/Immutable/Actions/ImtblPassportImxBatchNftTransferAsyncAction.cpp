@@ -55,6 +55,6 @@ void UImmutablePassportImxBatchNftTransferAsyncAction::OnTransferResponse(FImmut
 	}
 	else
 	{
-		Failed.Broadcast(Result.Message, TransferIds);
+		Failed.Broadcast(Result.Error, TransferIds);
 	}
 }

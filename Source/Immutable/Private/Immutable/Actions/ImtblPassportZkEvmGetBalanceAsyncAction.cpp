@@ -30,22 +30,22 @@ void UImtblPassportZkEvmGetBalanceAsyncAction::Activate()
 
 void UImtblPassportZkEvmGetBalanceAsyncAction::DoZkEvmGetBalance(TWeakObjectPtr<UImtblJSConnector> JSConnector)
 {
-	// Get Passport
 	auto Passport = GetSubsystem()->GetPassport();
-	// Run ZkEvmGetBalance
-	Passport->ZkEvmGetBalance(FImmutablePassportZkEvmGetBalanceData{Address, BlockNumberOrTag}, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmGetBalanceAsyncAction::OnZkEvmGetBalanceResponse));
+
+	if (Passport.IsValid())
+	{
+		Passport->ZkEvmGetBalance(FImmutablePassportZkEvmGetBalanceData{Address, BlockNumberOrTag}, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmGetBalanceAsyncAction::OnZkEvmGetBalanceResponse));
+	}
 }
 
 void UImtblPassportZkEvmGetBalanceAsyncAction::OnZkEvmGetBalanceResponse(FImmutablePassportResult Result)
 {
 	if (Result.Success)
 	{
-		IMTBL_LOG("ZkEvmGetBalance success")
-		GotBalance.Broadcast(TEXT(""), Result.Message);
+		GotBalance.Broadcast(TEXT(""), UImmutablePassport::GetResponseResultAsString(Result.Response));
 	}
 	else
 	{
-		IMTBL_LOG("ZkEvmGetBalance failed")
-		Failed.Broadcast(Result.Message, TEXT(""));
+		Failed.Broadcast(Result.Error, TEXT(""));
 	}
 }

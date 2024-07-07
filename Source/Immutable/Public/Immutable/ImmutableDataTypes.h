@@ -159,7 +159,7 @@ struct IMMUTABLE_API FImmutablePassportResult
 	bool Success = false;
 	
 	UPROPERTY()
-	FString Message;
+	FString Error;
 
 	FImtblJSResponse Response;
 };

@@ -29,10 +29,12 @@ void UImtblPassportZkEvmSendTransactionAsyncAction::Activate()
 
 void UImtblPassportZkEvmSendTransactionAsyncAction::DoZkEvmSendTransaction(TWeakObjectPtr<UImtblJSConnector> JSConnector)
 {
-	// Get Passport
 	auto Passport = GetSubsystem()->GetPassport();
-	// Run ZkEvmSendTransaction
-	Passport->ZkEvmSendTransaction(TransactionRequest, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmSendTransactionAsyncAction::OnZkEvmSendTransactionResponse));
+
+	if (Passport.IsValid())
+	{
+		Passport->ZkEvmSendTransaction(TransactionRequest, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmSendTransactionAsyncAction::OnZkEvmSendTransactionResponse));
+	}
 }
 
 void UImtblPassportZkEvmSendTransactionAsyncAction::OnZkEvmSendTransactionResponse(FImmutablePassportResult Result)
@@ -40,12 +42,12 @@ void UImtblPassportZkEvmSendTransactionAsyncAction::OnZkEvmSendTransactionRespon
 	if (Result.Success)
 	{
 		IMTBL_LOG("zkEVM Send Transaction success")
-		TransactionSent.Broadcast(TEXT(""), Result.Message);
+		TransactionSent.Broadcast(TEXT(""), UImmutablePassport::GetResponseResultAsString(Result.Response));
 	}
 	else
 	{
 		IMTBL_LOG("zkEVM Send Transaction failed")
-		Failed.Broadcast(Result.Message, TEXT(""));
+		Failed.Broadcast(Result.Error, TEXT(""));
 	}
 }
 
@@ -105,6 +107,6 @@ void UImtblPassportZkEvmSendTransactionWithConfirmationAA::OnZkEvmSendTransactio
 	else
 	{
 		IMTBL_LOG("zkEVM Send Transaction with confirmation failed")
-		Failed.Broadcast(Result.Message, FZkEvmTransactionReceipt());
+		Failed.Broadcast(Result.Error, FZkEvmTransactionReceipt());
 	}
 }
