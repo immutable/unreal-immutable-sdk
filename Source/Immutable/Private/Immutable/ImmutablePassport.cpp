@@ -158,6 +158,11 @@ void UImmutablePassport::GetEmail(const FImtblPassportResponseDelegate& Response
 	CallJS(ImmutablePassportAction::GetEmail, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
+void UImmutablePassport::GetLinkedAddresses(const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+	CallJS(ImmutablePassportAction::GetLinkedAddresses, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
+}
+
 void UImmutablePassport::ImxTransfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	IMTBL_LOG("Tranfer Request: %s", *UStructToJsonString(RequestData))
@@ -223,7 +228,6 @@ FString UImmutablePassport::GetResponseResultAsString(const FImtblJSResponse& Re
 	}
 
 	return Response.JsonObject->GetStringField(TEXT("result"));
-	
 }
 
 bool UImmutablePassport::GetResponseResultAsBool(const FImtblJSResponse& Response)
@@ -236,6 +240,25 @@ bool UImmutablePassport::GetResponseResultAsBool(const FImtblJSResponse& Respons
 	}
 
 	return Response.JsonObject->GetBoolField(TEXT("result"));
+}
+
+TArray<FString> UImmutablePassport::GetResponseResultAsStringArray(const FImtblJSResponse& Response)
+{
+	if (!Response.JsonObject.IsValid())
+	{
+		IMTBL_ERR("Response JSON data for %s is not valid", *Response.responseFor)
+		
+		return TArray<FString>();	
+	}
+	
+	TArray<FString> StringArray;
+	
+	for (const TSharedPtr<FJsonValue>& Value : Response.JsonObject->GetArrayField(TEXT("result")))
+	{
+		StringArray.Add(Value->AsString());
+	}
+
+	return StringArray;
 }
 
 
