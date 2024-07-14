@@ -60,8 +60,9 @@ bool UImtblBrowserWidget::IsPageLoaded() const
 {
 #if USING_BUNDLED_CEF
 	return WebBrowserWidget.IsValid() && WebBrowserWidget->IsLoaded();
-#endif
+#else
 	return false;
+#endif
 }
 
 void UImtblBrowserWidget::ExecuteJS(const FString& ScriptText) const
