@@ -35,7 +35,7 @@ struct IMMUTABLE_API FImtblResponseError
 	UPROPERTY()
 	FString errorMessage;
 
-	FString ToString()
+	FString ToString() const
 	{
 		const FString ErrType = StaticEnum<EImtblPassportError>()->GetNameStringByValue(static_cast<int8>(errorType));
 		return ErrType == "" ? errorMessage : ErrType + ": " + errorMessage;
