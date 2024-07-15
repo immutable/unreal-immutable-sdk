@@ -39,10 +39,10 @@ FString FImxBatchNftTransferRequest::ToJsonString() const
 		return "";
 	}
 
-	if (Wrapper.JsonObject->HasField("nftTransferDetails"))
+	if (Wrapper.JsonObject->HasField(TEXT("nftTransferDetails")))
 	{
 		const auto Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutString);
-		FJsonSerializer::Serialize(Wrapper.JsonObject->GetArrayField("nftTransferDetails"), Writer);
+		FJsonSerializer::Serialize(Wrapper.JsonObject->GetArrayField(TEXT("nftTransferDetails")), Writer);
 		IMTBL_LOG("FImxBatchNftTransferRequest Serialised: %s", *OutString);
 		Writer->Close();
 	}
