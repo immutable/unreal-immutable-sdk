@@ -31,16 +31,17 @@ public:
 
 	bool IsReady() const { return bIsReady; }
 
-	// FOnGameViewportTick& OnGameViewportTick() { return GameViewportTickEvent; }
-
 	// Execute a delegate when the subsystem is ready (i.e.: when the browser is
 	// running and the Immutable SDK game bridge has loaded).
 	template <class UserClass>
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-	void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func);
+	void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func)
 #else
-  void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func);
+  void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func)
 #endif
+	{
+		OnReady.AddUObject(Object, Func);
+	}
 
 private:
 	UPROPERTY()
