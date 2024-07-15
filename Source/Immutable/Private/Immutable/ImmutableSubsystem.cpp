@@ -56,16 +56,6 @@ void UImmutableSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-template <class UserClass>
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TMethodPtr<UserClass> Func)
-#else
-void UImmutableSubsystem::WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func)
-#endif
-{
-	OnReady.AddUObject(Object, Func);
-}
-
 void UImmutableSubsystem::OnBridgeReady()
 {
 	// When the bridge is ready our subsystem is ready to be used by game code.

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ImmutableDataTypes.h"
 
 #include "ImmutableRequests.generated.h"
 
@@ -48,7 +49,7 @@ struct IMMUTABLE_API FImxBatchNftTransferRequest
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<FNftTransferDetails> nftTransferDetails;
+	TArray<struct FNftTransferDetails> nftTransferDetails;
 
 	FString ToJsonString() const;
 };

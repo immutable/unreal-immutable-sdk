@@ -35,7 +35,7 @@ struct IMMUTABLE_API FImtblResponseError
 	UPROPERTY()
 	FString errorMessage;
 
-	FString ToString()
+	FString ToString() const
 	{
 		const FString ErrType = StaticEnum<EImtblPassportError>()->GetNameStringByValue(static_cast<int8>(errorType));
 		return ErrType == "" ? errorMessage : ErrType + ": " + errorMessage;
@@ -110,8 +110,8 @@ struct IMMUTABLE_API FImtblJSResponse
 			FString Error;
 			if (JSResponse.JsonObject.IsValid())
 			{
-				JSResponse.JsonObject->TryGetNumberField("errorType", ErrType);
-				JSResponse.JsonObject->TryGetStringField("error", Error);
+				JSResponse.JsonObject->TryGetNumberField(TEXT("errorType"), ErrType);
+				JSResponse.JsonObject->TryGetStringField(TEXT("error"), Error);
 			}
 			JSResponse.Error = FImtblResponseError{static_cast<EImtblPassportError>(ErrType), Error};
 		}

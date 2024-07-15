@@ -17,9 +17,9 @@ FString FImmutablePassportInitData::ToJsonString() const
 	}
 	// Remove redirectUri field if it's empty so that the bridge doesn't try to
 	// use it
-	if (Wrapper.JsonObject->HasField("redirectUri") && Wrapper.JsonObject->GetStringField("redirectUri").IsEmpty())
+	if (Wrapper.JsonObject->HasField(TEXT("redirectUri")) && Wrapper.JsonObject->GetStringField(TEXT("redirectUri")).IsEmpty())
 	{
-		Wrapper.JsonObject->RemoveField("redirectUri");
+		Wrapper.JsonObject->RemoveField(TEXT("redirectUri"));
 	}
 	Wrapper.JsonObjectToString(OutString);
 
