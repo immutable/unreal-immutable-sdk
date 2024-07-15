@@ -188,7 +188,7 @@ void UImmutablePassport::HasStoredCredentials(const FImtblPassportResponseDelega
 {
 	// we do check credentials into two steps, we check accessToken and then IdToken
 	// check access token
-	CallJS(ImmutablePassportAction::GetAccessToken, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateLambda([=, this](FImtblJSResponse Response)
+	CallJS(ImmutablePassportAction::GetAccessToken, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateLambda([this, ResponseDelegate](FImtblJSResponse Response)
 	{
 		FString AccessToken;
 
