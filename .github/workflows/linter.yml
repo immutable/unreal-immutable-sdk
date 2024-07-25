@@ -65,3 +65,4 @@
               VALIDATE_CPP: false
               VALIDATE_CSHARP: false
               VALIDATE_CLANG_FORMAT: false
+              FILTER_REGEX_EXCLUDE: .*/Web/index.js
