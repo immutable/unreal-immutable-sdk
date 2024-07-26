@@ -56,15 +56,6 @@ For UE 4.26 and 4.27 we are using Blui as the in built browser does not work.
 3. Place the Win folder from the `BluBrowserCEF...7z` into the BLUI plugin `Thirdparty/cef`
 4. Zip the Blui plugin folder and upload to the GitHub release.
 
-## How to Add Game Bridge Asset to Packaged Resources
-
-1. Open Unreal Editor in the lowest supported version (i.e. 4.26) for this Plugin.
-2. Open Content Drawer
-3. Navigate to Plugins -> Immutable Content -> Packages Resources
-4. Delete the existing imported `index.uasset`
-5. Right click and import the `index.js` file
-   ![Import Asset](ImportAsset.png)
-
 ## Contributing
 Thank you for your interest in contributing to our project! Here's a quick guide on how you can get started:
 
@@ -89,7 +80,7 @@ To get help from other developers, discuss ideas, and stay up-to-date on what's 
 
 You can also join the conversation, connect with other projects, and ask questions in our Immutable X Discourse forum.
 
-[Visit the forum](https://forum.immutable.com/)
+[Visit the blog](https//immutable.com/blog)
 
 #### Still need help?
 

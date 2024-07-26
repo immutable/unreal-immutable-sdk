@@ -6,8 +6,6 @@
 #include "ImtblBrowserWidget.h"
 #include "Immutable/ImtblJSMessages.h"
 
-UImtblJSConnector::UImtblJSConnector() { IMTBL_LOG_FUNCSIG }
-
 void UImtblJSConnector::Init(bool bPageLoaded)
 {
 	IMTBL_LOG("JSConnect::Init called, bPageloaded %d", bPageLoaded);
