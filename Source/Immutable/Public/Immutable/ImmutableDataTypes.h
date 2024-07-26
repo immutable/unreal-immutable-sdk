@@ -8,7 +8,7 @@
 
 // This is the version of the Unreal Immutable SDK that is being used. This is not the version of the engine.
 // This hardcoded value will be updated by a workflow during the release process.
-#define ENGINE_SDK_VERSION TEXT("1.2.4")
+#define ENGINE_SDK_VERSION TEXT("1.2.9-alpha1")
 
 USTRUCT()
 struct FImmutableEngineVersionData
