@@ -12,9 +12,10 @@ bool FImmutableUtilities::LoadGameBridge(FString& GameBridge)
 	IMTBL_LOG("Trying to locate game-bridge file")
 	if (FFileHelper::LoadFileToString(GameBridge, *JavaScriptFilePath, FFileHelper::EHashOptions::EnableVerify))
 	{
-		IMTBL_LOG("Game-bridge has been loaded")
+		IMTBL_LOG("Successfully loaded game-bridge file")
 		return true;
 	}
+	IMTBL_LOG("Failed to load game-bridge file")
 
 	return false;
 }
