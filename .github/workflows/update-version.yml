@@ -1,32 +1,47 @@
 ---
-  name: "Update engine SDK version in Immutable Data Types"
-  
-  on:
-    workflow_dispatch:
-      inputs:
-        version:
-          description: 'Version to update to (e.g. 1.20.0)'
-          required: true
-  
-  jobs:
-    update:
-      runs-on: ubuntu-latest
-      steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+name: "Update engine SDK version in ImmutableDataTypes.h"
 
-      # - name: Check team membership
-      #   id: check_team
-      #   run: |
-      #     IS_MEMBER=$(./.github/scripts/check_team_membership.sh "${{ github.actor }}" "${{ secrets.GITHUB_TOKEN }}")
-      #     if [[ "$IS_MEMBER" != "true" ]]; then
-      #       echo "Not a member of the SDK team, skipping update"
-      #       exit 1
-      #     fi
-  
-      - name: Replace engine sdk version string
-        id: replace_engine_sdk_version
-        run: |
-          FILE=./Source/Immutable/Public/Immutable/ImmutableDataTypes.h
-          VERSION=${{ github.event.inputs.version }}
-          sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+\"\)/#define ENGINE_SDK_VERSION TEXT(\"$VERSION\")/g" $FILE
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to update to (e.g. 1.20.0)'
+        required: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.UNREAL_IMMUTABLE_SDK_GITHUB_TOKEN }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Check team membership
+      id: check_team
+      run: |
+        ./.github/scripts/check_team_membership.sh "${{ github.actor }}" "${{ secrets.UNREAL_IMMUTABLE_SDK_GITHUB_TOKEN }}"
+        # shellcheck disable=SC1090
+        source "$GITHUB_ENV"
+        echo "${{ github.actor }} is a member of the SDK team: $IS_MEMBER"
+        if [[ "$IS_MEMBER" != "true" ]]; then
+          echo "Not a member of the SDK team, skipping update"
+          exit 1
+        fi
+
+    - name: Replace engine sdk version string
+      id: replace_engine_sdk_version
+      run: |
+        FILE=./Source/Immutable/Public/Immutable/ImmutableDataTypes.h
+        VERSION=${{ github.event.inputs.version }}
+        sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+\"\)/#define ENGINE_SDK_VERSION TEXT(\"$VERSION\")/g" $FILE
+
+    - uses: gr2m/create-or-update-pull-request-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        title: "release: update version"
+        body: "Update version in ImmutableDataTypes.h"
+        branch: "release/update-version"
+        commit-message: "release: update version"
+        labels: release
