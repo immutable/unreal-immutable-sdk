@@ -6,7 +6,7 @@ struct IMMUTABLE_API FImmutableUtilities
 {
 public:
 	/**
-	 * Loads game bridge which is javascript with Immutable functionality. The game bridge is located in the Web folder. 
+	 * Loads the JavaScript game bridge file from the Web folder and retrieves its content as a string. The JavaScript game bridge facilitates two-way communication between the Immutable Unreal SDK and the Immutable TypeScript SDK.
 	 * 
 	 * @param GameBridge	Output the game bridge javascript.
 	 * @return True if the game bridge was loaded and false otherwise.
