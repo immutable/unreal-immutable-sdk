@@ -15,7 +15,7 @@ bool FImmutableUtilities::LoadGameBridge(FString& GameBridge)
 		IMTBL_LOG("Successfully loaded game-bridge file")
 		return true;
 	}
-	IMTBL_LOG("Failed to load game-bridge file")
+	IMTBL_ERR("Failed to load game-bridge file")
 
 	return false;
 }
