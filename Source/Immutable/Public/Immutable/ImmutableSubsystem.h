@@ -19,8 +19,6 @@ class IMMUTABLE_API UImmutableSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	UImmutableSubsystem();
-
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
@@ -44,6 +42,13 @@ public:
 	}
 
 private:
+	void SetupGameBridge();
+	void OnBridgeReady();
+	void ManageBridgeDelegateQueue();
+	void OnViewportCreated();
+	void WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds);
+
+private:
 	UPROPERTY()
 	class UImtblBrowserUserWidget* BrowserWidget = nullptr;
 
@@ -60,12 +65,8 @@ private:
 	FDelegateHandle WorldTickHandle;
 	FDelegateHandle ViewportCreatedHandle;
 #if PLATFORM_ANDROID | PLATFORM_IOS
-  FDelegateHandle EngineInitCompleteHandle;
+	FDelegateHandle EngineInitCompleteHandle;
 #endif
 
-	void SetupGameBridge();
-	void OnBridgeReady();
-	void ManageBridgeDelegateQueue();
-	void OnViewportCreated();
-	void WorldTickStart(UWorld* World, ELevelTick TickType, float DeltaSeconds);
+
 };

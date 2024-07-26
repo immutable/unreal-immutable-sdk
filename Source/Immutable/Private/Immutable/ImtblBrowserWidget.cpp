@@ -4,12 +4,12 @@
 
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Immutable/ImtblJSConnector.h"
+#include "Immutable/ImmutableUtilities.h"
+#include "Misc/FileHelper.h"
 #if USING_BUNDLED_CEF
 #include "SWebBrowser.h"
 #endif
-#include "Immutable/Assets/ImtblSDKResource.h"
-#include "Immutable/ImmutableSubsystem.h"
-#include "Interfaces/IPluginManager.h"
+
 
 UImtblBrowserWidget::UImtblBrowserWidget()
 {
@@ -18,18 +18,6 @@ UImtblBrowserWidget::UImtblBrowserWidget()
 	JSConnector = NewObject<UImtblJSConnector>(this, "JSConnector");
 	JSConnector->ExecuteJs = UImtblJSConnector::FOnExecuteJsDelegate::CreateUObject(this, &UImtblBrowserWidget::ExecuteJS);
 
-	// WebBrowserWidget->LoadString("<html><head><title>Test</title></head><body><h1>Test</h1></body></html>",
-	// TEXT("http://www.google.com")); InitialURL = TEXT("http://www.google.com");
-	// InitialURL = TEXT("chrome://version");
-	// IPluginManager& PluginManager = IPluginManager::Get();
-	// if (const TSharedPtr<IPlugin> Plugin =
-	// PluginManager.FindPlugin("Immutable"))
-	// {
-	//     InitialURL = FString::Printf(TEXT("%s%s"), TEXT("file:///"),
-	//     *FPaths::ConvertRelativePathToFull(FPaths::Combine(Plugin->GetContentDir(),
-	//     TEXT("index.html")))); IMTBL_LOG("Loading initial url: %s",
-	//     *InitialURL)
-	// }
 	InitialURL = TEXT("about:blank");
 }
 
@@ -78,26 +66,19 @@ void UImtblBrowserWidget::ExecuteJS(const FString& ScriptText) const
 void UImtblBrowserWidget::SetBrowserContent()
 {
 #if USING_BUNDLED_CEF
-	FSoftObjectPath AssetRef(TEXT("/Script/Immutable.ImtblSDKResource'/Immutable/" "PackagedResources/index.index'"));
-	if (UObject* LoadedAsset = AssetRef.TryLoad())
+	if (!WebBrowserWidget.IsValid())
 	{
-		if (auto Resource = Cast<UImtblSDKResource>(LoadedAsset))
-		{
-			if (!WebBrowserWidget.IsValid())
-			{
-				IMTBL_ERR("no browser")
-				return;
-			}
-
-			const FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta " "charset='utf-8'><title>GameSDK Bridge</title><script>") + Resource->Js + FString("</script></head><body><h1>Bridge Running</h1></body></html>");
-
-			// IMTBL_LOG("Loaded resource: %s", *Resource->GetName())
-			WebBrowserWidget->LoadString(IndexHtml, TEXT("file:///immutable/index.html"));
-			// WebBrowserWidget->LoadURL(FString::Printf(TEXT("%s%s"),
-			// TEXT("file:///"),
-			// *FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(),
-			// TEXT("html"), TEXT("index.html")))));
-		}
+		IMTBL_ERR("Browser widget is not valid")
+		return;
+	}
+	
+	FString JavaScript;
+	
+	if (FImmutableUtilities::LoadGameBridge(JavaScript))
+	{
+		FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta " "charset='utf-8'><title>GameSDK Bridge</title><script>") + JavaScript + FString("</script></head><body><h1>Bridge Running</h1></body></html>");
+		
+		WebBrowserWidget->LoadString(IndexHtml, TEXT("file:///immutable/index.html"));	
 	}
 #endif
 }
