@@ -40,8 +40,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        title: "release: update version"
+        title: "chore: update version"
         body: "Update version in ImmutableDataTypes.h"
-        branch: "release/update-version"
-        commit-message: "release: update version"
+        branch: "chore/update-version"
+        commit-message: "chore: update version"
         labels: release
