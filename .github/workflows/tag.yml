@@ -28,6 +28,16 @@ jobs:
           
           echo "VERSION=${version}" >> "$GITHUB_ENV"
 
+      - name: Check TS SDK version exists in index.js
+        id: check_ts_sdk_version
+        run: |
+          version=$(grep -oP '"x-sdk-version":"ts-immutable-sdk-\K[0-9]+\.[0-9]+\.[0-9]+' ./Web/index.js | head -n 1)
+
+          if [[ -z "$version" ]]; then
+            echo "Error: TS SDK version not found in index.js" >&2
+            exit 1
+          fi
+
       - name: Create Tag
         uses: negz/create-tag@v1
         with:
