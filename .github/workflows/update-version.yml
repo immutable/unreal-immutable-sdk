@@ -42,6 +42,6 @@ jobs:
       with:
         title: "chore: update version"
         body: "Update version in ImmutableDataTypes.h"
-        branch: "chore/update-version"
+        branch: "chore/update-version-${{ github.event.inputs.version }}"
         commit-message: "chore: update version"
         labels: release
