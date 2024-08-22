@@ -11,7 +11,7 @@ void UImmutableAnalytics::Track(EEventName EventName)
 	
 	FString FullData;
 	
-	FJsonObjectConverter::UStructToJsonObjectString<FEventData>({ "unrealSdk", GetEventName(EventName), "" }, FullData);
+	FJsonObjectConverter::UStructToJsonObjectString<FEventData>({ "unrealSdk", GetEventName(EventName), "{}" }, FullData);
 
 	JSConnector->CallJS(ImmutablePassportAction::TRACK, FullData, FImtblJSResponseDelegate::CreateUObject(this, &UImmutableAnalytics::OnTrackResponse));
 }
