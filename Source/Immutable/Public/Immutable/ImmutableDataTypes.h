@@ -56,7 +56,7 @@ struct IMMUTABLE_API FImmutablePassportInitData
 	FString environment = ImmutablePassportAction::EnvSandbox;
 
 	UPROPERTY()
-	bool IsSilentLogout = false;
+	bool isSilentLogout = false;
 
 	UPROPERTY()
 	FImmutableEngineVersionData engineVersion;
