@@ -20,7 +20,7 @@ class IMMUTABLE_API UImtblPassportInitializationAsyncAction : public UImtblBluep
 
 public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblPassportInitializationAsyncAction* InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& LogoutUri, const FString& Environment);
+	static UImtblPassportInitializationAsyncAction* InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& LogoutUri, const FString& Environment, bool IsSilentLogout);
 
 	virtual void Activate() override;
 
@@ -29,6 +29,7 @@ private:
 	FString RedirectUri;
 	FString LogoutUri;
 	FString Environment;
+	bool IsSilentLogout;
 
 	UPROPERTY(BlueprintAssignable)
 	FPassportInitializationOutputPin Initialized;
