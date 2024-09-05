@@ -56,6 +56,9 @@ struct IMMUTABLE_API FImmutablePassportInitData
 	FString environment = ImmutablePassportAction::EnvSandbox;
 
 	UPROPERTY()
+	bool isSilentLogout = false;
+
+	UPROPERTY()
 	FImmutableEngineVersionData engineVersion;
 
 	FString ToJsonString() const;

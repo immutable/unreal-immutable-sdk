@@ -6,7 +6,7 @@
 #include "Immutable/ImmutableSubsystem.h"
 
 
-UImtblPassportInitializationAsyncAction* UImtblPassportInitializationAsyncAction::InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& LogoutUri, const FString& Environment)
+UImtblPassportInitializationAsyncAction* UImtblPassportInitializationAsyncAction::InitializePassport(UObject* WorldContextObject, const FString& ClientID, const FString& RedirectUri, const FString& LogoutUri, const FString& Environment, bool IsSilentLogout)
 {
 	UImtblPassportInitializationAsyncAction* PassportInitBlueprintNode = NewObject<UImtblPassportInitializationAsyncAction>();
 
@@ -15,6 +15,7 @@ UImtblPassportInitializationAsyncAction* UImtblPassportInitializationAsyncAction
 	PassportInitBlueprintNode->LogoutUri = LogoutUri;
 	PassportInitBlueprintNode->Environment = Environment;
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
+	PassportInitBlueprintNode->IsSilentLogout = IsSilentLogout;
 
 	return PassportInitBlueprintNode;
 }
@@ -35,7 +36,7 @@ void UImtblPassportInitializationAsyncAction::DoInit(TWeakObjectPtr<UImtblJSConn
 	// Get Passport
 	auto Passport = GetSubsystem()->GetPassport();
 	// Run Initialize
-	Passport->Initialize(FImmutablePassportInitData{ClientId, RedirectUri, LogoutUri, Environment}, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportInitializationAsyncAction::OnInitialized));
+	Passport->Initialize(FImmutablePassportInitData{ClientId, RedirectUri, LogoutUri, Environment, IsSilentLogout}, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportInitializationAsyncAction::OnInitialized));
 }
 
 void UImtblPassportInitializationAsyncAction::OnInitialized(FImmutablePassportResult Result)
