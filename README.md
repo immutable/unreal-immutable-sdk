@@ -80,7 +80,7 @@ To get help from other developers, discuss ideas, and stay up-to-date on what's 
 
 You can also join the conversation, connect with other projects, and ask questions in our Immutable X Discourse forum.
 
-[Visit the blog](https//immutable.com/blog)
+[Visit the blog](https://www.immutable.com/blog)
 
 #### Still need help?
 
