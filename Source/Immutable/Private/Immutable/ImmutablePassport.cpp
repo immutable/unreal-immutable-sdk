@@ -10,6 +10,7 @@
 #include "Immutable/ImmutableSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
+#include "Json.h"
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #include "GenericPlatform/GenericPlatformHttp.h"
@@ -26,6 +27,34 @@
 #endif
 
 #define PASSPORT_SAVE_GAME_SLOT_NAME TEXT("Immutable")
+
+TSharedPtr<FJsonObject> UStructToJsonObject(const UStruct* Struct, const void* StructData)
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+    
+	if (FJsonObjectConverter::UStructToJsonObject(Struct, StructData, JsonObject.ToSharedRef(), 0, 0))
+	{
+		return JsonObject;
+	}
+    
+	return nullptr; // Return nullptr if conversion fails
+}
+
+TArray<TSharedPtr<FJsonValue>> ConvertNameTypeToJsonArray(const TArray<FZkEvmSignTypedDataV4NameType>& NameTypes)
+{
+	TArray<TSharedPtr<FJsonValue>> NameTypeArray;
+
+	for (const FZkEvmSignTypedDataV4NameType& Item : NameTypes)
+	{
+		TSharedPtr<FJsonObject> NameTypeItemObject = MakeShareable(new FJsonObject());
+		NameTypeItemObject->SetStringField("name", Item.Name);
+		NameTypeItemObject->SetStringField("type", Item.Type);
+
+		NameTypeArray.Add(MakeShareable(new FJsonValueObject(NameTypeItemObject)));
+	}
+
+	return NameTypeArray;
+}
 
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
@@ -128,6 +157,37 @@ void UImmutablePassport::ZkEvmSendTransactionWithConfirmation(const FImtblTransa
 void UImmutablePassport::ZkEvmGetTransactionReceipt(const FZkEvmTransactionReceiptRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	CallJS(ImmutablePassportAction::ZkEvmGetTransactionReceipt, UStructToJsonString(Request), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
+}
+
+void UImmutablePassport::ZkEvmSignTypedDataV4(const FZkEvmSignTypedDataV4Request& Request, const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+	// this messy and manual JSON conversion is because the UR4 JSON util automatically downcases the first letter of
+	// property names. The SignTypedDataV4 method on the game bridge side requires the `Request.types` properties
+	// to be capitalised, otherwise the TS Passport module will throw a validation erro.
+	TSharedPtr<FJsonObject> DomainJsonObject = UStructToJsonObject(FZkEvmSignTypedDataV4Domain::StaticStruct(), &Request.domain);
+	TSharedPtr<FJsonObject> MessageJsonObject = UStructToJsonObject(FZkEvmSignTypedDataV4Message::StaticStruct(), &Request.message);
+	
+	TArray<TSharedPtr<FJsonValue>> OrderComponentsArray = ConvertNameTypeToJsonArray(Request.types.OrderComponents);
+	TArray<TSharedPtr<FJsonValue>> ConsiderationItemArray = ConvertNameTypeToJsonArray(Request.types.ConsiderationItem);
+	TArray<TSharedPtr<FJsonValue>> OfferItemArray = ConvertNameTypeToJsonArray(Request.types.OfferItem);
+	TArray<TSharedPtr<FJsonValue>> EIP712DomainArray = ConvertNameTypeToJsonArray(Request.types.EIP712Domain);
+	TSharedPtr<FJsonObject> TypesJsonObject = MakeShareable(new FJsonObject());
+	TypesJsonObject->SetArrayField("OrderComponents", OrderComponentsArray);
+	TypesJsonObject->SetArrayField("ConsiderationItem", ConsiderationItemArray);
+	TypesJsonObject->SetArrayField("OfferItem", OfferItemArray);
+	TypesJsonObject->SetArrayField("EIP712Domain", EIP712DomainArray);
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+	JsonObject->SetObjectField("domain", DomainJsonObject);
+	JsonObject->SetObjectField("types", TypesJsonObject);
+	JsonObject->SetObjectField("message", MessageJsonObject);
+	JsonObject->SetStringField("primaryType", Request.primaryType);
+
+	FString JsonString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+	
+	CallJS(ImmutablePassportAction::ZkEvmSignTypedDataV4, JsonString, ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate)
