@@ -164,6 +164,13 @@ public:
 	 * FImtblPassportResponseDelegate to call on response from JS.
 	 */
 	void ZkEvmGetTransactionReceipt(const FZkEvmTransactionReceiptRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
+
+	/**
+	 * Generate a signature for a typed data V4 object
+	 * @param Request Type data to sign
+	 * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+	 */
+	void ZkEvmSignTypedDataV4(const FZkEvmSignTypedDataV4Request& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
 	
 	/**
 	 * Gets the currently saved ID token without verifying its validity. 
