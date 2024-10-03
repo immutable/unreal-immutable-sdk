@@ -300,3 +300,12 @@ struct IMMUTABLE_API FZkEvmTransactionReceipt
 	UPROPERTY()
 	FString type;
 };
+
+USTRUCT(BlueprintType)
+struct FZkEvmSignTypedDataV4Response
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString signature;
+};
