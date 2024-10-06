@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "ImmutablePassport.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 // clang-format off
 #include "ImmutableSubsystem.generated.h"
@@ -22,7 +22,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	TWeakObjectPtr<class UImmutablePassport> GetPassport() const
+	TWeakObjectPtr<UImmutablePassport> GetPassport() const
 	{
 		return MakeWeakObjectPtr(Passport);
 	}
@@ -56,7 +56,7 @@ private:
 	class UImtblBlui* ImtblBlui = nullptr;
 
 	UPROPERTY()
-	class UImmutablePassport* Passport = nullptr;
+	UImmutablePassport* Passport = nullptr;
 
 	bool bHasSetupGameBridge = false;
 	bool bIsReady = false;
