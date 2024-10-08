@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Immutable/ImmutableSubsystem.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 
 #include "ImtblBlueprintAsyncAction.generated.h"
@@ -20,5 +20,5 @@ protected:
 	UObject* WorldContextObject;
 
 	// Get subsystem
-	class UImmutableSubsystem* GetSubsystem() const;
+	UImmutableSubsystem* GetSubsystem() const;
 };

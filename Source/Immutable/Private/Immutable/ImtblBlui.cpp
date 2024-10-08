@@ -93,7 +93,11 @@ void UImtblBlui::Init()
 	BluEye->bEnabled = true;
 	IMTBL_LOG("Events subscribed")
 
-	BluEye->Init();
+	if (!BluEye->Init())
+	{
+		IMTBL_ERR("BluEye is not initialised")
+		return;
+	}
 	IMTBL_LOG("BluEye Initialised")
 
 	// We're attempting to replicate the process that Unreal's WebBrowser

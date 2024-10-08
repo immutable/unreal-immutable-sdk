@@ -100,7 +100,7 @@ struct FImtblUserProfile
 };
 
 USTRUCT()
-struct FImmutablePassportZkEvmRequestAccountsData
+struct IMMUTABLE_API FImmutablePassportZkEvmRequestAccountsData
 {
 	GENERATED_BODY()
 
