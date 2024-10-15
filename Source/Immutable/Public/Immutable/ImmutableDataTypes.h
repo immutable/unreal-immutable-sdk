@@ -38,29 +38,47 @@ struct FImmutableEngineVersionData
 	FString deviceModel = FGenericPlatformMisc::GetDeviceMakeAndModel();
 };
 
+/**
+ * Structure to hold initialisation data for the Immutable Passport.
+ */
 USTRUCT()
 struct IMMUTABLE_API FImmutablePassportInitData
 {
 	GENERATED_BODY()
 
+	/** The Client Id. */
 	UPROPERTY()
 	FString clientId;
 
+	/**
+	 * (Android, iOS, and macOS only)
+	 * The URL where the browser will redirect after successful authentication.
+	 */
 	UPROPERTY()
 	FString redirectUri;
 
+	/** The URL where the browser will redirect after logout is complete. */
 	UPROPERTY()
 	FString logoutRedirectUri;
 
+	/** The environment to connect to. */
 	UPROPERTY()
 	FString environment = ImmutablePassportAction::EnvSandbox;
 
+	/** Whether silent logout is enabled. */
 	UPROPERTY()
 	bool isSilentLogout = false;
 
+	/** Information about engine version */
 	UPROPERTY()
 	FImmutableEngineVersionData engineVersion;
 
+	/**
+	 * Converts the FImmutablePassportInitData structure to a JSON string representation. 
+	 *
+	 * @return 	A JSON string representation of the FImmutablePassportInitData structure.
+	 * 			Returns an empty string if the conversion fails.
+	 */
 	FString ToJsonString() const;
 };
 
@@ -158,12 +176,15 @@ struct IMMUTABLE_API FImmutablePassportResult
 {
 	GENERATED_BODY()
 
+	/** Whether the response was successful. */
 	UPROPERTY()
 	bool Success = false;
-	
+
+	/** Error string for the response. */
 	UPROPERTY()
 	FString Error;
 
+	/** Response payload. */
 	FImtblJSResponse Response;
 };
 
