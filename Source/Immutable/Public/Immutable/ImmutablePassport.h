@@ -13,7 +13,13 @@
 
 #include "ImmutablePassport.generated.h"
 
-
+/**
+ * Converts a UStruct instance to a JSON string representation.
+ *
+ * @param InStruct 	The UStruct instance to convert.
+ *
+ * @return 			A JSON string representation of the input struct.
+ */
 template <typename UStructType>
 FString UStructToJsonString(const UStructType& InStruct)
 {
@@ -22,6 +28,13 @@ FString UStructToJsonString(const UStructType& InStruct)
 	return OutString;
 }
 
+/**
+ * Converts a JSON object to a UStruct instance.
+ *
+ * @param JsonObject 	The JSON object to convert into a UStruct.
+ *
+ * @return 				An optional UStruct instance, or an empty optional if conversion fails.
+ */
 template <typename UStructType>
 TOptional<UStructType> JsonObjectToUStruct(const TSharedPtr<FJsonObject>& JsonObject)
 {
@@ -50,6 +63,9 @@ class IMMUTABLE_API UImmutablePassport : public UObject
 	friend class UImmutableSubsystem;
 
 public:
+	/**
+	 * Delegate used for when passport is ready.
+	 */
 	DECLARE_MULTICAST_DELEGATE(FOnPassportReadyDelegate);
 
 	/**
@@ -244,23 +260,45 @@ public:
 	 * @return 			An array of FString extracted from the "result" field if Response.JsonObject is valid, otherwise, an empty array.
 	 */
 	static TArray<FString> GetResponseResultAsStringArray(const FImtblJSResponse& Response);
-	
+
 #if PLATFORM_ANDROID
+	/**
+	 * Handle deep linking. This is called from Android JNI.
+	 *
+	 * @param DeepLink The deep link URL, passed from the Android JNI. This string contains the deep link data to be processed.
+	 */
 	void HandleDeepLink(FString DeepLink) const;
+
+	/*
+	 * Handles the dismissal of custom tabs.
+	 *
+	 * @param Url The URL associated with the custom tab that was dismissed. 
+	 */
 	void HandleCustomTabsDismissed(FString Url);
 #elif PLATFORM_IOS | PLATFORM_MAC
+	/**
+	 * Handle deep linking. This is called from Objective-C.
+	 *
+	 * @param DeepLink	The deep link URL, passed from the iOS/Mac. This string contains the deep link data to be processed.
+	 */
 	void HandleDeepLink(NSString* sDeepLink) const;
 #endif
 	
 protected:
 #if PLATFORM_ANDROID
+	/*
+	 * Delegate used for handling the dismissal of the PKCE flow on Android.
+	 */
 	DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
 #endif
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+	/*
+	 * Delegate used for handling deep links.
+	 */
 	DECLARE_DELEGATE_OneParam(FImtblPassportHandleDeepLinkDelegate, FString);
 #endif
-	
+
 	/**
 	 * Calls JavaScript function to the connected browser with specified parameters.
 	 *
@@ -351,38 +389,75 @@ protected:
 
 	// mobile platform callbacks
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+	/**
+	 * Callback from Get PKCE Auth URL.
+	 *
+	 * @param Response The JavaScript response object containing the result of the callback.
+	 */
 	void OnGetPKCEAuthUrlResponse(FImtblJSResponse Response);
+
+	/*
+	 * Callback from Connect PKCE.
+	 *
+	 * @param Response The JavaScript response object containing the result of the callback.
+	 */
 	void OnConnectPKCEResponse(FImtblJSResponse Response);
+
+	/*
+	 * Callback when deep link is activated.
+	 *
+	 * @param DeepLink The deep link URL that was activated. 
+	 */
 	void OnDeepLinkActivated(FString DeepLink);
-    void CompleteLoginPKCEFlow(FString Url);
+
+	/*
+	 * Completes the PKCE login flow using the provided URL.
+	 * 
+	 * @param Url The URL containing the authorisation code and state.
+	 */
+	void CompleteLoginPKCEFlow(FString Url);
 #endif
 
 #if PLATFORM_ANDROID
+	/**
+	 * Callback when Login PKCE is dismissed.
+	 */
 	void HandleOnLoginPKCEDismissed();
+
+	/**
+	 * Calls a static void method in Java using JNI.
+	 *
+	 * @param Env		The JNI (Java Native Interface) environment.
+	 * @param Class		The Java class containing the method.
+	 * @param Method	The method ID of the method to call.
+	 * @param ...		Additional parameters to forward to the method to call.
+	 */
 	void CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class, jmethodID Method, ...);
+
+	/**
+	 * Launches a URL on Android using JNI.
+	 *
+	 * @param Url The URL to launch.
+	 */
 	void LaunchAndroidUrl(FString Url);
 #endif
 
 	/**
 	 * Sets the specified state flags by applying a bitwise OR operation.
-	 *
 	 * @param StateIn The state flags to be set.
 	 */
 	void SetStateFlags(uint8 StateIn);
 
 	/**
 	 * Resets the specified state flags by applying a bitwise AND operation with the negated flags.
-	 *
 	 * @param StateIn The state flags to be reset.
 	 */
 	void ResetStateFlags(uint8 StateIn);
 
 	/**
 	 * Checks if the specified state flags are set. 
-	 *
-	 * @param StateIn 	The state flags to check.
-	 *
-	 * @return 			True if all StateIn flags are set, otherwise, false.
+	 * @param StateIn The state flags to check.
+	 * @return True if all StateIn flags are set, otherwise, false.
 	 */
 	bool IsStateFlagsSet(uint8 StateIn) const;
 
@@ -396,14 +471,17 @@ protected:
 	TMap<FString, FImtblPassportResponseDelegate> ResponseDelegates;
 
 #if PLATFORM_ANDROID
+	/** Delegate called when the PKCE flow is dismissed. */
 	FImtblPassportOnPKCEDismissedDelegate OnPKCEDismissed;
 #endif
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+	/** Delegate for handling deep link activation. */
 	FImtblPassportHandleDeepLinkDelegate OnHandleDeepLink;
 	// Since the second part of PKCE is triggered by deep links, saving the
 	// response delegate here so it's easier to get
 	FImtblPassportResponseDelegate PKCEResponseDelegate;
+	/** Delegate for handling PCKE logout. */
 	FImtblPassportResponseDelegate PKCELogoutResponseDelegate;
 	// bool IsPKCEConnected = false;
 #endif
@@ -421,6 +499,9 @@ private:
 	void LoadPassportSettings();
 
 private:
+	/**
+	 * State flgas for Immutable Passport.
+	 */
 	enum EImmutablePassportStateFlags : uint8
 	{
 		IPS_NONE = 0,
@@ -433,8 +514,10 @@ private:
 		IPS_HARDLOGOUT = 1 << 6
 	};
 
+	/** Passport state flags. */
 	uint8 StateFlags = IPS_NONE;
 
+	/** Pointer to the analytics manager instance for tracking events and metrics. */
 	UPROPERTY()
 	class UImmutableAnalytics* Analytics = nullptr;
 
