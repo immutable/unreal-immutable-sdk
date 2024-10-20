@@ -87,11 +87,18 @@ public:
 	 * This will open the user's default browser and take them through Passport login. 
 	 * @param IsConnectImx 		If true, the "re-connect" method is used to authenticate into Passport with Immutable X.
 	 * 							Else, "re-login" is used for authentication. To access a wallet with Immutable X or zkEVM later, you must call "Connect" again with this value set to true, or use "ConnectEvm."
-	 * @param TryToRelogin 		If true, the game bridge will use a cached session to re-connect or re-login the user, avoiding the need for a web browser. If this attempt fails, it will fall back to device code authentication.
+	 * @param TryToRelogin 		If true, the game bridge will use a cached session to re-connect or re-login the user, avoiding the need to open a web browser. If this attempt fails, it will fall back to device code authentication.
 	 * @param ResponseDelegate 	Callback delegate.
 	 */
 	void Connect(bool IsConnectImx, bool TryToRelogin, const FImtblPassportResponseDelegate& ResponseDelegate);
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
+	/**
+	 * (Android, iOS and macOS only) Logs into Passport using Authorisation Code Flow with Proof Key for Code Exchange (PKCE)
+	 *
+	 * @param IsConnectImx 		If true, player will go through the device code auth login flow and connect to Immutable X.
+	 * 							Else, initiate only the device auth login flow.
+	 * @param ResponseDelegate 	Callback delegate.
+	 */
 	void ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
 #endif
 
@@ -277,7 +284,7 @@ public:
 	void HandleCustomTabsDismissed(FString Url);
 #elif PLATFORM_IOS | PLATFORM_MAC
 	/**
-	 * Handle deep linking. This is called from Objective-C.
+	 * Handle deep linking. This is called from iOS/Mac native code.
 	 *
 	 * @param DeepLink	The deep link URL, passed from the iOS/Mac. This string contains the deep link data to be processed.
 	 */
@@ -325,12 +332,12 @@ protected:
 	void ReinstateConnection(FImtblJSResponse Response);
 
 	/**
-	 * Checks if the passport has been initialised before allowing an action to proceed.
+	 * Checks if Passport has been initialised before allowing an action to proceed.
 	 *
 	 * @param Action 			The name of the JavaScript action to be called. Used for logging purposes.
 	 * @param ResponseDelegate 	Delegate to handle the response if the passport is not initialised.
 	 *
-	 * @return 					True if the passport is initialised, otherwise, false.
+	 * @return 					True if Passport is initialised, otherwise, false.
 	 */
 	bool CheckIsInitialized(const FString& Action, const FImtblPassportResponseDelegate& ResponseDelegate) const;
 
@@ -435,7 +442,8 @@ protected:
 	void CallJniStaticVoidMethod(JNIEnv* Env, const jclass Class, jmethodID Method, ...);
 
 	/**
-	 * Launches a URL on Android using JNI.
+	 * Opens a specified URL on Android using Chrome Custom Tabs via JNI if Chrome is installed.
+	 * Else, it launches the URL in any available browser.
 	 *
 	 * @param Url The URL to launch.
 	 */
@@ -489,7 +497,7 @@ protected:
 
 private:
 	/**
-	 * Saves the current passport settings to save game object.
+	 * Saves the current Passport settings to save game object.
 	 */
 	void SavePassportSettings();
 

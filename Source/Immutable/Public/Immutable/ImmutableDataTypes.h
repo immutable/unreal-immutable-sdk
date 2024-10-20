@@ -46,7 +46,7 @@ struct IMMUTABLE_API FImmutablePassportInitData
 {
 	GENERATED_BODY()
 
-	/** The Client Id. */
+	/** The Client ID. */
 	UPROPERTY()
 	FString clientId;
 
@@ -65,7 +65,10 @@ struct IMMUTABLE_API FImmutablePassportInitData
 	UPROPERTY()
 	FString environment = ImmutablePassportAction::EnvSandbox;
 
-	/** Whether silent logout is enabled. */
+	/** 
+	 * Whether silent logout is enabled.
+	 * If true, logout silently (without popping up a new browser tab)
+	 */
 	UPROPERTY()
 	bool isSilentLogout = false;
 
