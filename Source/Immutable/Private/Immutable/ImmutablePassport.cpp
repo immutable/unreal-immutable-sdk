@@ -164,6 +164,11 @@ void UImmutablePassport::ZkEvmSignTypedDataV4(const FString& JsonString, const F
 	CallJS(ImmutablePassportAction::ZkEvmSignTypedDataV4, JsonString, ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
+void UImmutablePassport::ZkEvmSignTypedDataV4(const FString& JsonString, const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+	CallJS(ImmutablePassportAction::ZkEvmSignTypedDataV4, JsonString, ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
+}
+
 void UImmutablePassport::ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	FImmutablePassportCodeConfirmRequestData Data{DeviceCode, Interval};
