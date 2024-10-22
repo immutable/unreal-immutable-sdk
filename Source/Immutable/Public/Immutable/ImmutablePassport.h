@@ -169,7 +169,6 @@ public:
 	 * @param Request Type data to sign
 	 * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
 	 */
-	void ZkEvmSignTypedDataV4(const FZkEvmSignTypedDataV4Request& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
 	void ZkEvmSignTypedDataV4(const FString& JsonString, const FImtblPassportResponseDelegate& ResponseDelegate);
 	
 	/**
