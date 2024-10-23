@@ -40,22 +40,6 @@ TSharedPtr<FJsonObject> UStructToJsonObject(const UStruct* Struct, const void* S
 	return nullptr; // Return nullptr if conversion fails
 }
 
-TArray<TSharedPtr<FJsonValue>> ConvertNameTypeToJsonArray(const TArray<FZkEvmSignTypedDataV4NameType>& NameTypes)
-{
-	TArray<TSharedPtr<FJsonValue>> NameTypeArray;
-
-	for (const FZkEvmSignTypedDataV4NameType& Item : NameTypes)
-	{
-		TSharedPtr<FJsonObject> NameTypeItemObject = MakeShareable(new FJsonObject());
-		NameTypeItemObject->SetStringField("name", Item.Name);
-		NameTypeItemObject->SetStringField("type", Item.Type);
-
-		NameTypeArray.Add(MakeShareable(new FJsonValueObject(NameTypeItemObject)));
-	}
-
-	return NameTypeArray;
-}
-
 void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	check(JSConnector.IsValid());
