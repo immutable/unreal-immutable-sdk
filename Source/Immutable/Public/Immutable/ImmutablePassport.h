@@ -172,7 +172,7 @@ public:
 	 * @param ResponseDelegate The response delegate of type
 	 * FImtblPassportResponseDelegate to call on response from JS.
 	 */
-	void ZkEvmSignTypedDataV4(const FString& JsonString, const FImtblPassportResponseDelegate& ResponseDelegate);
+	void ZkEvmSignTypedDataV4(const FString& RequestJsonString, const FImtblPassportResponseDelegate& ResponseDelegate);
 	
 	/**
 	 * Gets the currently saved ID token without verifying its validity. 

@@ -1,14 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
-#include "CoreMinimal.h"
+
 #include "Immutable/ImmutablePassport.h"
 #include "ImtblBlueprintAsyncAction.h"
+
 #include "ImtblPassportZkEvmSignTypedDataV4AsyncAction.generated.h"
 
 /**
- * Async action blueprint node for zkEVM Send Transaction
+ * Async action blueprint node for zkEVM SignTypedDataV4
  */
 UCLASS()
 class IMMUTABLE_API UImtblPassportZkEvmSignTypedDataV4AsyncAction : public UImtblBlueprintAsyncAction
@@ -19,12 +18,12 @@ class IMMUTABLE_API UImtblPassportZkEvmSignTypedDataV4AsyncAction : public UImtb
 
 public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblPassportZkEvmSignTypedDataV4AsyncAction* ZkEvmSignTypedDataV4(UObject* WorldContextObject, const FZkEvmSignTypedDataV4Request& Request);
+	static UImtblPassportZkEvmSignTypedDataV4AsyncAction* ZkEvmSignTypedDataV4(UObject* WorldContextObject, const FString& JsonStringRequest);
 
 	virtual void Activate() override;
 
 private:
-	FZkEvmSignTypedDataV4Request SignRequest;
+	FString JsonStringSignRequest;
 
 	UPROPERTY(BlueprintAssignable)
 	FPassportZkEvmSignTypedDataV4OutputPin MessageSigned;

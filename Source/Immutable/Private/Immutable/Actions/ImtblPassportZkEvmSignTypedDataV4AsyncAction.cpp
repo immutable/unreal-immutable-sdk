@@ -1,16 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Immutable/Actions/ImtblPassportZkEvmSignTypedDataV4AsyncAction.h"
 
 #include "Immutable/ImmutablePassport.h"
 #include "Immutable/ImmutableSubsystem.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
-UImtblPassportZkEvmSignTypedDataV4AsyncAction* UImtblPassportZkEvmSignTypedDataV4AsyncAction::ZkEvmSignTypedDataV4(UObject* WorldContextObject, const FZkEvmSignTypedDataV4Request& Request)
+
+UImtblPassportZkEvmSignTypedDataV4AsyncAction* UImtblPassportZkEvmSignTypedDataV4AsyncAction::ZkEvmSignTypedDataV4(UObject* WorldContextObject, const FString& JsonStringRequest)
 {
 	UImtblPassportZkEvmSignTypedDataV4AsyncAction* PassportZkEvmSignTypedDataV4BlueprintNode = NewObject<UImtblPassportZkEvmSignTypedDataV4AsyncAction>();
+	
 	PassportZkEvmSignTypedDataV4BlueprintNode->WorldContextObject = WorldContextObject;
-	PassportZkEvmSignTypedDataV4BlueprintNode->SignRequest = Request;
+	PassportZkEvmSignTypedDataV4BlueprintNode->JsonStringSignRequest = JsonStringRequest;
+
 	return PassportZkEvmSignTypedDataV4BlueprintNode;
 }
 
@@ -33,7 +34,7 @@ void UImtblPassportZkEvmSignTypedDataV4AsyncAction::DoZkEvmSignTypedDataV4(TWeak
 
 	if (Passport.IsValid())
 	{
-		Passport->ZkEvmSignTypedDataV4(SignRequest, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmSignTypedDataV4AsyncAction::OnZkEvmSignTypedDataV4Response));
+		Passport->ZkEvmSignTypedDataV4(JsonStringSignRequest, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblPassportZkEvmSignTypedDataV4AsyncAction::OnZkEvmSignTypedDataV4Response));
 	}
 }
 
