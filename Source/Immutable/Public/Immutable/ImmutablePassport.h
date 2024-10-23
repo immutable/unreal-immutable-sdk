@@ -166,8 +166,11 @@ public:
 
 	/**
 	 * Generate a signature for a typed data V4 object
-	 * @param Request Type data to sign
-	 * @param ResponseDelegate The response delegate of type FImtblPassportResponseDelegate to call on response from JS.
+	 * Signs the EIP-712 structured message in JSON string format using the logged-in Passport account.
+	 * @see https://eips.ethereum.org/EIPS/eip-712
+	 * @param RequestJsonString The EIP-712 structured data in JSON string format
+	 * @param ResponseDelegate The response delegate of type
+	 * FImtblPassportResponseDelegate to call on response from JS.
 	 */
 	void ZkEvmSignTypedDataV4(const FString& JsonString, const FImtblPassportResponseDelegate& ResponseDelegate);
 	
