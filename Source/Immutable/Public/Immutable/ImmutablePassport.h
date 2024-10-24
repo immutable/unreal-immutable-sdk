@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "JsonObjectConverter.h"
-#include "Misc/EngineVersion.h"
 #include "Runtime/Core/Public/HAL/Platform.h"
 #include "UObject/Object.h"
 #include "Immutable/ImtblJSConnector.h"
@@ -164,6 +163,16 @@ public:
 	 * FImtblPassportResponseDelegate to call on response from JS.
 	 */
 	void ZkEvmGetTransactionReceipt(const FZkEvmTransactionReceiptRequest& Request, const FImtblPassportResponseDelegate& ResponseDelegate);
+
+	/**
+	 * Generate a signature for a typed data V4 object
+	 * Signs the EIP-712 structured message in JSON string format using the logged-in Passport account.
+	 * @see https://eips.ethereum.org/EIPS/eip-712
+	 * @param RequestJsonString The EIP-712 structured data in JSON string format
+	 * @param ResponseDelegate The response delegate of type
+	 * FImtblPassportResponseDelegate to call on response from JS.
+	 */
+	void ZkEvmSignTypedDataV4(const FString& RequestJsonString, const FImtblPassportResponseDelegate& ResponseDelegate);
 	
 	/**
 	 * Gets the currently saved ID token without verifying its validity. 
