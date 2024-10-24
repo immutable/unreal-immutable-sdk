@@ -13,8 +13,12 @@
       push:
         branches-ignore: [main]
         # Remove the line above to run when pushing to master
+        paths-ignore:
+          - 'openapi.json'
       pull_request:
         branches: [main]
+        paths-ignore:
+          - 'openapi.json'
     
     ###############
     # Set the Job #
