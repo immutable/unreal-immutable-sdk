@@ -76,7 +76,12 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIPrepareL
 void APIPrepareListingRequestSell::WriteJson(JsonWriter& Writer) const
 {
 	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("amount")); WriteJsonValue(Writer, Amount);
+	// -- DIVERGE
+	if (Amount.IsSet())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("amount")); WriteJsonValue(Writer, Amount.GetValue());
+	}
+	// -- DIVERGE
 	Writer->WriteIdentifierPrefix(TEXT("contractAddress")); WriteJsonValue(Writer, ContractAddress);
 	Writer->WriteIdentifierPrefix(TEXT("tokenId")); WriteJsonValue(Writer, TokenId);
 	Writer->WriteIdentifierPrefix(TEXT("type")); WriteJsonValue(Writer, Type);

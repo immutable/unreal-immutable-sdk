@@ -29,8 +29,9 @@ public:
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
+	// -- DIVERGE
 	uint8 Value;
-
+	// -- DIVERGE
 };
 
 }

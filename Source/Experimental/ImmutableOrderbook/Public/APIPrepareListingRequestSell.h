@@ -31,7 +31,9 @@ public:
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
-	FString Amount;
+	// -- DIVERGE
+	TOptional<FString> Amount;
+	// -- DIVERGE
 	FString ContractAddress;
 	FString TokenId;
 	enum class TypeEnum
