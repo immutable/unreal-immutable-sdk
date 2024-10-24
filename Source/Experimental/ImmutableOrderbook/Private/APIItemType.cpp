@@ -19,7 +19,7 @@
 
 namespace ImmutableOrderbook
 {
-
+// -- DIVERGE
 void APIItemType::WriteJson(JsonWriter& Writer) const
 {
 	Writer->WriteValue(Value);
@@ -29,5 +29,5 @@ bool APIItemType::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
 	return JsonValue->TryGetNumber(Value);
 }
-
+// -- DIVERGE
 }
