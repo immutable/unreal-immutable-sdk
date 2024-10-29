@@ -1,0 +1,999 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "TS SDK API",
+        "description": "running ts sdk as an api",
+        "contact": {
+            "name": "Support",
+            "url": "https://immutable.com",
+            "email": "contact@immutable.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [{
+        "url": "https://api.immutable.com",
+        "description": "Production Server"
+    }, {
+        "url": "https://api.sandbox.immutable.com",
+        "description": "Sandbox Server"
+    }],
+    "tags": [{
+        "name": "ts sdk api"
+    }],
+    "components": {
+        "schemas": {
+            "ERC1155Item": {
+                "properties": {
+                    "amount": {
+                        "type": "string"
+                    },
+                    "contractAddress": {
+                        "type": "string"
+                    },
+                    "tokenId": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "enum": ["ERC1155"],
+                        "type": "string"
+                    }
+                },
+                "required": ["amount", "contractAddress", "tokenId", "type"],
+                "type": "object"
+            },
+            "ERC20Item": {
+                "properties": {
+                    "amount": {
+                        "type": "string"
+                    },
+                    "contractAddress": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "enum": ["ERC20"],
+                        "type": "string"
+                    }
+                },
+                "required": ["amount", "contractAddress", "type"],
+                "type": "object"
+            },
+            "ERC721Item": {
+                "properties": {
+                    "contractAddress": {
+                        "type": "string"
+                    },
+                    "tokenId": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "enum": ["ERC721"],
+                        "type": "string"
+                    }
+                },
+                "required": ["contractAddress", "tokenId", "type"],
+                "type": "object"
+            },
+            "NativeItem": {
+                "properties": {
+                    "amount": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "enum": ["NATIVE"],
+                        "type": "string"
+                    }
+                },
+                "required": ["amount", "type"],
+                "type": "object"
+            },
+            "Action": {
+                "oneOf": [{
+                    "$ref": "#/components/schemas/TransactionAction"
+                }, {
+                    "$ref": "#/components/schemas/SignableAction"
+                }]
+            },
+            "BigNumber": {
+                "type": "string"
+            },
+            "BytesLike": {
+                "type": "string"
+            },
+            "ItemType": {
+                "enum": [0, 1, 2, 3, 4, 5],
+                "type": "number"
+            },
+            "OrderComponents": {
+                "properties": {
+                    "conduitKey": {
+                        "type": "string"
+                    },
+                    "consideration": {
+                        "items": {
+                            "properties": {
+                                "endAmount": {
+                                    "type": "string"
+                                },
+                                "identifierOrCriteria": {
+                                    "type": "string"
+                                },
+                                "itemType": {
+                                    "$ref": "#/components/schemas/ItemType"
+                                },
+                                "recipient": {
+                                    "type": "string"
+                                },
+                                "startAmount": {
+                                    "type": "string"
+                                },
+                                "token": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["identifierOrCriteria", "itemType", "token", "startAmount", "endAmount", "recipient"],
+                            "type": "object"
+                        },
+                        "type": "array"
+                    },
+                    "endTime": {
+                        "type": "string"
+                    },
+                    "offer": {
+                        "items": {
+                            "properties": {
+                                "endAmount": {
+                                    "type": "string"
+                                },
+                                "identifierOrCriteria": {
+                                    "type": "string"
+                                },
+                                "itemType": {
+                                    "$ref": "#/components/schemas/ItemType"
+                                },
+                                "startAmount": {
+                                    "type": "string"
+                                },
+                                "token": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["identifierOrCriteria", "itemType", "token", "startAmount", "endAmount"],
+                            "type": "object"
+                        },
+                        "type": "array"
+                    },
+                    "offerer": {
+                        "type": "string"
+                    },
+                    "orderType": {
+                        "$ref": "#/components/schemas/OrderType"
+                    },
+                    "salt": {
+                        "type": "string"
+                    },
+                    "startTime": {
+                        "type": "string"
+                    },
+                    "totalOriginalConsiderationItems": {
+                        "type": "string"
+                    },
+                    "zone": {
+                        "type": "string"
+                    },
+                    "zoneHash": {
+                        "type": "string"
+                    },
+                    "counter": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": ["conduitKey", "consideration", "endTime", "offer", "offerer", "orderType", "salt", "startTime", "zone", "zoneHash", "counter", "totalOriginalConsiderationItems"]
+            },
+            "OrderType": {
+                "enum": [0, 1, 2, 3],
+                "type": "number"
+            },
+            "RecordStringTypedDataField": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": ["type", "name"]
+                    }
+                }
+            },
+            "RecordStringAny": {
+                "type": "object",
+                "additionalProperties": true
+            },
+            "SignableAction": {
+                "properties": {
+                    "message": {
+                        "properties": {
+                            "domain": {
+                                "$ref": "#/components/schemas/TypedDataDomain"
+                            },
+                            "types": {
+                                "$ref": "#/components/schemas/RecordStringTypedDataField"
+                            },
+                            "message": {
+                                "$ref": "#/components/schemas/RecordStringAny"
+                            },
+                            "primaryType": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "purpose": {
+                        "$ref": "#/components/schemas/SignablePurpose"
+                    },
+                    "type": {
+                        "enum": ["SIGNABLE"],
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": ["type"]
+            },
+            "SignablePurpose": {
+                "enum": ["CREATE_LISTING", "OFF_CHAIN_CANCELLATION"],
+                "type": "string"
+            },
+            "TransactionAction": {
+                "properties": {
+                    "populatedTransactions": {
+                        "type": "object",
+                        "properties": {
+                            "to": {
+                                "type": "string"
+                            },
+                            "from": {
+                                "type": "string"
+                            },
+                            "nonce": {
+                                "type": "number"
+                            },
+                            "gasLimit": {
+                                "$ref": "#/components/schemas/BigNumber"
+                            },
+                            "gasPrice": {
+                                "$ref": "#/components/schemas/BigNumber"
+                            },
+                            "data": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "$ref": "#/components/schemas/BigNumber"
+                            },
+                            "chainId": {
+                                "type": "number"
+                            },
+                            "type": {
+                                "type": "number"
+                            },
+                            "accessList": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "address": {
+                                            "type": "string"
+                                        },
+                                        "storageKeys": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "maxFeePerGas": {
+                                "$ref": "#/components/schemas/BigNumber"
+                            },
+                            "maxPriorityFeePerGas": {
+                                "$ref": "#/components/schemas/BigNumber"
+                            },
+                            "customData": {
+                                "type": "object",
+                                "additionalProperties": true
+                            },
+                            "ccipReadEnabled": {
+                                "type": "boolean"
+                            }
+                        }
+                    },
+                    "purpose": {
+                        "$ref": "#/components/schemas/TransactionPurpose"
+                    },
+                    "type": {
+                        "enum": ["TRANSACTION"],
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": ["type"]
+            },
+            "TransactionPurpose": {
+                "enum": ["APPROVAL", "FULFILL_ORDER", "CANCEL"],
+                "type": "string"
+            },
+            "TypedDataDomain": {
+                "properties": {
+                    "chainId": {
+                        "$ref": "#/components/schemas/BigNumber"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "salt": {
+                        "type": "string"
+                    },
+                    "verifyingContract": {
+                        "type": "string"
+                    },
+                    "version": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "BigNumberish": {
+                "oneOf": [{
+                    "type": "string"
+                }, {
+                    "type": "number"
+                }],
+                "description": "Any type that can be used where a big number is needed."
+            },
+            "FeeValue": {
+                "properties": {
+                    "amount": {
+                        "type": "string"
+                    },
+                    "recipientAddress": {
+                        "type": "string"
+                    }
+                },
+                "required": ["amount", "recipientAddress"],
+                "type": "object"
+            },
+            "CancellationType": {
+                "description": "Whether the cancellation was done on-chain or off-chain or as a result of an underfunded account",
+                "enum": ["ON_CHAIN", "OFF_CHAIN", "UNDERFUNDED"],
+                "type": "string"
+            },
+            "Fee": {
+                "properties": {
+                    "amount": {
+                        "type": "string"
+                    },
+                    "recipientAddress": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/FeeType"
+                    }
+                },
+                "type": "object"
+            },
+            "FeeType": {
+                "enum": ["MAKER_ECOSYSTEM", "TAKER_ECOSYSTEM", "PROTOCOL", "ROYALTY"],
+                "type": "string"
+            },
+            "Order": {
+                "properties": {
+                    "accountAddress": {
+                        "type": "string"
+                    },
+                    "buy": {
+                        "items": {
+                            "oneOf": [{
+                                "$ref": "#/components/schemas/ERC20Item"
+                            }, {
+                                "$ref": "#/components/schemas/NativeItem"
+                            }]
+                        },
+                        "type": "array"
+                    },
+                    "chain": {
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "endAt": {
+                        "description": "Time after which the Order is expired",
+                        "type": "string"
+                    },
+                    "fees": {
+                        "items": {
+                            "$ref": "#/components/schemas/Fee"
+                        },
+                        "type": "array"
+                    },
+                    "fillStatus": {
+                        "properties": {
+                            "denominator": {
+                                "type": "string"
+                            },
+                            "numerator": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "orderHash": {
+                        "type": "string"
+                    },
+                    "protocolData": {
+                        "properties": {
+                            "counter": {
+                                "type": "string"
+                            },
+                            "orderType": {
+                                "enum": ["FULL_RESTRICTED", "PARTIAL_RESTRICTED"],
+                                "type": "string"
+                            },
+                            "seaportAddress": {
+                                "type": "string"
+                            },
+                            "seaportVersion": {
+                                "type": "string"
+                            },
+                            "zoneAddress": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "salt": {
+                        "type": "string"
+                    },
+                    "sell": {
+                        "items": {
+                            "oneOf": [{
+                                "$ref": "#/components/schemas/ERC1155Item"
+                            }, {
+                                "$ref": "#/components/schemas/ERC721Item"
+                            }]
+                        },
+                        "type": "array"
+                    },
+                    "signature": {
+                        "type": "string"
+                    },
+                    "startAt": {
+                        "description": "Time after which the Order is considered active",
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OrderStatus"
+                    },
+                    "type": {
+                        "enum": ["LISTING"],
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": ["id", "orderHash", "updatedAt", "type", "sell", "signature", "startAt", "status"]
+            },
+            "OrderStatus": {
+                "oneOf": [{
+                    "properties": {
+                        "name": {
+                            "enum": ["ACTIVE"],
+                            "description": "The order status that indicates an order can be fulfilled.",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }, {
+                    "properties": {
+                        "cancellation_type": {
+                            "$ref": "#/components/schemas/CancellationType"
+                        },
+                        "name": {
+                            "enum": ["CANCELLED"],
+                            "description": "The order status indicating a order is has been cancelled or about to be cancelled.",
+                            "type": "string"
+                        },
+                        "pending": {
+                            "description": "Whether the cancellation of the order is pending",
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                }, {
+                    "properties": {
+                        "name": {
+                            "enum": ["EXPIRED"],
+                            "description": "A terminal order status indicating that an order cannot be fulfilled due to expiry.",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }, {
+                    "properties": {
+                        "name": {
+                            "enum": ["FILLED"],
+                            "description": "A terminal order status indicating that an order has been fulfilled.",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }, {
+                    "properties": {
+                        "name": {
+                            "enum": ["INACTIVE"],
+                            "description": "The order status that indicates an order cannot be fulfilled.",
+                            "type": "string"
+                        },
+                        "sufficient_approvals": {
+                            "description": "Whether the order offerer has sufficient approvals",
+                            "type": "boolean"
+                        },
+                        "sufficient_balances": {
+                            "description": "Whether the order offerer still has sufficient balance to complete the order",
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                }, {
+                    "properties": {
+                        "evaluated": {
+                            "description": "Whether the order has been evaluated after its creation",
+                            "type": "boolean"
+                        },
+                        "name": {
+                            "enum": ["PENDING"],
+                            "description": "The order status that indicates the order is yet to be active due to various reasons.",
+                            "type": "string"
+                        },
+                        "started": {
+                            "description": "Whether the order has reached its specified start time",
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                }],
+                "description": "The Order status"
+            },
+            "CancelledOrderStatusCancellationType": {
+                "description": "Whether the cancellation was done on-chain or off-chain or as a result of an underfunded account",
+                "enum": ["ON_CHAIN", "OFF_CHAIN", "UNDERFUNDED"],
+                "type": "string"
+            }
+        }
+    },
+    "paths": {
+        "/v1/ts-sdk/orderbook/cancelOrders": {
+            "post": {
+                "operationId": "cancelOrders",
+                "tags": ["orderbook"],
+                "responses": {
+                    "200": {
+                        "description": "Response schema for the cancelOrder endpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Response schema for the cancelOrder endpoint",
+                                    "properties": {
+                                        "result": {
+                                            "properties": {
+                                                "failed_cancellations": {
+                                                    "description": "Orders which failed to be cancelled",
+                                                    "items": {
+                                                        "properties": {
+                                                            "order": {
+                                                                "description": "ID of the order which failed to be cancelled",
+                                                                "type": "string"
+                                                            },
+                                                            "reason_code": {
+                                                                "enum": ["FILLED"],
+                                                                "description": "Reason code indicating why the order failed to be cancelled",
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "pending_cancellations": {
+                                                    "description": "Orders which are marked for cancellation but the cancellation cannot be guaranteed",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "successful_cancellations": {
+                                                    "description": "Orders which were successfully cancelled",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "orderIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "accountAddress": {
+                                        "type": "string"
+                                    },
+                                    "signature": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["orderIds", "accountAddress", "signature"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/ts-sdk/orderbook/cancelOrdersOnChain": {
+            "post": {
+                "operationId": "cancelOrdersOnChain",
+                "tags": ["orderbook"],
+                "responses": {
+                    "200": {
+                        "description": "Response schema for the cancelOrder endpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Response schema for the cancelOrder endpoint",
+                                    "properties": {
+                                        "cancellationAction": {
+                                            "$ref": "#/components/schemas/TransactionAction"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "orderIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "accountAddress": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["orderIds", "accountAddress"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/ts-sdk/orderbook/createListing": {
+            "post": {
+                "operationId": "createListing",
+                "tags": ["orderbook"],
+                "responses": {
+                    "200": {
+                        "description": "The response schema for the create listing endpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "The response schema for the create listing endpoint",
+                                    "properties": {
+                                        "result": {
+                                            "$ref": "#/components/schemas/Order"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "makerFees": {
+                                        "items": {
+                                            "$ref": "#/components/schemas/FeeValue"
+                                        },
+                                        "type": "array"
+                                    },
+                                    "orderComponents": {
+                                        "$ref": "#/components/schemas/OrderComponents"
+                                    },
+                                    "orderHash": {
+                                        "type": "string"
+                                    },
+                                    "orderSignature": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["makerFees", "orderComponents", "orderHash", "orderSignature"],
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/ts-sdk/orderbook/fulfillOrder": {
+            "post": {
+                "operationId": "fulfillOrder",
+                "tags": ["orderbook"],
+                "responses": {
+                    "200": {
+                        "description": "Response schema for the fulfillOrder endpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Response schema for the fulfillOrder endpoint",
+                                    "properties": {
+                                        "actions": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/TransactionAction"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "expiration": {
+                                            "description": "User MUST submit the fulfillment transaction before the expiration\nSubmitting after the expiration will result in a on chain revert",
+                                            "type": "string"
+                                        },
+                                        "order": {
+                                            "$ref": "#/components/schemas/Order"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "listingId": {
+                                        "type": "string",
+                                        "description": "listingId"
+                                    },
+                                    "takerAddress": {
+                                        "type": "string",
+                                        "description": "takerAddress"
+                                    },
+                                    "takerFees": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "amount": {
+                                                    "type": "string"
+                                                },
+                                                "recipientAddress": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": ["amount", "recipientAddress"],
+                                            "type": "object"
+                                        },
+                                        "description": "takerFees"
+                                    },
+                                    "amountToFill": {
+                                        "type": "string",
+                                        "description": "amountToFill"
+                                    }
+                                },
+                                "required": ["listingId", "takerAddress", "takerFees"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/ts-sdk/orderbook/prepareListing": {
+            "post": {
+                "operationId": "prepareListing",
+                "tags": ["orderbook"],
+                "responses": {
+                    "200": {
+                        "description": "Response schema for the prepareListing endpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Response schema for the prepareListing endpoint",
+                                    "properties": {
+                                        "actions": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/Action"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "orderComponents": {
+                                            "$ref": "#/components/schemas/OrderComponents"
+                                        },
+                                        "orderHash": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["actions", "orderComponents", "orderHash"],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "buy": {
+                                        "oneOf": [{
+                                            "$ref": "#/components/schemas/ERC20Item"
+                                        }, {
+                                            "$ref": "#/components/schemas/NativeItem"
+                                        }]
+                                    },
+                                    "makerAddress": {
+                                        "type": "string"
+                                    },
+                                    "orderExpiry": {
+                                        "format": "date-time",
+                                        "type": "string"
+                                    },
+                                    "sell": {
+                                        "oneOf": [{
+                                            "$ref": "#/components/schemas/ERC1155Item"
+                                        }, {
+                                            "$ref": "#/components/schemas/ERC721Item"
+                                        }]
+                                    }
+                                },
+                                "type": "object",
+                                "required": ["makerAddress", "buy", "sell"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/ts-sdk/orderbook/prepareOrderCancellations": {
+            "post": {
+                "operationId": "prepareOrderCancellations",
+                "tags": ["orderbook"],
+                "responses": {
+                    "200": {
+                        "description": "Response schema for the prepareOrderCancellations endpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Response schema for the prepareOrderCancellations endpoint",
+                                    "properties": {
+                                        "signableAction": {
+                                            "$ref": "#/components/schemas/SignableAction"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "orderIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "minItems": 1
+                                    }
+                                },
+                                "required": ["orderIds"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/ts-sdk/token/balance": {
+            "get": {
+                "operationId": "tokenBalance",
+                "tags": ["orderbook"],
+                "parameters": [{
+                    "name": "wallet_address",
+                    "in": "query",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "required": true
+                }, {
+                    "name": "contract_address",
+                    "in": "query",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "required": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "The response body returned from get balance endpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "The response body returned from get balance endpoint",
+                                    "type": "object",
+                                    "properties": {
+                                        "quantity": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["quantity"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
