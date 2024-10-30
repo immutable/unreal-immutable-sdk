@@ -25,7 +25,6 @@ void APIListing::WriteJson(JsonWriter& Writer) const
 	Writer->WriteObjectStart();
 	Writer->WriteIdentifierPrefix(TEXT("listing_id")); WriteJsonValue(Writer, ListingId);
 	Writer->WriteIdentifierPrefix(TEXT("price_details")); WriteJsonValue(Writer, PriceDetails);
-	Writer->WriteIdentifierPrefix(TEXT("converted_prices")); WriteJsonValue(Writer, ConvertedPrices);
 	Writer->WriteIdentifierPrefix(TEXT("token_id")); WriteJsonValue(Writer, TokenId);
 	Writer->WriteIdentifierPrefix(TEXT("contract_address")); WriteJsonValue(Writer, ContractAddress);
 	Writer->WriteIdentifierPrefix(TEXT("creator")); WriteJsonValue(Writer, Creator);
@@ -43,7 +42,6 @@ bool APIListing::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("listing_id"), ListingId);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("price_details"), PriceDetails);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("converted_prices"), ConvertedPrices);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("token_id"), TokenId);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_address"), ContractAddress);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("creator"), Creator);

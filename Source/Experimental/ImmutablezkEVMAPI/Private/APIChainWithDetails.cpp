@@ -29,6 +29,14 @@ void APIChainWithDetails::WriteJson(JsonWriter& Writer) const
 	{
 		Writer->WriteIdentifierPrefix(TEXT("rpc_url")); WriteJsonValue(Writer, RpcUrl.GetValue());
 	}
+	if (OperatorAllowlistAddress.IsSet())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("operator_allowlist_address")); WriteJsonValue(Writer, OperatorAllowlistAddress.GetValue());
+	}
+	if (MinterAddress.IsSet())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("minter_address")); WriteJsonValue(Writer, MinterAddress.GetValue());
+	}
 	Writer->WriteObjectEnd();
 }
 
@@ -43,6 +51,8 @@ bool APIChainWithDetails::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("id"), Id);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("name"), Name);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("rpc_url"), RpcUrl);
+	ParseSuccess &= TryGetJsonValue(*Object, TEXT("operator_allowlist_address"), OperatorAllowlistAddress);
+	ParseSuccess &= TryGetJsonValue(*Object, TEXT("minter_address"), MinterAddress);
 
 	return ParseSuccess;
 }

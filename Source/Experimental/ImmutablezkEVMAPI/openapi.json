@@ -3624,6 +3624,75 @@
         }
       }
     },
+    "/experimental/chains/{chain_name}/search/filters/{contract_address}": {
+      "get": {
+        "x-hide-from-sdk": true,
+        "tags": [
+          "stacks"
+        ],
+        "operationId": "ListFilters",
+        "summary": "Experimental: Get list of metadata attribute filters",
+        "description": "![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get list of metadata filters",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "description": "Contract addresses for collection",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$",
+              "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListFiltersResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/experimental/chains/{chain_name}/search/nfts": {
       "get": {
         "x-hide-from-sdk": true,
@@ -3826,7 +3895,7 @@
             }
           },
           {
-            "name": "trait",
+            "name": "traits",
             "in": "query",
             "required": false,
             "description": "JSON encoded traits to filter by. e.g. encodeURIComponent(JSON.stringify({\"rarity\": {\"values\": [\"common\", \"rare\"], \"condition\": \"eq\"}}))",
@@ -5695,10 +5764,22 @@
                 "type": "string",
                 "nullable": true,
                 "description": "URL for RPC node"
+              },
+              "operator_allowlist_address": {
+                "type": "string",
+                "nullable": true,
+                "description": "The address of the Operator Allowlist - https://docs.immutable.com/products/zkevm/minting/royalties/allowlist-spec/"
+              },
+              "minter_address": {
+                "type": "string",
+                "nullable": true,
+                "description": "The address of the minter used in the Minting API - https://docs.immutable.com/products/zkEVM/minting/minting-api#minting-api-prerequisites"
               }
             },
             "required": [
-              "rpc_url"
+              "rpc_url",
+              "operator_allowlist_address",
+              "minter_address"
             ]
           }
         ]
@@ -9082,6 +9163,100 @@
           }
         }
       },
+      "FilterValue": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "nft_count": {
+            "type": "string",
+            "description": "Number of NFTs that have this trait. Uint256 as string"
+          }
+        },
+        "example": [
+          {
+            "value": "Common",
+            "nft_count": "42"
+          },
+          {
+            "value": "Rare",
+            "nft_count": "17"
+          }
+        ],
+        "required": [
+          "value",
+          "nft_count"
+        ]
+      },
+      "Filter": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of trait",
+            "example": "Rarity"
+          },
+          "values": {
+            "description": "List of 100 most common values for this trait sorted by number of associated NFTs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterValue"
+            }
+          },
+          "omitted_values_count": {
+            "type": "integer",
+            "description": "Indicated how many more distinct values exist",
+            "example": 0
+          }
+        },
+        "required": [
+          "name",
+          "values",
+          "omitted_values_count"
+        ]
+      },
+      "FilterResult": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "ETH Address of collection that the asset belongs to",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "filters": {
+            "description": "List of all filters and the most common values",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            }
+          }
+        },
+        "required": [
+          "chain",
+          "contract_address",
+          "filters"
+        ]
+      },
+      "ListFiltersResult": {
+        "type": "object",
+        "description": "List filters result",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/FilterResult"
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
       "MarketplaceContractType": {
         "description": "The contract type for a collection",
         "type": "string",
@@ -9297,6 +9472,18 @@
           "recipient_address"
         ]
       },
+      "ConvertedPrices": {
+        "type": "object",
+        "description": "A mapping of converted prices for major currencies such as ETH, USD. All converted prices are fee-inclusive.",
+        "nullable": true,
+        "additionalProperties": {
+          "type": "string"
+        },
+        "example": {
+          "ETH": "0.0058079775",
+          "USD": "15.89"
+        }
+      },
       "MarketPriceDetails": {
         "type": "object",
         "description": "Market Price details",
@@ -9337,25 +9524,18 @@
                 "amount": "1000000000000000000"
               }
             ]
+          },
+          "converted_prices": {
+            "$ref": "#/components/schemas/ConvertedPrices"
           }
         },
         "required": [
           "token",
           "amount",
           "fee_inclusive_amount",
-          "fees"
+          "fees",
+          "converted_prices"
         ]
-      },
-      "ConvertedPrices": {
-        "type": "object",
-        "description": "A mapping of converted prices for major currencies such as ETH, USD. All converted prices are fee-inclusive.",
-        "additionalProperties": {
-          "type": "string"
-        },
-        "example": {
-          "ETH": "0.0058079775",
-          "USD": "15.89"
-        }
       },
       "Listing": {
         "type": "object",
@@ -9367,9 +9547,6 @@
           },
           "price_details": {
             "$ref": "#/components/schemas/MarketPriceDetails"
-          },
-          "converted_prices": {
-            "$ref": "#/components/schemas/ConvertedPrices"
           },
           "token_id": {
             "type": "string",
@@ -9395,7 +9572,6 @@
         "required": [
           "listing_id",
           "price_details",
-          "converted_prices",
           "creator",
           "token_id",
           "contract_address",

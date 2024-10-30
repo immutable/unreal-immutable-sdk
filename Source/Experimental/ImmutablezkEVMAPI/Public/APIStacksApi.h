@@ -38,6 +38,8 @@ public:
 	void SetHttpRetryManager(FHttpRetrySystem::FManager& RetryManager);
 	FHttpRetrySystem::FManager& GetHttpRetryManager();
 
+	class ListFiltersRequest;
+	class ListFiltersResponse;
 	class ListStacksRequest;
 	class ListStacksResponse;
 	class SearchNFTsRequest;
@@ -45,15 +47,18 @@ public:
 	class SearchStacksRequest;
 	class SearchStacksResponse;
 	
+    DECLARE_DELEGATE_OneParam(FListFiltersDelegate, const ListFiltersResponse&);
     DECLARE_DELEGATE_OneParam(FListStacksDelegate, const ListStacksResponse&);
     DECLARE_DELEGATE_OneParam(FSearchNFTsDelegate, const SearchNFTsResponse&);
     DECLARE_DELEGATE_OneParam(FSearchStacksDelegate, const SearchStacksResponse&);
     
+    FHttpRequestPtr ListFilters(const ListFiltersRequest& Request, const FListFiltersDelegate& Delegate = FListFiltersDelegate()) const;
     FHttpRequestPtr ListStacks(const ListStacksRequest& Request, const FListStacksDelegate& Delegate = FListStacksDelegate()) const;
     FHttpRequestPtr SearchNFTs(const SearchNFTsRequest& Request, const FSearchNFTsDelegate& Delegate = FSearchNFTsDelegate()) const;
     FHttpRequestPtr SearchStacks(const SearchStacksRequest& Request, const FSearchStacksDelegate& Delegate = FSearchStacksDelegate()) const;
     
 private:
+    void OnListFiltersResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListFiltersDelegate Delegate) const;
     void OnListStacksResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListStacksDelegate Delegate) const;
     void OnSearchNFTsResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FSearchNFTsDelegate Delegate) const;
     void OnSearchStacksResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FSearchStacksDelegate Delegate) const;

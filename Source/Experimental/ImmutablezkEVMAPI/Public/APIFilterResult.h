@@ -13,34 +13,29 @@
 #pragma once
 
 #include "APIBaseModel.h"
-#include "APIMarketPriceDetails.h"
+#include "APIChain.h"
+#include "APIFilter.h"
 
 namespace ImmutablezkEVMAPI
 {
 
 /*
- * APIListing
+ * APIFilterResult
  *
  * 
  */
-class IMMUTABLEZKEVMAPI_API APIListing : public Model
+class IMMUTABLEZKEVMAPI_API APIFilterResult : public Model
 {
 public:
-    virtual ~APIListing() {}
+    virtual ~APIFilterResult() {}
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
-	/* Global Order identifier */
-	FString ListingId;
-	APIMarketPriceDetails PriceDetails;
-	/* Token ID */
-	FString TokenId;
+	APIChain Chain;
 	/* ETH Address of collection that the asset belongs to */
 	FString ContractAddress;
-	/* ETH Address of listing creator */
-	FString Creator;
-	/* Amount of token included in the listing */
-	FString Amount;
+	/* List of all filters and the most common values */
+	TArray<APIFilter> Filters;
 };
 
 }
