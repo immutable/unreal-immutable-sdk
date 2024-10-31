@@ -27,6 +27,10 @@ void APIMarketPriceDetails::WriteJson(JsonWriter& Writer) const
 	Writer->WriteIdentifierPrefix(TEXT("amount")); WriteJsonValue(Writer, Amount);
 	Writer->WriteIdentifierPrefix(TEXT("fee_inclusive_amount")); WriteJsonValue(Writer, FeeInclusiveAmount);
 	Writer->WriteIdentifierPrefix(TEXT("fees")); WriteJsonValue(Writer, Fees);
+	if (ConvertedPrices.IsSet())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("converted_prices")); WriteJsonValue(Writer, ConvertedPrices.GetValue());
+	}
 	Writer->WriteObjectEnd();
 }
 
@@ -42,6 +46,7 @@ bool APIMarketPriceDetails::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("amount"), Amount);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("fee_inclusive_amount"), FeeInclusiveAmount);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("fees"), Fees);
+	ParseSuccess &= TryGetJsonValue(*Object, TEXT("converted_prices"), ConvertedPrices);
 
 	return ParseSuccess;
 }

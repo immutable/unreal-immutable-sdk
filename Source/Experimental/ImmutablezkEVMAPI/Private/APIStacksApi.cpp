@@ -133,6 +133,33 @@ void APIStacksApi::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded
 	InOutResponse.SetHttpResponseCode(EHttpResponseCodes::RequestTimeout);
 }
 
+FHttpRequestPtr APIStacksApi::ListFilters(const ListFiltersRequest& Request, const FListFiltersDelegate& Delegate /*= FListFiltersDelegate()*/) const
+{
+	if (!IsValid())
+		return nullptr;
+
+	FHttpRequestRef HttpRequest = CreateHttpRequest(Request);
+	HttpRequest->SetURL(*(Url + Request.ComputePath()));
+
+	for(const auto& It : AdditionalHeaderParams)
+	{
+		HttpRequest->SetHeader(It.Key, It.Value);
+	}
+
+	Request.SetupHttpRequest(HttpRequest);
+
+	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIStacksApi::OnListFiltersResponse, Delegate);
+	HttpRequest->ProcessRequest();
+	return HttpRequest;
+}
+
+void APIStacksApi::OnListFiltersResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListFiltersDelegate Delegate) const
+{
+	ListFiltersResponse Response;
+	HandleResponse(HttpResponse, bSucceeded, Response);
+	Delegate.ExecuteIfBound(Response);
+}
+
 FHttpRequestPtr APIStacksApi::ListStacks(const ListStacksRequest& Request, const FListStacksDelegate& Delegate /*= FListStacksDelegate()*/) const
 {
 	if (!IsValid())

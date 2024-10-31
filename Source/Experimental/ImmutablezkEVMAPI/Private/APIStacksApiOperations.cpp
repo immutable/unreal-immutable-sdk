@@ -23,6 +23,60 @@
 namespace ImmutablezkEVMAPI
 {
 
+FString APIStacksApi::ListFiltersRequest::ComputePath() const
+{
+	TMap<FString, FStringFormatArg> PathParams = { 
+	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) },
+	{ TEXT("contract_address"), FStringFormatArg(ToUrlString(ContractAddress)) } };
+
+	FString Path = FString::Format(TEXT("/experimental/chains/{chain_name}/search/filters/{contract_address}"), PathParams);
+
+	return Path;
+}
+
+void APIStacksApi::ListFiltersRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
+{
+	static const TArray<FString> Consumes = {  };
+	//static const TArray<FString> Produces = { TEXT("application/json") };
+
+	HttpRequest->SetVerb(TEXT("GET"));
+
+}
+
+void APIStacksApi::ListFiltersResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
+{
+	Response::SetHttpResponseCode(InHttpResponseCode);
+	switch ((int)InHttpResponseCode)
+	{
+	case 200:
+		SetResponseString(TEXT("200 response"));
+		break;
+	case 400:
+		SetResponseString(TEXT("Bad Request (400)"));
+		break;
+	case 401:
+		SetResponseString(TEXT("Unauthorised Request (401)"));
+		break;
+	case 403:
+		SetResponseString(TEXT("Forbidden Request (403)"));
+		break;
+	case 404:
+		SetResponseString(TEXT("The specified resource was not found (404)"));
+		break;
+	case 429:
+		SetResponseString(TEXT("Too Many Requests (429)"));
+		break;
+	case 500:
+		SetResponseString(TEXT("Internal Server Error (500)"));
+		break;
+	}
+}
+
+bool APIStacksApi::ListFiltersResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
+{
+	return TryGetJsonValue(JsonValue, Content);
+}
+
 FString APIStacksApi::ListStacksRequest::ComputePath() const
 {
 	TMap<FString, FStringFormatArg> PathParams = { 
@@ -230,9 +284,9 @@ FString APIStacksApi::SearchStacksRequest::ComputePath() const
 	{
 		QueryParams.Add(FString(TEXT("only_if_has_active_listings=")) + ToUrlString(OnlyIfHasActiveListings.GetValue()));
 	}
-	if(Trait.IsSet())
+	if(Traits.IsSet())
 	{
-		QueryParams.Add(FString(TEXT("trait=")) + ToUrlString(Trait.GetValue()));
+		QueryParams.Add(FString(TEXT("traits=")) + ToUrlString(Traits.GetValue()));
 	}
 	if(Keyword.IsSet())
 	{

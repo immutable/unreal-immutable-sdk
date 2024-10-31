@@ -21,12 +21,40 @@
 #include "APIAPIError404.h"
 #include "APIAPIError429.h"
 #include "APIAPIError500.h"
+#include "APIListFiltersResult.h"
 #include "APISearchNFTsResult.h"
 #include "APISearchStacksResult.h"
 #include "APIStackBundle.h"
 
 namespace ImmutablezkEVMAPI
 {
+
+/* Experimental: Get list of metadata attribute filters
+ *
+ * ![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get list of metadata filters
+*/
+class IMMUTABLEZKEVMAPI_API APIStacksApi::ListFiltersRequest : public Request
+{
+public:
+    virtual ~ListFiltersRequest() {}
+	void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const final;
+	FString ComputePath() const final;
+
+	/* The name of chain */
+	FString ChainName;
+	/* Contract addresses for collection */
+	FString ContractAddress;
+};
+
+class IMMUTABLEZKEVMAPI_API APIStacksApi::ListFiltersResponse : public Response
+{
+public:
+    virtual ~ListFiltersResponse() {}
+	void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) final;
+	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
+
+    APIListFiltersResult Content;
+};
 
 /* Experimental: List NFT stacks by stack_id
  *
@@ -114,7 +142,7 @@ public:
 	/* Filters results to include only stacks that have a current active listing. False and 'null' return all unfiltered stacks. */
 	TOptional<bool> OnlyIfHasActiveListings;
 	/* JSON encoded traits to filter by. e.g. encodeURIComponent(JSON.stringify({\"rarity\": {\"values\": [\"common\", \"rare\"], \"condition\": \"eq\"}})) */
-	TOptional<FString> Trait;
+	TOptional<FString> Traits;
 	/* Keyword to search NFT name and description. Alphanumeric characters only. */
 	TOptional<FString> Keyword;
 	enum class SortByEnum

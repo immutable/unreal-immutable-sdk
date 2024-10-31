@@ -35,6 +35,10 @@ public:
 	FString Name;
 	/* URL for RPC node */
 	TOptional<FString> RpcUrl;
+	/* The address of the Operator Allowlist - https://docs.immutable.com/products/zkevm/minting/royalties/allowlist-spec/ */
+	TOptional<FString> OperatorAllowlistAddress;
+	/* The address of the minter used in the Minting API - https://docs.immutable.com/products/zkEVM/minting/minting-api#minting-api-prerequisites */
+	TOptional<FString> MinterAddress;
 };
 
 }

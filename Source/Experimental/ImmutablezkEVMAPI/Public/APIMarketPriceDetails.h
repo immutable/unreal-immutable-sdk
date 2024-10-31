@@ -37,6 +37,8 @@ public:
 	/* The token amount value. This value is provided in the smallest unit of the token (e.g. wei for ETH) */
 	FString FeeInclusiveAmount;
 	TArray<APIMarketPriceFees> Fees;
+	/* A mapping of converted prices for major currencies such as ETH, USD. All converted prices are fee-inclusive. */
+	TOptional<TMap<FString, FString>> ConvertedPrices;
 };
 
 }
