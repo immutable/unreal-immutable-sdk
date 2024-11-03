@@ -27,9 +27,9 @@
 namespace ImmutablezkEVMAPI
 {
 
-/* Experimental: Get pricing data for a list of token ids
+/* Get pricing data for a list of token ids
  *
- * ![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get pricing data for a list of token ids
+ * pricing data for a list of token ids
 */
 class IMMUTABLEZKEVMAPI_API APIPricingApi::QuotesForNFTsRequest : public Request
 {
@@ -58,9 +58,9 @@ public:
     APIQuotesForNFTsResult Content;
 };
 
-/* Experimental: Get pricing data for a list of stack ids
+/* Get pricing data for a list of stack ids
  *
- * ![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get pricing data for a list of stack ids
+ * Get pricing data for a list of stack ids
 */
 class IMMUTABLEZKEVMAPI_API APIPricingApi::QuotesForStacksRequest : public Request
 {

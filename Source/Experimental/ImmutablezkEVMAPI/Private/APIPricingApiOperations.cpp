@@ -29,7 +29,7 @@ FString APIPricingApi::QuotesForNFTsRequest::ComputePath() const
 	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) },
 	{ TEXT("contract_address"), FStringFormatArg(ToUrlString(ContractAddress)) } };
 
-	FString Path = FString::Format(TEXT("/experimental/chains/{chain_name}/quotes/{contract_address}/nfts"), PathParams);
+	FString Path = FString::Format(TEXT("/v1/chains/{chain_name}/quotes/{contract_address}/nfts"), PathParams);
 
 	TArray<FString> QueryParams;
 	QueryParams.Add(CollectionToUrlString_multi(TokenId, TEXT("token_id")));
@@ -92,7 +92,7 @@ FString APIPricingApi::QuotesForStacksRequest::ComputePath() const
 	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) },
 	{ TEXT("contract_address"), FStringFormatArg(ToUrlString(ContractAddress)) } };
 
-	FString Path = FString::Format(TEXT("/experimental/chains/{chain_name}/quotes/{contract_address}/stacks"), PathParams);
+	FString Path = FString::Format(TEXT("/v1/chains/{chain_name}/quotes/{contract_address}/stacks"), PathParams);
 
 	TArray<FString> QueryParams;
 	QueryParams.Add(CollectionToUrlString_multi(StackId, TEXT("stack_id")));

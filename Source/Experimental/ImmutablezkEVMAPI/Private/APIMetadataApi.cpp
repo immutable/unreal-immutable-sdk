@@ -214,6 +214,33 @@ void APIMetadataApi::OnListMetadataForChainResponse(FHttpRequestPtr HttpRequest,
 	Delegate.ExecuteIfBound(Response);
 }
 
+FHttpRequestPtr APIMetadataApi::ListStacks(const ListStacksRequest& Request, const FListStacksDelegate& Delegate /*= FListStacksDelegate()*/) const
+{
+	if (!IsValid())
+		return nullptr;
+
+	FHttpRequestRef HttpRequest = CreateHttpRequest(Request);
+	HttpRequest->SetURL(*(Url + Request.ComputePath()));
+
+	for(const auto& It : AdditionalHeaderParams)
+	{
+		HttpRequest->SetHeader(It.Key, It.Value);
+	}
+
+	Request.SetupHttpRequest(HttpRequest);
+
+	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIMetadataApi::OnListStacksResponse, Delegate);
+	HttpRequest->ProcessRequest();
+	return HttpRequest;
+}
+
+void APIMetadataApi::OnListStacksResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListStacksDelegate Delegate) const
+{
+	ListStacksResponse Response;
+	HandleResponse(HttpResponse, bSucceeded, Response);
+	Delegate.ExecuteIfBound(Response);
+}
+
 FHttpRequestPtr APIMetadataApi::RefreshMetadataByID(const RefreshMetadataByIDRequest& Request, const FRefreshMetadataByIDDelegate& Delegate /*= FRefreshMetadataByIDDelegate()*/) const
 {
 	if (!IsValid())

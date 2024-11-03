@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-#include "APIStacksApiOperations.h"
+#include "APIMetadataSearchApiOperations.h"
 
 #include "ImmutablezkEVMAPIModule.h"
 #include "APIHelpers.h"
@@ -23,18 +23,18 @@
 namespace ImmutablezkEVMAPI
 {
 
-FString APIStacksApi::ListFiltersRequest::ComputePath() const
+FString APIMetadataSearchApi::ListFiltersRequest::ComputePath() const
 {
 	TMap<FString, FStringFormatArg> PathParams = { 
 	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) },
 	{ TEXT("contract_address"), FStringFormatArg(ToUrlString(ContractAddress)) } };
 
-	FString Path = FString::Format(TEXT("/experimental/chains/{chain_name}/search/filters/{contract_address}"), PathParams);
+	FString Path = FString::Format(TEXT("/v1/chains/{chain_name}/search/filters/{contract_address}"), PathParams);
 
 	return Path;
 }
 
-void APIStacksApi::ListFiltersRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
+void APIMetadataSearchApi::ListFiltersRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
 {
 	static const TArray<FString> Consumes = {  };
 	//static const TArray<FString> Produces = { TEXT("application/json") };
@@ -43,7 +43,7 @@ void APIStacksApi::ListFiltersRequest::SetupHttpRequest(const FHttpRequestRef& H
 
 }
 
-void APIStacksApi::ListFiltersResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
+void APIMetadataSearchApi::ListFiltersResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
 {
 	Response::SetHttpResponseCode(InHttpResponseCode);
 	switch ((int)InHttpResponseCode)
@@ -72,75 +72,17 @@ void APIStacksApi::ListFiltersResponse::SetHttpResponseCode(EHttpResponseCodes::
 	}
 }
 
-bool APIStacksApi::ListFiltersResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
+bool APIMetadataSearchApi::ListFiltersResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
 	return TryGetJsonValue(JsonValue, Content);
 }
 
-FString APIStacksApi::ListStacksRequest::ComputePath() const
+FString APIMetadataSearchApi::SearchNFTsRequest::ComputePath() const
 {
 	TMap<FString, FStringFormatArg> PathParams = { 
 	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) } };
 
-	FString Path = FString::Format(TEXT("/experimental/chains/{chain_name}/stacks"), PathParams);
-
-	TArray<FString> QueryParams;
-	QueryParams.Add(CollectionToUrlString_multi(StackId, TEXT("stack_id")));
-	Path += TCHAR('?');
-	Path += FString::Join(QueryParams, TEXT("&"));
-
-	return Path;
-}
-
-void APIStacksApi::ListStacksRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
-{
-	static const TArray<FString> Consumes = {  };
-	//static const TArray<FString> Produces = { TEXT("application/json") };
-
-	HttpRequest->SetVerb(TEXT("GET"));
-
-}
-
-void APIStacksApi::ListStacksResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
-{
-	Response::SetHttpResponseCode(InHttpResponseCode);
-	switch ((int)InHttpResponseCode)
-	{
-	case 200:
-		SetResponseString(TEXT("200 response"));
-		break;
-	case 400:
-		SetResponseString(TEXT("Bad Request (400)"));
-		break;
-	case 401:
-		SetResponseString(TEXT("Unauthorised Request (401)"));
-		break;
-	case 403:
-		SetResponseString(TEXT("Forbidden Request (403)"));
-		break;
-	case 404:
-		SetResponseString(TEXT("The specified resource was not found (404)"));
-		break;
-	case 429:
-		SetResponseString(TEXT("Too Many Requests (429)"));
-		break;
-	case 500:
-		SetResponseString(TEXT("Internal Server Error (500)"));
-		break;
-	}
-}
-
-bool APIStacksApi::ListStacksResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
-{
-	return TryGetJsonValue(JsonValue, Content);
-}
-
-FString APIStacksApi::SearchNFTsRequest::ComputePath() const
-{
-	TMap<FString, FStringFormatArg> PathParams = { 
-	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) } };
-
-	FString Path = FString::Format(TEXT("/experimental/chains/{chain_name}/search/nfts"), PathParams);
+	FString Path = FString::Format(TEXT("/v1/chains/{chain_name}/search/nfts"), PathParams);
 
 	TArray<FString> QueryParams;
 	QueryParams.Add(CollectionToUrlString_multi(ContractAddress, TEXT("contract_address")));
@@ -170,7 +112,7 @@ FString APIStacksApi::SearchNFTsRequest::ComputePath() const
 	return Path;
 }
 
-void APIStacksApi::SearchNFTsRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
+void APIMetadataSearchApi::SearchNFTsRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
 {
 	static const TArray<FString> Consumes = {  };
 	//static const TArray<FString> Produces = { TEXT("application/json") };
@@ -179,7 +121,7 @@ void APIStacksApi::SearchNFTsRequest::SetupHttpRequest(const FHttpRequestRef& Ht
 
 }
 
-void APIStacksApi::SearchNFTsResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
+void APIMetadataSearchApi::SearchNFTsResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
 {
 	Response::SetHttpResponseCode(InHttpResponseCode);
 	switch ((int)InHttpResponseCode)
@@ -208,32 +150,32 @@ void APIStacksApi::SearchNFTsResponse::SetHttpResponseCode(EHttpResponseCodes::T
 	}
 }
 
-bool APIStacksApi::SearchNFTsResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
+bool APIMetadataSearchApi::SearchNFTsResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
 	return TryGetJsonValue(JsonValue, Content);
 }
 
-inline FString ToString(const APIStacksApi::SearchStacksRequest::SortByEnum& Value)
+inline FString ToString(const APIMetadataSearchApi::SearchStacksRequest::SortByEnum& Value)
 {
 	switch (Value)
 	{
-	case APIStacksApi::SearchStacksRequest::SortByEnum::CheapestFirst:
+	case APIMetadataSearchApi::SearchStacksRequest::SortByEnum::CheapestFirst:
 		return TEXT("cheapest_first");
 	}
 
-	UE_LOG(LogImmutablezkEVMAPI, Error, TEXT("Invalid APIStacksApi::SearchStacksRequest::SortByEnum Value (%d)"), (int)Value);
+	UE_LOG(LogImmutablezkEVMAPI, Error, TEXT("Invalid APIMetadataSearchApi::SearchStacksRequest::SortByEnum Value (%d)"), (int)Value);
 	return TEXT("");
 }
 
-FString APIStacksApi::SearchStacksRequest::EnumToString(const APIStacksApi::SearchStacksRequest::SortByEnum& EnumValue)
+FString APIMetadataSearchApi::SearchStacksRequest::EnumToString(const APIMetadataSearchApi::SearchStacksRequest::SortByEnum& EnumValue)
 {
 	return ToString(EnumValue);
 }
 
-inline bool FromString(const FString& EnumAsString, APIStacksApi::SearchStacksRequest::SortByEnum& Value)
+inline bool FromString(const FString& EnumAsString, APIMetadataSearchApi::SearchStacksRequest::SortByEnum& Value)
 {
-	static TMap<FString, APIStacksApi::SearchStacksRequest::SortByEnum> StringToEnum = { 
-		{ TEXT("cheapest_first"), APIStacksApi::SearchStacksRequest::SortByEnum::CheapestFirst }, };
+	static TMap<FString, APIMetadataSearchApi::SearchStacksRequest::SortByEnum> StringToEnum = { 
+		{ TEXT("cheapest_first"), APIMetadataSearchApi::SearchStacksRequest::SortByEnum::CheapestFirst }, };
 
 	const auto Found = StringToEnum.Find(EnumAsString);
 	if(Found)
@@ -242,17 +184,17 @@ inline bool FromString(const FString& EnumAsString, APIStacksApi::SearchStacksRe
 	return Found != nullptr;
 }
 
-bool APIStacksApi::SearchStacksRequest::EnumFromString(const FString& EnumAsString, APIStacksApi::SearchStacksRequest::SortByEnum& EnumValue)
+bool APIMetadataSearchApi::SearchStacksRequest::EnumFromString(const FString& EnumAsString, APIMetadataSearchApi::SearchStacksRequest::SortByEnum& EnumValue)
 {
 	return FromString(EnumAsString, EnumValue);
 }
 
-inline void WriteJsonValue(JsonWriter& Writer, const APIStacksApi::SearchStacksRequest::SortByEnum& Value)
+inline void WriteJsonValue(JsonWriter& Writer, const APIMetadataSearchApi::SearchStacksRequest::SortByEnum& Value)
 {
 	WriteJsonValue(Writer, ToString(Value));
 }
 
-inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIStacksApi::SearchStacksRequest::SortByEnum& Value)
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIMetadataSearchApi::SearchStacksRequest::SortByEnum& Value)
 {
 	FString TmpValue;
 	if (JsonValue->TryGetString(TmpValue))
@@ -263,12 +205,12 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIStacksAp
 	return false;
 }
 
-FString APIStacksApi::SearchStacksRequest::ComputePath() const
+FString APIMetadataSearchApi::SearchStacksRequest::ComputePath() const
 {
 	TMap<FString, FStringFormatArg> PathParams = { 
 	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) } };
 
-	FString Path = FString::Format(TEXT("/experimental/chains/{chain_name}/search/stacks"), PathParams);
+	FString Path = FString::Format(TEXT("/v1/chains/{chain_name}/search/stacks"), PathParams);
 
 	TArray<FString> QueryParams;
 	QueryParams.Add(CollectionToUrlString_multi(ContractAddress, TEXT("contract_address")));
@@ -310,7 +252,7 @@ FString APIStacksApi::SearchStacksRequest::ComputePath() const
 	return Path;
 }
 
-void APIStacksApi::SearchStacksRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
+void APIMetadataSearchApi::SearchStacksRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
 {
 	static const TArray<FString> Consumes = {  };
 	//static const TArray<FString> Produces = { TEXT("application/json") };
@@ -319,7 +261,7 @@ void APIStacksApi::SearchStacksRequest::SetupHttpRequest(const FHttpRequestRef& 
 
 }
 
-void APIStacksApi::SearchStacksResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
+void APIMetadataSearchApi::SearchStacksResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
 {
 	Response::SetHttpResponseCode(InHttpResponseCode);
 	switch ((int)InHttpResponseCode)
@@ -348,7 +290,7 @@ void APIStacksApi::SearchStacksResponse::SetHttpResponseCode(EHttpResponseCodes:
 	}
 }
 
-bool APIStacksApi::SearchStacksResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
+bool APIMetadataSearchApi::SearchStacksResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
 	return TryGetJsonValue(JsonValue, Content);
 }

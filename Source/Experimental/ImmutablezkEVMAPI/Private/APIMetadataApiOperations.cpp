@@ -190,6 +190,64 @@ bool APIMetadataApi::ListMetadataForChainResponse::FromJson(const TSharedPtr<FJs
 	return TryGetJsonValue(JsonValue, Content);
 }
 
+FString APIMetadataApi::ListStacksRequest::ComputePath() const
+{
+	TMap<FString, FStringFormatArg> PathParams = { 
+	{ TEXT("chain_name"), FStringFormatArg(ToUrlString(ChainName)) } };
+
+	FString Path = FString::Format(TEXT("/v1/chains/{chain_name}/stacks"), PathParams);
+
+	TArray<FString> QueryParams;
+	QueryParams.Add(CollectionToUrlString_multi(StackId, TEXT("stack_id")));
+	Path += TCHAR('?');
+	Path += FString::Join(QueryParams, TEXT("&"));
+
+	return Path;
+}
+
+void APIMetadataApi::ListStacksRequest::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
+{
+	static const TArray<FString> Consumes = {  };
+	//static const TArray<FString> Produces = { TEXT("application/json") };
+
+	HttpRequest->SetVerb(TEXT("GET"));
+
+}
+
+void APIMetadataApi::ListStacksResponse::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
+{
+	Response::SetHttpResponseCode(InHttpResponseCode);
+	switch ((int)InHttpResponseCode)
+	{
+	case 200:
+		SetResponseString(TEXT("200 response"));
+		break;
+	case 400:
+		SetResponseString(TEXT("Bad Request (400)"));
+		break;
+	case 401:
+		SetResponseString(TEXT("Unauthorised Request (401)"));
+		break;
+	case 403:
+		SetResponseString(TEXT("Forbidden Request (403)"));
+		break;
+	case 404:
+		SetResponseString(TEXT("The specified resource was not found (404)"));
+		break;
+	case 429:
+		SetResponseString(TEXT("Too Many Requests (429)"));
+		break;
+	case 500:
+		SetResponseString(TEXT("Internal Server Error (500)"));
+		break;
+	}
+}
+
+bool APIMetadataApi::ListStacksResponse::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
+{
+	return TryGetJsonValue(JsonValue, Content);
+}
+
 FString APIMetadataApi::RefreshMetadataByIDRequest::ComputePath() const
 {
 	TMap<FString, FStringFormatArg> PathParams = { 

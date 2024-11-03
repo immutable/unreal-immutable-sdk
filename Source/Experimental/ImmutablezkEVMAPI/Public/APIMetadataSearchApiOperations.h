@@ -13,7 +13,7 @@
 #pragma once
 
 #include "APIBaseModel.h"
-#include "APIStacksApi.h"
+#include "APIMetadataSearchApi.h"
 
 #include "APIAPIError400.h"
 #include "APIAPIError401.h"
@@ -24,16 +24,15 @@
 #include "APIListFiltersResult.h"
 #include "APISearchNFTsResult.h"
 #include "APISearchStacksResult.h"
-#include "APIStackBundle.h"
 
 namespace ImmutablezkEVMAPI
 {
 
-/* Experimental: Get list of metadata attribute filters
+/* Get list of metadata attribute filters
  *
- * ![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get list of metadata filters
+ * Get list of metadata filters
 */
-class IMMUTABLEZKEVMAPI_API APIStacksApi::ListFiltersRequest : public Request
+class IMMUTABLEZKEVMAPI_API APIMetadataSearchApi::ListFiltersRequest : public Request
 {
 public:
     virtual ~ListFiltersRequest() {}
@@ -46,7 +45,7 @@ public:
 	FString ContractAddress;
 };
 
-class IMMUTABLEZKEVMAPI_API APIStacksApi::ListFiltersResponse : public Response
+class IMMUTABLEZKEVMAPI_API APIMetadataSearchApi::ListFiltersResponse : public Response
 {
 public:
     virtual ~ListFiltersResponse() {}
@@ -56,38 +55,11 @@ public:
     APIListFiltersResult Content;
 };
 
-/* Experimental: List NFT stacks by stack_id
+/* Search NFTs
  *
- * ![Experimental](https://img.shields.io/badge/status-experimental-yellow) NFT stacks
+ * Search NFTs
 */
-class IMMUTABLEZKEVMAPI_API APIStacksApi::ListStacksRequest : public Request
-{
-public:
-    virtual ~ListStacksRequest() {}
-	void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const final;
-	FString ComputePath() const final;
-
-	/* The name of chain */
-	FString ChainName;
-	/* List of stack_id to filter by */
-	TArray<FGuid> StackId;
-};
-
-class IMMUTABLEZKEVMAPI_API APIStacksApi::ListStacksResponse : public Response
-{
-public:
-    virtual ~ListStacksResponse() {}
-	void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) final;
-	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
-
-    TArray<APIStackBundle> Content;
-};
-
-/* Experimental: Search NFTs
- *
- * ![Experimental](https://img.shields.io/badge/status-experimental-yellow) Search NFTs
-*/
-class IMMUTABLEZKEVMAPI_API APIStacksApi::SearchNFTsRequest : public Request
+class IMMUTABLEZKEVMAPI_API APIMetadataSearchApi::SearchNFTsRequest : public Request
 {
 public:
     virtual ~SearchNFTsRequest() {}
@@ -110,7 +82,7 @@ public:
 	TOptional<FString> PageCursor;
 };
 
-class IMMUTABLEZKEVMAPI_API APIStacksApi::SearchNFTsResponse : public Response
+class IMMUTABLEZKEVMAPI_API APIMetadataSearchApi::SearchNFTsResponse : public Response
 {
 public:
     virtual ~SearchNFTsResponse() {}
@@ -120,11 +92,11 @@ public:
     APISearchNFTsResult Content;
 };
 
-/* Experimental: Search NFT stacks
+/* Search NFT stacks
  *
- * ![Experimental](https://img.shields.io/badge/status-experimental-yellow) Search NFT stacks
+ * Search NFT stacks
 */
-class IMMUTABLEZKEVMAPI_API APIStacksApi::SearchStacksRequest : public Request
+class IMMUTABLEZKEVMAPI_API APIMetadataSearchApi::SearchStacksRequest : public Request
 {
 public:
     virtual ~SearchStacksRequest() {}
@@ -160,7 +132,7 @@ public:
 	TOptional<FString> PageCursor;
 };
 
-class IMMUTABLEZKEVMAPI_API APIStacksApi::SearchStacksResponse : public Response
+class IMMUTABLEZKEVMAPI_API APIMetadataSearchApi::SearchStacksResponse : public Response
 {
 public:
     virtual ~SearchStacksResponse() {}
