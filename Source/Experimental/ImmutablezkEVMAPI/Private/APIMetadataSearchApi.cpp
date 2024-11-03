@@ -10,9 +10,9 @@
  * Do not edit the class manually.
  */
 
-#include "APIStacksApi.h"
+#include "APIMetadataSearchApi.h"
 
-#include "APIStacksApiOperations.h"
+#include "APIMetadataSearchApiOperations.h"
 #include "ImmutablezkEVMAPIModule.h"
 
 #include "HttpModule.h"
@@ -21,40 +21,40 @@
 namespace ImmutablezkEVMAPI
 {
 
-APIStacksApi::APIStacksApi()
+APIMetadataSearchApi::APIMetadataSearchApi()
 : Url(TEXT("https://api.sandbox.immutable.com"))
 {
 }
 
-APIStacksApi::~APIStacksApi() {}
+APIMetadataSearchApi::~APIMetadataSearchApi() {}
 
-void APIStacksApi::SetURL(const FString& InUrl)
+void APIMetadataSearchApi::SetURL(const FString& InUrl)
 {
 	Url = InUrl;
 }
 
-void APIStacksApi::AddHeaderParam(const FString& Key, const FString& Value)
+void APIMetadataSearchApi::AddHeaderParam(const FString& Key, const FString& Value)
 {
 	AdditionalHeaderParams.Add(Key, Value);
 }
 
-void APIStacksApi::ClearHeaderParams()
+void APIMetadataSearchApi::ClearHeaderParams()
 {
 	AdditionalHeaderParams.Reset();
 }
 
-bool APIStacksApi::IsValid() const
+bool APIMetadataSearchApi::IsValid() const
 {
 	if (Url.IsEmpty())
 	{
-		UE_LOG(LogImmutablezkEVMAPI, Error, TEXT("APIStacksApi: Endpoint Url is not set, request cannot be performed"));
+		UE_LOG(LogImmutablezkEVMAPI, Error, TEXT("APIMetadataSearchApi: Endpoint Url is not set, request cannot be performed"));
 		return false;
 	}
 
 	return true;
 }
 
-void APIStacksApi::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManager)
+void APIMetadataSearchApi::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManager)
 {
 	if (RetryManager != &InRetryManager)
 	{
@@ -63,13 +63,13 @@ void APIStacksApi::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManage
 	}
 }
 
-FHttpRetrySystem::FManager& APIStacksApi::GetHttpRetryManager()
+FHttpRetrySystem::FManager& APIMetadataSearchApi::GetHttpRetryManager()
 {
-	checkf(RetryManager, TEXT("APIStacksApi: RetryManager is null.  You may have meant to set it with SetHttpRetryManager first, or you may not be using a custom RetryManager at all."))
+	checkf(RetryManager, TEXT("APIMetadataSearchApi: RetryManager is null.  You may have meant to set it with SetHttpRetryManager first, or you may not be using a custom RetryManager at all."))
 	return *RetryManager;
 }
 
-FHttpRequestRef APIStacksApi::CreateHttpRequest(const Request& Request) const
+FHttpRequestRef APIMetadataSearchApi::CreateHttpRequest(const Request& Request) const
 {
 	if (!Request.GetRetryParams().IsSet())
 	{
@@ -89,7 +89,7 @@ FHttpRequestRef APIStacksApi::CreateHttpRequest(const Request& Request) const
 	}
 }
 
-void APIStacksApi::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, Response& InOutResponse) const
+void APIMetadataSearchApi::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, Response& InOutResponse) const
 {
 	InOutResponse.SetHttpResponse(HttpResponse);
 	InOutResponse.SetSuccessful(bSucceeded);
@@ -133,7 +133,7 @@ void APIStacksApi::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded
 	InOutResponse.SetHttpResponseCode(EHttpResponseCodes::RequestTimeout);
 }
 
-FHttpRequestPtr APIStacksApi::ListFilters(const ListFiltersRequest& Request, const FListFiltersDelegate& Delegate /*= FListFiltersDelegate()*/) const
+FHttpRequestPtr APIMetadataSearchApi::ListFilters(const ListFiltersRequest& Request, const FListFiltersDelegate& Delegate /*= FListFiltersDelegate()*/) const
 {
 	if (!IsValid())
 		return nullptr;
@@ -148,19 +148,19 @@ FHttpRequestPtr APIStacksApi::ListFilters(const ListFiltersRequest& Request, con
 
 	Request.SetupHttpRequest(HttpRequest);
 
-	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIStacksApi::OnListFiltersResponse, Delegate);
+	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIMetadataSearchApi::OnListFiltersResponse, Delegate);
 	HttpRequest->ProcessRequest();
 	return HttpRequest;
 }
 
-void APIStacksApi::OnListFiltersResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListFiltersDelegate Delegate) const
+void APIMetadataSearchApi::OnListFiltersResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListFiltersDelegate Delegate) const
 {
 	ListFiltersResponse Response;
 	HandleResponse(HttpResponse, bSucceeded, Response);
 	Delegate.ExecuteIfBound(Response);
 }
 
-FHttpRequestPtr APIStacksApi::ListStacks(const ListStacksRequest& Request, const FListStacksDelegate& Delegate /*= FListStacksDelegate()*/) const
+FHttpRequestPtr APIMetadataSearchApi::SearchNFTs(const SearchNFTsRequest& Request, const FSearchNFTsDelegate& Delegate /*= FSearchNFTsDelegate()*/) const
 {
 	if (!IsValid())
 		return nullptr;
@@ -175,46 +175,19 @@ FHttpRequestPtr APIStacksApi::ListStacks(const ListStacksRequest& Request, const
 
 	Request.SetupHttpRequest(HttpRequest);
 
-	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIStacksApi::OnListStacksResponse, Delegate);
+	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIMetadataSearchApi::OnSearchNFTsResponse, Delegate);
 	HttpRequest->ProcessRequest();
 	return HttpRequest;
 }
 
-void APIStacksApi::OnListStacksResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListStacksDelegate Delegate) const
-{
-	ListStacksResponse Response;
-	HandleResponse(HttpResponse, bSucceeded, Response);
-	Delegate.ExecuteIfBound(Response);
-}
-
-FHttpRequestPtr APIStacksApi::SearchNFTs(const SearchNFTsRequest& Request, const FSearchNFTsDelegate& Delegate /*= FSearchNFTsDelegate()*/) const
-{
-	if (!IsValid())
-		return nullptr;
-
-	FHttpRequestRef HttpRequest = CreateHttpRequest(Request);
-	HttpRequest->SetURL(*(Url + Request.ComputePath()));
-
-	for(const auto& It : AdditionalHeaderParams)
-	{
-		HttpRequest->SetHeader(It.Key, It.Value);
-	}
-
-	Request.SetupHttpRequest(HttpRequest);
-
-	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIStacksApi::OnSearchNFTsResponse, Delegate);
-	HttpRequest->ProcessRequest();
-	return HttpRequest;
-}
-
-void APIStacksApi::OnSearchNFTsResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FSearchNFTsDelegate Delegate) const
+void APIMetadataSearchApi::OnSearchNFTsResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FSearchNFTsDelegate Delegate) const
 {
 	SearchNFTsResponse Response;
 	HandleResponse(HttpResponse, bSucceeded, Response);
 	Delegate.ExecuteIfBound(Response);
 }
 
-FHttpRequestPtr APIStacksApi::SearchStacks(const SearchStacksRequest& Request, const FSearchStacksDelegate& Delegate /*= FSearchStacksDelegate()*/) const
+FHttpRequestPtr APIMetadataSearchApi::SearchStacks(const SearchStacksRequest& Request, const FSearchStacksDelegate& Delegate /*= FSearchStacksDelegate()*/) const
 {
 	if (!IsValid())
 		return nullptr;
@@ -229,12 +202,12 @@ FHttpRequestPtr APIStacksApi::SearchStacks(const SearchStacksRequest& Request, c
 
 	Request.SetupHttpRequest(HttpRequest);
 
-	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIStacksApi::OnSearchStacksResponse, Delegate);
+	HttpRequest->OnProcessRequestComplete().BindRaw(this, &APIMetadataSearchApi::OnSearchStacksResponse, Delegate);
 	HttpRequest->ProcessRequest();
 	return HttpRequest;
 }
 
-void APIStacksApi::OnSearchStacksResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FSearchStacksDelegate Delegate) const
+void APIMetadataSearchApi::OnSearchStacksResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FSearchStacksDelegate Delegate) const
 {
 	SearchStacksResponse Response;
 	HandleResponse(HttpResponse, bSucceeded, Response);

@@ -44,6 +44,8 @@ public:
 	class ListMetadataResponse;
 	class ListMetadataForChainRequest;
 	class ListMetadataForChainResponse;
+	class ListStacksRequest;
+	class ListStacksResponse;
 	class RefreshMetadataByIDRequest;
 	class RefreshMetadataByIDResponse;
 	class RefreshNFTMetadataByTokenIDRequest;
@@ -52,12 +54,14 @@ public:
     DECLARE_DELEGATE_OneParam(FGetMetadataDelegate, const GetMetadataResponse&);
     DECLARE_DELEGATE_OneParam(FListMetadataDelegate, const ListMetadataResponse&);
     DECLARE_DELEGATE_OneParam(FListMetadataForChainDelegate, const ListMetadataForChainResponse&);
+    DECLARE_DELEGATE_OneParam(FListStacksDelegate, const ListStacksResponse&);
     DECLARE_DELEGATE_OneParam(FRefreshMetadataByIDDelegate, const RefreshMetadataByIDResponse&);
     DECLARE_DELEGATE_OneParam(FRefreshNFTMetadataByTokenIDDelegate, const RefreshNFTMetadataByTokenIDResponse&);
     
     FHttpRequestPtr GetMetadata(const GetMetadataRequest& Request, const FGetMetadataDelegate& Delegate = FGetMetadataDelegate()) const;
     FHttpRequestPtr ListMetadata(const ListMetadataRequest& Request, const FListMetadataDelegate& Delegate = FListMetadataDelegate()) const;
     FHttpRequestPtr ListMetadataForChain(const ListMetadataForChainRequest& Request, const FListMetadataForChainDelegate& Delegate = FListMetadataForChainDelegate()) const;
+    FHttpRequestPtr ListStacks(const ListStacksRequest& Request, const FListStacksDelegate& Delegate = FListStacksDelegate()) const;
     FHttpRequestPtr RefreshMetadataByID(const RefreshMetadataByIDRequest& Request, const FRefreshMetadataByIDDelegate& Delegate = FRefreshMetadataByIDDelegate()) const;
     FHttpRequestPtr RefreshNFTMetadataByTokenID(const RefreshNFTMetadataByTokenIDRequest& Request, const FRefreshNFTMetadataByTokenIDDelegate& Delegate = FRefreshNFTMetadataByTokenIDDelegate()) const;
     
@@ -65,6 +69,7 @@ private:
     void OnGetMetadataResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FGetMetadataDelegate Delegate) const;
     void OnListMetadataResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListMetadataDelegate Delegate) const;
     void OnListMetadataForChainResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListMetadataForChainDelegate Delegate) const;
+    void OnListStacksResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FListStacksDelegate Delegate) const;
     void OnRefreshMetadataByIDResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FRefreshMetadataByIDDelegate Delegate) const;
     void OnRefreshNFTMetadataByTokenIDResponse(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, FRefreshNFTMetadataByTokenIDDelegate Delegate) const;
     

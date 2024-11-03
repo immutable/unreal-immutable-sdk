@@ -98,9 +98,8 @@
       "x-displayName": "pricing"
     },
     {
-      "name": "stacks",
-      "description": "Stacks Endpoints",
-      "x-displayName": "stacks"
+      "name": "metadata-search",
+      "x-displayName": "metadata-search"
     }
   ],
   "paths": {
@@ -3624,15 +3623,15 @@
         }
       }
     },
-    "/experimental/chains/{chain_name}/search/filters/{contract_address}": {
+    "/v1/chains/{chain_name}/search/filters/{contract_address}": {
       "get": {
         "x-hide-from-sdk": true,
         "tags": [
-          "stacks"
+          "metadata-search"
         ],
         "operationId": "ListFilters",
-        "summary": "Experimental: Get list of metadata attribute filters",
-        "description": "![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get list of metadata filters",
+        "summary": "Get list of metadata attribute filters",
+        "description": "Get list of metadata filters",
         "parameters": [
           {
             "name": "chain_name",
@@ -3693,15 +3692,15 @@
         }
       }
     },
-    "/experimental/chains/{chain_name}/search/nfts": {
+    "/v1/chains/{chain_name}/search/nfts": {
       "get": {
         "x-hide-from-sdk": true,
         "tags": [
-          "stacks"
+          "metadata-search"
         ],
         "operationId": "SearchNFTs",
-        "summary": "Experimental: Search NFTs",
-        "description": "![Experimental](https://img.shields.io/badge/status-experimental-yellow) Search NFTs",
+        "summary": "Search NFTs",
+        "description": "Search NFTs",
         "parameters": [
           {
             "name": "chain_name",
@@ -3822,15 +3821,15 @@
         }
       }
     },
-    "/experimental/chains/{chain_name}/search/stacks": {
+    "/v1/chains/{chain_name}/search/stacks": {
       "get": {
         "x-hide-from-sdk": true,
         "tags": [
-          "stacks"
+          "metadata-search"
         ],
         "operationId": "SearchStacks",
-        "summary": "Experimental: Search NFT stacks",
-        "description": "![Experimental](https://img.shields.io/badge/status-experimental-yellow) Search NFT stacks",
+        "summary": "Search NFT stacks",
+        "description": "Search NFT stacks",
         "parameters": [
           {
             "name": "chain_name",
@@ -3977,15 +3976,15 @@
         }
       }
     },
-    "/experimental/chains/{chain_name}/stacks": {
+    "/v1/chains/{chain_name}/stacks": {
       "get": {
         "x-hide-from-sdk": true,
         "tags": [
-          "stacks"
+          "metadata"
         ],
         "operationId": "ListStacks",
-        "summary": "Experimental: List NFT stacks by stack_id",
-        "description": "![Experimental](https://img.shields.io/badge/status-experimental-yellow) NFT stacks",
+        "summary": "List NFT stack bundles by stack_id. Response will include Market, Listings & Stack Count information for each stack",
+        "description": "List NFT stack bundles by stack_id. This endpoint functions similarly to `ListMetadataByID` but extends the response to include Market, Listings & Stack Count information for each stack.",
         "parameters": [
           {
             "name": "chain_name",
@@ -4055,15 +4054,15 @@
         }
       }
     },
-    "/experimental/chains/{chain_name}/quotes/{contract_address}/stacks": {
+    "/v1/chains/{chain_name}/quotes/{contract_address}/stacks": {
       "get": {
         "x-hide-from-sdk": true,
         "tags": [
           "pricing"
         ],
         "operationId": "QuotesForStacks",
-        "summary": "Experimental: Get pricing data for a list of stack ids",
-        "description": "![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get pricing data for a list of stack ids",
+        "summary": "Get pricing data for a list of stack ids",
+        "description": "Get pricing data for a list of stack ids",
         "parameters": [
           {
             "name": "chain_name",
@@ -4148,15 +4147,15 @@
         }
       }
     },
-    "/experimental/chains/{chain_name}/quotes/{contract_address}/nfts": {
+    "/v1/chains/{chain_name}/quotes/{contract_address}/nfts": {
       "get": {
         "x-hide-from-sdk": true,
         "tags": [
           "pricing"
         ],
         "operationId": "QuotesForNFTs",
-        "summary": "Experimental: Get pricing data for a list of token ids",
-        "description": "![Experimental](https://img.shields.io/badge/status-experimental-yellow) Get pricing data for a list of token ids",
+        "summary": "Get pricing data for a list of token ids",
+        "description": "pricing data for a list of token ids",
         "parameters": [
           {
             "name": "chain_name",
@@ -9954,50 +9953,5 @@
         ]
       }
     }
-  },
-  "x-tagGroups": [
-    {
-      "name": "Multi Rollup API",
-      "tags": [
-        "activities",
-        "chains",
-        "collections",
-        "nfts",
-        "nft owners",
-        "metadata",
-        "tokens",
-        "demopage",
-        "verification",
-        "operatorallowlist",
-        "crafting",
-        "listings",
-        "orders"
-      ]
-    },
-    {
-      "name": "Passport MR",
-      "tags": [
-        "passport"
-      ]
-    },
-    {
-      "name": "Passport Profile Service API",
-      "tags": [
-        "passport profile"
-      ]
-    },
-    {
-      "name": "Guardian",
-      "tags": [
-        "guardian"
-      ]
-    },
-    {
-      "name": "Indexer Marketplace APIs",
-      "tags": [
-        "pricing",
-        "stacks"
-      ]
-    }
-  ]
+  }
 }

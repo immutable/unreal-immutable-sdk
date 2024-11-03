@@ -26,6 +26,7 @@
 #include "APIMetadataRefreshRateLimitResult.h"
 #include "APIRefreshMetadataByIDRequest.h"
 #include "APIRefreshNFTMetadataByTokenIDRequest.h"
+#include "APIStackBundle.h"
 
 namespace ImmutablezkEVMAPI
 {
@@ -121,6 +122,33 @@ public:
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 
     APIListMetadataResult Content;
+};
+
+/* List NFT stack bundles by stack_id. Response will include Market, Listings &amp; Stack Count information for each stack
+ *
+ * List NFT stack bundles by stack_id. This endpoint functions similarly to &#x60;ListMetadataByID&#x60; but extends the response to include Market, Listings &amp; Stack Count information for each stack.
+*/
+class IMMUTABLEZKEVMAPI_API APIMetadataApi::ListStacksRequest : public Request
+{
+public:
+    virtual ~ListStacksRequest() {}
+	void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const final;
+	FString ComputePath() const final;
+
+	/* The name of chain */
+	FString ChainName;
+	/* List of stack_id to filter by */
+	TArray<FGuid> StackId;
+};
+
+class IMMUTABLEZKEVMAPI_API APIMetadataApi::ListStacksResponse : public Response
+{
+public:
+    virtual ~ListStacksResponse() {}
+	void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) final;
+	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
+
+    TArray<APIStackBundle> Content;
 };
 
 /* Refresh stacked metadata
