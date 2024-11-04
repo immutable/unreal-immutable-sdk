@@ -46,15 +46,11 @@ Next, launch the game and then open a separate Chrome/Chromium browser and navig
 ## Release Unreal Immutable SDK Plugin
 
 1. Release the plugin using GitHub releases. See https://github.com/immutable/unreal-immutable-sdk/releases
+## BLUI Plugin
 
-## Release Blui Plugin for UE4
+For Unreal Engine versions 4.26, 4.27, and 5.0, we use the BLUI plugin because Epic's WebBrowserWidget plugin is incompatible with this SDK due to its reliance on an older version of CEF.
 
-For UE 4.26 and 4.27 we are using Blui as the in built browser does not work.
-
-1. Download Blui release from https://github.com/immutable/BLUI-Unreal/tree/Imtbl4.2
-2. Download CEF Browser from https://github.com/getnamo/BLUI-Unreal/releases/tag/v4.6.0 (`BluBrowserCEF....7z`)
-3. Place the Win folder from the `BluBrowserCEF...7z` into the BLUI plugin `Thirdparty/cef`
-4. Zip the Blui plugin folder and upload to the GitHub release.
+Please follow the [installation instructions](https://github.com/immutable/immutable-BLUI?tab=readme-ov-file#installation) to install the Immutable BLUI plugin.
 
 ## Contributing
 Thank you for your interest in contributing to our project! Here's a quick guide on how you can get started:
