@@ -8,6 +8,7 @@
 #include "Immutable/ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
 #include "Immutable/ImmutableSaveGame.h"
+#include "Immutable/ImmutableUtilities.h"
 #include "Kismet/GameplayStatics.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
 
@@ -41,6 +42,36 @@ void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, cons
 	}
 
 	InitData = Data;
+
+	CallJS(ImmutablePassportAction::INIT, InitData.ToJsonString(), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse), false);
+}
+
+void UImmutablePassport::Initialize(const FImtblPassportResponseDelegate& ResponseDelegate)
+{
+	check(JSConnector.IsValid());
+	
+	UApplicationConfig* ApplicationConfig = FImmutableUtilities::GetDefaultApplicationConfig();
+
+	if (!ApplicationConfig)
+	{
+		ResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, "Failed to retrieve default application configuration for Passport initialization"});
+
+		return;
+	}
+
+	InitData.clientId = ApplicationConfig->GetClientID();
+	InitData.environment = ApplicationConfig->GetEnvironment();
+	InitData.redirectUri = ApplicationConfig->GetRedirectURL();
+	InitData.logoutRedirectUri = ApplicationConfig->GetLogoutURL();
+
+	LoadPassportSettings();
+	// we check saved settings in case if player has not logged out properly
+	if (InitData.logoutRedirectUri.IsEmpty() && IsStateFlagsSet(IPS_PKCE))
+	{
+		IMTBL_ERR("Logout URI is empty. Previously logged in via PKCE.")
+		ResetStateFlags(IPS_PKCE);
+		SavePassportSettings();
+	}
 
 	CallJS(ImmutablePassportAction::INIT, InitData.ToJsonString(), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnInitializeResponse), false);
 }

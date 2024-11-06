@@ -81,6 +81,15 @@ public:
 	void Initialize(const FImmutablePassportInitData& InitData, const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
+	 * Initialises passport. This sets up the Passport instance, configures the web browser, and waits for the ready signal.
+	 * @details The functionality is the same with Initilize above except it obtains Passport initilization data from ApplicationConfig asset
+	 * @see UApplicationConfig
+	 *
+	 * @param ResponseDelegate 	Callback delegate.
+	 */
+	void Initialize(const FImtblPassportResponseDelegate& ResponseDelegate);
+
+	/**
 	 * Logs the user into Passport via device code auth and sets up the Immutable X provider.
 	 *
 	 * This will open the user's default browser and take them through Passport login. 
