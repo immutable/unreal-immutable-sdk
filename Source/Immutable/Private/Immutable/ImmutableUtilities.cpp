@@ -1,5 +1,6 @@
 #include "Immutable/ImmutableUtilities.h"
 
+#include "Immutable/ImmutablePluginSettings.h"
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Interfaces/IPluginManager.h"
 #include "Misc/FileHelper.h"
@@ -18,4 +19,16 @@ bool FImmutableUtilities::LoadGameBridge(FString& GameBridge)
 	IMTBL_ERR("Failed to load game-bridge file")
 
 	return false;
+}
+
+UApplicationConfig* FImmutableUtilities::GetDefaultApplicationConfig()
+{
+	auto Settings = GetDefault<UImmutablePluginSettings>();
+
+	if (!Settings)
+	{
+		return nullptr;
+	}
+
+	return Settings->DefaultApplicationConfig.GetDefaultObject();
 }

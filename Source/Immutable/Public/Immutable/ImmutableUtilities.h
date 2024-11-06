@@ -1,4 +1,5 @@
 #pragma once
+#include "ApplicationConfig.h"
 
 
 /** A wrapper struct around various Immutable namespace utility and support methods. */
@@ -12,4 +13,6 @@ public:
 	 * @return True if the game bridge content was sucessfully retrieved. Otherwise, false.
 	 */
 	static bool LoadGameBridge(FString& GameBridge);
+
+	static UApplicationConfig* GetDefaultApplicationConfig();
 };

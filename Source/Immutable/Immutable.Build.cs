@@ -33,6 +33,7 @@ public class Immutable : ModuleRules
                 "Json",
                 "UMG",
                 "Projects", 
+                "DeveloperSettings",
 			}
         );
 
