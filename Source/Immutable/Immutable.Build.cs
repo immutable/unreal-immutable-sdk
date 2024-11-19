@@ -38,14 +38,21 @@ public class Immutable : ModuleRules
         );
 
 #if UE_5_0_OR_LATER
-			PublicDependencyModuleNames.Add("WebBrowserWidget");
+        PublicDependencyModuleNames.Add("WebBrowserWidget");
+#else
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            PublicDependencyModuleNames.Add("Blu");
+        }
+#endif
+
+#if UE_5_0_OR_LATER
 			PrivateDependencyModuleNames.Add("WebBrowser");
 			PublicDefinitions.Add("USING_BUNDLED_CEF=1");
 			PublicDefinitions.Add("USING_BLUI_CEF=0");
 #else
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-            PrivateDependencyModuleNames.Add("Blu");
             PublicDefinitions.Add("USING_BLUI_CEF=1");
         }
         else
