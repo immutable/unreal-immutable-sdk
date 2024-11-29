@@ -2,6 +2,8 @@
 
 #include "Containers/UnrealString.h"
 #include "CoreTypes.h"
+#include "Runtime/Launch/Resources/Version.h"
+
 #include "Immutable/ImmutablePassport.h"
 
 #include "Misc/AutomationTest.h"
@@ -15,7 +17,11 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FImtblMessagesTest, "Immutable.JSMessages", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ServerContext | EAutomationTestFlags::ProductFilter)
+#if ((ENGINE_MAJOR_VERSION <= 4) || (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION <= 4))
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FImtblMessagesTest, "Immutable.JSMessages", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::EngineFilter)
+#else
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FImtblMessagesTest, "Immutable.JSMessages", EAutomationTestFlags_ApplicationContextMask | EAutomationTestFlags::EngineFilter)
+#endif
 
 // EAutomationTestFlags::SmokeFilter -- note that SmokeFilter will run
 // automatically during cooking

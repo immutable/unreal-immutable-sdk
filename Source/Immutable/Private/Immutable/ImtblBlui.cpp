@@ -35,15 +35,18 @@ void UImtblBlui::OnLogEvent(const FString& LogText)
 void UImtblBlui::WorldTickStart(UWorld* World, ELevelTick LevelTick, float X)
 {
 #if USING_BLUI_CEF
-	if (!GetBluEye()->IsBrowserLoading() && !bLoadedIndexJS)
+	if (UBluEye* BluEye = GetBluEye())
 	{
-		FString JavaScript;
-		
-		IMTBL_LOG("BLUI CEF Browser loaded");
-		bLoadedIndexJS = true;
-		if (FImmutableUtilities::LoadGameBridge(JavaScript))
+		if (!BluEye->IsBrowserLoading() && !bLoadedIndexJS)
 		{
-			GetBluEye()->ExecuteJS(JavaScript);
+			FString JavaScript;
+
+			IMTBL_LOG("BLUI CEF Browser loaded");
+			bLoadedIndexJS = true;
+			if (FImmutableUtilities::LoadGameBridge(JavaScript))
+			{
+				BluEye->ExecuteJS(JavaScript);
+			}
 		}
 	}
 #endif
