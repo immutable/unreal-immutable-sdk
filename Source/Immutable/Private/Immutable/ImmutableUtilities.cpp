@@ -27,8 +27,24 @@ UApplicationConfig* FImmutableUtilities::GetDefaultApplicationConfig()
 
 	if (!Settings)
 	{
+		IMTBL_ERR("Failed to retrieve default Immutable application configuration")
+		
 		return nullptr;
 	}
 
 	return Settings->DefaultApplicationConfig.GetDefaultObject();
+}
+
+UTransakConfig* FImmutableUtilities::GetDefaultTransakConfig()
+{
+	auto Settings = GetDefault<UImmutablePluginSettings>();
+
+	if (!Settings)
+	{
+		IMTBL_ERR("Failed to retrieve default Immutable Transak configuration")
+		
+		return nullptr;
+	}
+
+	return Settings->DefaultTransakConfig.GetDefaultObject();
 }

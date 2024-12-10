@@ -1,5 +1,6 @@
 #pragma once
 #include "ApplicationConfig.h"
+#include "TransakConfig.h"
 
 
 /** A wrapper struct around various Immutable namespace utility and support methods. */
@@ -15,4 +16,5 @@ public:
 	static bool LoadGameBridge(FString& GameBridge);
 
 	static UApplicationConfig* GetDefaultApplicationConfig();
+	static UTransakConfig* GetDefaultTransakConfig();
 };

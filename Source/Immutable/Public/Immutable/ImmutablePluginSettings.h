@@ -2,6 +2,7 @@
 
 #include "Engine/DeveloperSettings.h"
 #include "ApplicationConfig.h"
+#include "TransakConfig.h"
 
 #include "ImmutablePluginSettings.generated.h"
 
@@ -22,4 +23,7 @@ public:
 	/// which will be used as the default configuration for the application.
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
 	TSubclassOf<UApplicationConfig> DefaultApplicationConfig;
+
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Transak")
+	TSubclassOf<UTransakConfig> DefaultTransakConfig;
 };
