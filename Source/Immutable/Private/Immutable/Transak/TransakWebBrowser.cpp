@@ -1,9 +1,9 @@
 ﻿#include "Immutable/Transak/TransakWebBrowser.h"
 
+#include "SWebBrowser.h"
 #include "PlatformHttp.h"
 #include "Immutable/ImmutableUtilities.h"
 #include "Immutable/TransakConfig.h"
-#include "Immutable/Misc/ImtblLogging.h"
 
 
 #define LOCTEXT_NAMESPACE "Immutable"
@@ -32,41 +32,28 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 	}
 	else
 	{
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 		WebBrowserWidget = SNew(SWebBrowser)
 			.InitialURL(TEXT("about:blank"))
 			.ShowControls(false)
-			.SupportsTransparency(false)
-			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
+			.SupportsTransparency(bSupportsTransparency)
+			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, OnUrlChanged))
 			.OnBeforePopup(BIND_UOBJECT_DELEGATE(FOnBeforePopupDelegate, HandleOnBeforePopup))
 			.OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage));
+
 		return WebBrowserWidget.ToSharedRef();
-#else
-		return SNullWidget::NullWidget;
-#endif
 	}
 }
 
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
+void UTransakWebBrowser::OnUrlChanged(const FText& Text)
 {
+	HandleOnUrlChanged(Text);
+
 	if (Text.EqualToCaseIgnored(FText::FromString(TEXT("about:blank"))))
 	{
 		bIsReady = true;
 		OnWhenReady.Broadcast();
 	}
 }
-
-void UTransakWebBrowser::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
-{
-	IMTBL_LOG("Transak Web Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
-}
-
-bool UTransakWebBrowser::HandleOnBeforePopup(FString URL, FString Frame)
-{
-	return false;
-}
-#endif
 
 void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
 {
@@ -79,17 +66,13 @@ void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email
 
     if (bIsReady)
     {
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
         WebBrowserWidget->LoadURL(UrlToLoad);
-#endif
     }
     else
     {
         FDelegateHandle OnWhenReadyHandle = CallAndRegister_OnWhenReady(UTransakWebBrowser::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad, OnWhenReadyHandle]()
         {
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
             WebBrowserWidget->LoadURL(UrlToLoad);
-#endif
         	OnWhenReady.Remove(OnWhenReadyHandle);
         }));
     }

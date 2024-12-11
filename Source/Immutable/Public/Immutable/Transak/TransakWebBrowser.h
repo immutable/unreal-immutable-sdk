@@ -1,10 +1,7 @@
 ﻿#pragma once
 
-#include "Components/Widget.h"
-
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-#include "SWebBrowser.h"
-#endif
+#include "CoreMinimal.h"
+#include "WebBrowser.h"
 
 #include "TransakWebBrowser.generated.h"
 
@@ -12,7 +9,7 @@
  * 
  */
 UCLASS()
-class IMMUTABLE_API UTransakWebBrowser : public UWidget
+class IMMUTABLE_API UTransakWebBrowser : public UWebBrowser
 {
 	GENERATED_BODY()
 
@@ -33,19 +30,9 @@ protected:
 
 private:
 	FString ComputePath(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle);
-
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-	void HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
-	void HandleOnUrlChanged(const FText& Text);
-	bool HandleOnBeforePopup(FString URL, FString Frame);
-#endif
+	void OnUrlChanged(const FText& Text);
 
 protected:
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-	TSharedPtr<class SWebBrowser> WebBrowserWidget;
-#else
-	TSharedPtr<class SNullWidget> WebBrowserWidget;
-#endif
 	FOnWhenReady OnWhenReady;
 
 private:
