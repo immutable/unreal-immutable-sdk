@@ -34,6 +34,7 @@ public class Immutable : ModuleRules
                 "UMG",
                 "Projects", 
                 "DeveloperSettings",
+                "HTTP",
 			}
         );
 
