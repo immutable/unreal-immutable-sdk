@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "WebBrowser.h"
+#include "WebBrowser.h"
 
 #include "TransakWebBrowser.generated.h"
 

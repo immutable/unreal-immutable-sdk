@@ -19,7 +19,9 @@ public class Immutable : ModuleRules
             new string[]
             {
                 "Core",
-                "JsonUtilities",
+                "JsonUtilities", 
+                "WebBrowser",
+                "WebBrowserWidget",
 			}
         );
         

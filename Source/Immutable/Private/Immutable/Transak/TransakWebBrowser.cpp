@@ -38,8 +38,10 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 			.SupportsTransparency(bSupportsTransparency)
 			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, OnUrlChanged))
 			.OnBeforePopup(BIND_UOBJECT_DELEGATE(FOnBeforePopupDelegate, HandleOnBeforePopup))
-			.OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage));
-
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+			.OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage))
+#endif
+			;
 		return WebBrowserWidget.ToSharedRef();
 	}
 }
