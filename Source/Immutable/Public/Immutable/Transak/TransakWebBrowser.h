@@ -33,7 +33,12 @@ protected:
 
 private:
 	FString ComputePath(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle);
-	void OnUrlChanged(const FText& Text);
+
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+	void HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
+	void HandleOnUrlChanged(const FText& Text);
+	bool HandleOnBeforePopup(FString URL, FString Frame);
+#endif
 
 protected:
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
