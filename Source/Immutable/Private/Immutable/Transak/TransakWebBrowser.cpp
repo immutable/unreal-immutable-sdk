@@ -1,6 +1,5 @@
 ﻿#include "Immutable/Transak/TransakWebBrowser.h"
 
-#include "SWebBrowser.h"
 #include "PlatformHttp.h"
 #include "Immutable/ImmutableUtilities.h"
 #include "Immutable/TransakConfig.h"
@@ -32,24 +31,23 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 	}
 	else
 	{
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 		WebBrowserWidget = SNew(SWebBrowser)
 			.InitialURL(TEXT("about:blank"))
 			.ShowControls(false)
 			.SupportsTransparency(bSupportsTransparency)
 			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, OnUrlChanged))
 			.OnBeforePopup(BIND_UOBJECT_DELEGATE(FOnBeforePopupDelegate, HandleOnBeforePopup))
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-			.OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage))
-#endif
-			;
+			.OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage));
 		return WebBrowserWidget.ToSharedRef();
+#else
+		return SNullWidget::NullWidget;
+#endif
 	}
 }
 
 void UTransakWebBrowser::OnUrlChanged(const FText& Text)
 {
-	HandleOnUrlChanged(Text);
-
 	if (Text.EqualToCaseIgnored(FText::FromString(TEXT("about:blank"))))
 	{
 		bIsReady = true;
@@ -68,13 +66,17 @@ void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email
 
     if (bIsReady)
     {
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
         WebBrowserWidget->LoadURL(UrlToLoad);
+#endif
     }
     else
     {
         FDelegateHandle OnWhenReadyHandle = CallAndRegister_OnWhenReady(UTransakWebBrowser::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad, OnWhenReadyHandle]()
         {
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
             WebBrowserWidget->LoadURL(UrlToLoad);
+#endif
         	OnWhenReady.Remove(OnWhenReadyHandle);
         }));
     }
