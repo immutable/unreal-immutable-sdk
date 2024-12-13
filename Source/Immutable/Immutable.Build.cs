@@ -20,8 +20,10 @@ public class Immutable : ModuleRules
             {
                 "Core",
                 "JsonUtilities", 
+#if UE_5_1_OR_LATER
                 "WebBrowser",
                 "WebBrowserWidget",
+#endif
 			}
         );
         

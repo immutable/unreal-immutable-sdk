@@ -1,8 +1,10 @@
 ﻿#pragma once
 
-#include "CoreMinimal.h"
-#include "WebBrowser.h"
-#include "WebBrowser.h"
+#include "Components/Widget.h"
+
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+#include "SWebBrowser.h"
+#endif
 
 #include "TransakWebBrowser.generated.h"
 
@@ -10,7 +12,7 @@
  * 
  */
 UCLASS()
-class IMMUTABLE_API UTransakWebBrowser : public UWebBrowser
+class IMMUTABLE_API UTransakWebBrowser : public UWidget
 {
 	GENERATED_BODY()
 
@@ -34,6 +36,11 @@ private:
 	void OnUrlChanged(const FText& Text);
 
 protected:
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+	TSharedPtr<class SWebBrowser> WebBrowserWidget;
+#else
+	TSharedPtr<class SNullWidget> WebBrowserWidget;
+#endif
 	FOnWhenReady OnWhenReady;
 
 private:
