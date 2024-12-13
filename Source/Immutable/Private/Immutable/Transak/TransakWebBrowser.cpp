@@ -3,6 +3,7 @@
 #include "PlatformHttp.h"
 #include "Immutable/ImmutableUtilities.h"
 #include "Immutable/TransakConfig.h"
+#include "Immutable/Misc/ImtblLogging.h"
 
 
 #define LOCTEXT_NAMESPACE "Immutable"
@@ -35,8 +36,8 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 		WebBrowserWidget = SNew(SWebBrowser)
 			.InitialURL(TEXT("about:blank"))
 			.ShowControls(false)
-			.SupportsTransparency(bSupportsTransparency)
-			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, OnUrlChanged))
+			.SupportsTransparency(false)
+			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
 			.OnBeforePopup(BIND_UOBJECT_DELEGATE(FOnBeforePopupDelegate, HandleOnBeforePopup))
 			.OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage));
 		return WebBrowserWidget.ToSharedRef();
@@ -46,7 +47,8 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 	}
 }
 
-void UTransakWebBrowser::OnUrlChanged(const FText& Text)
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
 {
 	if (Text.EqualToCaseIgnored(FText::FromString(TEXT("about:blank"))))
 	{
@@ -54,6 +56,17 @@ void UTransakWebBrowser::OnUrlChanged(const FText& Text)
 		OnWhenReady.Broadcast();
 	}
 }
+
+void UTransakWebBrowser::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
+{
+	IMTBL_LOG("Transak Web Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
+}
+
+bool UTransakWebBrowser::HandleOnBeforePopup(FString URL, FString Frame)
+{
+	return false;
+}
+#endif
 
 void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
 {
