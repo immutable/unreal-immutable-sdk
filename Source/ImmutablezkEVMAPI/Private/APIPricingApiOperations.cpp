@@ -33,6 +33,10 @@ FString APIPricingApi::QuotesForNFTsRequest::ComputePath() const
 
 	TArray<FString> QueryParams;
 	QueryParams.Add(CollectionToUrlString_multi(TokenId, TEXT("token_id")));
+	if(PaymentToken.IsSet())
+	{
+		QueryParams.Add(FString(TEXT("payment_token=")) + ToUrlString(PaymentToken.GetValue()));
+	}
 	if(PageCursor.IsSet())
 	{
 		QueryParams.Add(FString(TEXT("page_cursor=")) + ToUrlString(PageCursor.GetValue()));
@@ -96,6 +100,10 @@ FString APIPricingApi::QuotesForStacksRequest::ComputePath() const
 
 	TArray<FString> QueryParams;
 	QueryParams.Add(CollectionToUrlString_multi(StackId, TEXT("stack_id")));
+	if(PaymentToken.IsSet())
+	{
+		QueryParams.Add(FString(TEXT("payment_token=")) + ToUrlString(PaymentToken.GetValue()));
+	}
 	if(PageCursor.IsSet())
 	{
 		QueryParams.Add(FString(TEXT("page_cursor=")) + ToUrlString(PageCursor.GetValue()));

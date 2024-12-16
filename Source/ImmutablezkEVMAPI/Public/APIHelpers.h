@@ -295,6 +295,17 @@ inline void WriteJsonValue(JsonWriter& Writer, const TArray<T>& Value)
 	Writer->WriteArrayEnd();
 }
 
+template <typename T>
+inline void WriteJsonValue(JsonWriter& Writer, const TSet<T>& Value)
+{
+	Writer->WriteArrayStart();
+	for (const auto& Element : Value)
+	{
+		WriteJsonValue(Writer, Element);
+	}
+	Writer->WriteArrayEnd();
+}
+
 template<typename T>
 inline void WriteJsonValue(JsonWriter& Writer, const TMap<FString, T>& Value)
 {
@@ -418,6 +429,26 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, TArray<T>& 
 			T TmpValue;
 			ParseSuccess &= TryGetJsonValue((*JsonArray)[i], TmpValue);
 			ArrayValue.Emplace(MoveTemp(TmpValue));
+		}
+		return ParseSuccess;
+	}
+	return false;
+}
+
+template <typename T>
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, TSet<T>& SetValue)
+{
+	const TArray<TSharedPtr<FJsonValue>>* JsonArray;
+	if (JsonValue->TryGetArray(JsonArray))
+	{
+		bool ParseSuccess = true;
+		const int32 Count = JsonArray->Num();
+		SetValue.Reset();
+		for (int i = 0; i < Count; i++)
+		{
+			T TmpValue;
+			ParseSuccess &= TryGetJsonValue((*JsonArray)[i], TmpValue);
+			SetValue.Emplace(MoveTemp(TmpValue));
 		}
 		return ParseSuccess;
 	}
