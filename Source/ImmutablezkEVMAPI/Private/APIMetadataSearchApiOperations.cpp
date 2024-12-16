@@ -234,6 +234,10 @@ FString APIMetadataSearchApi::SearchStacksRequest::ComputePath() const
 	{
 		QueryParams.Add(FString(TEXT("keyword=")) + ToUrlString(Keyword.GetValue()));
 	}
+	if(PaymentToken.IsSet())
+	{
+		QueryParams.Add(FString(TEXT("payment_token=")) + ToUrlString(PaymentToken.GetValue()));
+	}
 	if(SortBy.IsSet())
 	{
 		QueryParams.Add(FString(TEXT("sort_by=")) + ToUrlString(SortBy.GetValue()));
