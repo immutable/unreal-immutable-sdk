@@ -117,6 +117,8 @@ public:
 	TOptional<FString> Traits;
 	/* Keyword to search NFT name and description. Alphanumeric characters only. */
 	TOptional<FString> Keyword;
+	/* Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or 'NATIVE' */
+	TOptional<FString> PaymentToken;
 	enum class SortByEnum
 	{
 		CheapestFirst,
