@@ -5,6 +5,11 @@
 #include "Immutable/TransakConfig.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+#include "SWebBrowser.h"
+#else
+#include "UserInterface/BluWebBrowser.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "Immutable"
 
@@ -34,7 +39,7 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 	{
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 		WebBrowserWidget = SNew(SWebBrowser)
-			.InitialURL(TEXT("about:blank"))
+			.InitialURL(InitialURL)
 			.ShowControls(false)
 			.SupportsTransparency(false)
 			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
@@ -42,21 +47,15 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 			.OnConsoleMessage(BIND_UOBJECT_DELEGATE(FOnConsoleMessageDelegate, HandleOnConsoleMessage));
 		return WebBrowserWidget.ToSharedRef();
 #else
-		return SNullWidget::NullWidget;
+		WebBrowserWidget = SNew(SBluWebBrowser)
+			.InitialURL(InitialURL)
+			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged));
+		return WebBrowserWidget.ToSharedRef();
 #endif
 	}
 }
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
-{
-	if (Text.EqualToCaseIgnored(FText::FromString(TEXT("about:blank"))))
-	{
-		bIsReady = true;
-		OnWhenReady.Broadcast();
-	}
-}
-
 void UTransakWebBrowser::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
 {
 	IMTBL_LOG("Transak Web Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
@@ -67,6 +66,15 @@ bool UTransakWebBrowser::HandleOnBeforePopup(FString URL, FString Frame)
 	return false;
 }
 #endif
+
+void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
+{
+	if (Text.EqualToCaseIgnored(FText::FromString(InitialURL)))
+	{
+		bIsReady = true;
+		OnWhenReady.Broadcast();
+	}
+}
 
 void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
 {
@@ -89,6 +97,8 @@ void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email
         {
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
             WebBrowserWidget->LoadURL(UrlToLoad);
+#else
+			WebBrowserWidget->LoadURL(UrlToLoad);
 #endif
         	OnWhenReady.Remove(OnWhenReadyHandle);
         }));

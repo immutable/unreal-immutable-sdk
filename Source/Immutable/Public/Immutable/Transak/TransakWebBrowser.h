@@ -2,11 +2,13 @@
 
 #include "Components/Widget.h"
 
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-#include "SWebBrowser.h"
-#endif
-
 #include "TransakWebBrowser.generated.h"
+
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+class SWebBrowser;
+#else
+class SBluWebBrowser;
+#endif
 
 /**
  * 
@@ -18,7 +20,8 @@ class IMMUTABLE_API UTransakWebBrowser : public UWidget
 
 public:
 	DECLARE_MULTICAST_DELEGATE(FOnWhenReady);
-	
+
+public:
 	UFUNCTION(BlueprintCallable)
 	void Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle);
 
@@ -36,19 +39,22 @@ private:
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 	void HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
-	void HandleOnUrlChanged(const FText& Text);
 	bool HandleOnBeforePopup(FString URL, FString Frame);
 #endif
+	void HandleOnUrlChanged(const FText& Text);
 
 protected:
+	/** URL that the browser will initially navigate to. The URL should include the protocol, eg http:// */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FString InitialURL = TEXT("about:blank");
+
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 	TSharedPtr<class SWebBrowser> WebBrowserWidget;
 #else
-	TSharedPtr<class SNullWidget> WebBrowserWidget;
+	TSharedPtr<SBluWebBrowser> WebBrowserWidget;
 #endif
 	FOnWhenReady OnWhenReady;
 
 private:
 	bool bIsReady = false;
-	
 };
