@@ -78,6 +78,11 @@ void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
 	}
 }
 
+bool UTransakWebBrowser::IsReady() const
+{
+	return bIsReady;
+}
+
 void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
 {
 	if (!WebBrowserWidget.IsValid())

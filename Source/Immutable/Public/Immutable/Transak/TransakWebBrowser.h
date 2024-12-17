@@ -22,10 +22,11 @@ public:
 	DECLARE_MULTICAST_DELEGATE(FOnWhenReady);
 
 public:
+	UFUNCTION(BlueprintPure)
+	bool IsReady() const;
+
 	UFUNCTION(BlueprintCallable)
 	void Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle);
-
-	bool IsReady() const { return bIsReady; };
 
 	FDelegateHandle CallAndRegister_OnWhenReady(FOnWhenReady::FDelegate Delegate);
 
