@@ -13,7 +13,7 @@
 #include "UserInterface/BluWebBrowser.h"
 #endif
 
-#define LOCTEXT_NAMESPACE "Immutable"
+#define LOCTEXT_NAMESPACE "TransakWebBrowser"
 
 bool UTransakWebBrowser::IsReady() const
 {
