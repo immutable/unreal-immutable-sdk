@@ -15,6 +15,40 @@
 
 #define LOCTEXT_NAMESPACE "Immutable"
 
+bool UTransakWebBrowser::IsReady() const
+{
+	return bIsReady;
+}
+
+void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
+{
+	if (!WebBrowserWidget.IsValid())
+	{
+		return;
+	}
+
+	FString UrlToLoad = ComputePath(WalletAddress, Email, ProductsAvailed, ScreenTitle);
+
+	if (bIsReady)
+	{
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+		WebBrowserWidget->LoadURL(UrlToLoad);
+#endif
+	}
+	else
+	{
+		FDelegateHandle OnWhenReadyHandle = CallAndRegister_OnWhenReady(UTransakWebBrowser::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad, OnWhenReadyHandle]()
+		{
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+			WebBrowserWidget->LoadURL(UrlToLoad);
+#else
+			WebBrowserWidget->LoadURL(UrlToLoad);
+#endif
+			OnWhenReady.Remove(OnWhenReadyHandle);
+		}));
+	}
+}
+
 FDelegateHandle UTransakWebBrowser::CallAndRegister_OnWhenReady(FOnWhenReady::FDelegate Delegate)
 {
 	if (bIsReady)
@@ -54,61 +88,6 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 			.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged));
 		return WebBrowserWidget.ToSharedRef();
 #endif
-	}
-}
-
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-void UTransakWebBrowser::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
-{
-	IMTBL_LOG("Transak Web Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
-}
-
-bool UTransakWebBrowser::HandleOnBeforePopup(FString URL, FString Frame)
-{
-	return false;
-}
-#endif
-
-void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
-{
-	if (Text.EqualToCaseIgnored(FText::FromString(InitialURL)))
-	{
-		bIsReady = true;
-		OnWhenReady.Broadcast();
-	}
-}
-
-bool UTransakWebBrowser::IsReady() const
-{
-	return bIsReady;
-}
-
-void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
-{
-	if (!WebBrowserWidget.IsValid())
-	{
-		return;
-	}
-
-	FString UrlToLoad = ComputePath(WalletAddress, Email, ProductsAvailed, ScreenTitle);
-
-	if (bIsReady)
-	{
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-		WebBrowserWidget->LoadURL(UrlToLoad);
-#endif
-	}
-	else
-	{
-		FDelegateHandle OnWhenReadyHandle = CallAndRegister_OnWhenReady(UTransakWebBrowser::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad, OnWhenReadyHandle]()
-		{
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-			WebBrowserWidget->LoadURL(UrlToLoad);
-#else
-			WebBrowserWidget->LoadURL(UrlToLoad);
-#endif
-			OnWhenReady.Remove(OnWhenReadyHandle);
-		}));
 	}
 }
 
@@ -181,3 +160,24 @@ FString UTransakWebBrowser::ComputePath(const FString& WalletAddress, const FStr
 
 	return Path;
 }
+
+void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
+{
+	if (Text.EqualToCaseIgnored(FText::FromString(InitialURL)))
+	{
+		bIsReady = true;
+		OnWhenReady.Broadcast();
+	}
+}
+
+#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
+void UTransakWebBrowser::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
+{
+	IMTBL_LOG("Transak Web Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
+}
+
+bool UTransakWebBrowser::HandleOnBeforePopup(FString URL, FString Frame)
+{
+	return false;
+}
+#endif

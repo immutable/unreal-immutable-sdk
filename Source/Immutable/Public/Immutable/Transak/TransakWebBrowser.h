@@ -38,11 +38,11 @@ protected:
 protected:
 	FString ComputePath(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle);
 
+	void HandleOnUrlChanged(const FText& Text);
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 	void HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
 	bool HandleOnBeforePopup(FString URL, FString Frame);
 #endif
-	void HandleOnUrlChanged(const FText& Text);
 
 protected:
 	/** URL that the browser will initially navigate to. The URL should include the protocol, eg http:// */
