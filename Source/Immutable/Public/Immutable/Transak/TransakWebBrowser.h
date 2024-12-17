@@ -35,7 +35,7 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	// End of UWidget interface
 
-private:
+protected:
 	FString ComputePath(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle);
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
@@ -56,6 +56,6 @@ protected:
 #endif
 	FOnWhenReady OnWhenReady;
 
-private:
+protected:
 	bool bIsReady = false;
 };
