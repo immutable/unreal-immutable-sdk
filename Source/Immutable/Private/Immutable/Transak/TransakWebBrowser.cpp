@@ -28,25 +28,11 @@ void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email
 	}
 
 	FString UrlToLoad = ComputePath(WalletAddress, Email, ProductsAvailed, ScreenTitle);
-
-	if (bIsReady)
+	FDelegateHandle OnWhenReadyHandle = CallAndRegister_OnWhenReady(UTransakWebBrowser::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad, OnWhenReadyHandle]()
 	{
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 		WebBrowserWidget->LoadURL(UrlToLoad);
-#endif
-	}
-	else
-	{
-		FDelegateHandle OnWhenReadyHandle = CallAndRegister_OnWhenReady(UTransakWebBrowser::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad, OnWhenReadyHandle]()
-		{
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-			WebBrowserWidget->LoadURL(UrlToLoad);
-#else
-			WebBrowserWidget->LoadURL(UrlToLoad);
-#endif
-			OnWhenReady.Remove(OnWhenReadyHandle);
-		}));
-	}
+		OnWhenReady.Remove(OnWhenReadyHandle);
+	}));
 }
 
 FDelegateHandle UTransakWebBrowser::CallAndRegister_OnWhenReady(FOnWhenReady::FDelegate Delegate)
