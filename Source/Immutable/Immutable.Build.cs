@@ -30,6 +30,7 @@ public class Immutable : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
+                "BluExtension",
                 "CoreUObject",
                 "Engine",
                 "Slate",
