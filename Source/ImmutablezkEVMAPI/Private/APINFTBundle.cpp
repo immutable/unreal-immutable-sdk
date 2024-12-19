@@ -29,6 +29,7 @@ void APINFTBundle::WriteJson(JsonWriter& Writer) const
 		Writer->WriteIdentifierPrefix(TEXT("market")); WriteJsonValue(Writer, Market.GetValue());
 	}
 	Writer->WriteIdentifierPrefix(TEXT("listings")); WriteJsonValue(Writer, Listings);
+	Writer->WriteIdentifierPrefix(TEXT("bids")); WriteJsonValue(Writer, Bids);
 	Writer->WriteObjectEnd();
 }
 
@@ -43,6 +44,7 @@ bool APINFTBundle::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("nft_with_stack"), NftWithStack);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("market"), Market);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("listings"), Listings);
+	ParseSuccess &= TryGetJsonValue(*Object, TEXT("bids"), Bids);
 
 	return ParseSuccess;
 }

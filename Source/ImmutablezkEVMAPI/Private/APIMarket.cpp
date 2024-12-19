@@ -27,6 +27,10 @@ void APIMarket::WriteJson(JsonWriter& Writer) const
 	{
 		Writer->WriteIdentifierPrefix(TEXT("floor_listing")); WriteJsonValue(Writer, FloorListing.GetValue());
 	}
+	if (TopBid.IsSet())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("top_bid")); WriteJsonValue(Writer, TopBid.GetValue());
+	}
 	if (LastTrade.IsSet())
 	{
 		Writer->WriteIdentifierPrefix(TEXT("last_trade")); WriteJsonValue(Writer, LastTrade.GetValue());
@@ -43,6 +47,7 @@ bool APIMarket::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	bool ParseSuccess = true;
 
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("floor_listing"), FloorListing);
+	ParseSuccess &= TryGetJsonValue(*Object, TEXT("top_bid"), TopBid);
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("last_trade"), LastTrade);
 
 	return ParseSuccess;

@@ -13,6 +13,7 @@
 #pragma once
 
 #include "APIBaseModel.h"
+#include "APIBid.h"
 #include "APIListing.h"
 #include "APIMarket.h"
 #include "APIStack.h"
@@ -38,6 +39,8 @@ public:
 	TOptional<APIMarket> Market;
 	/* List of open listings for the stack. */
 	TArray<APIListing> Listings;
+	/* List of open bids for the stack. */
+	TArray<APIBid> Bids;
 };
 
 }

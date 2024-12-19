@@ -1,8 +1,3 @@
 # Usage
 
-TO generate OpenAPI locally:
-
-    ```
-    openapi-generator-cli generate -i openapi.json -g cpp-ue4 -o . --additional-properties=modelNamePrefix="API",cppNamespace=ImmutablezkEVMAPI,unrealModuleName=ImmutablezkEVMAPI
-    
-    ```
+To generate OpenAPI locally, use the corresponding batch files in `openapi-generator/batch-files`

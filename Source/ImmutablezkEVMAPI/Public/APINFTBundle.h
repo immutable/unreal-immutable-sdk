@@ -13,6 +13,7 @@
 #pragma once
 
 #include "APIBaseModel.h"
+#include "APIBid.h"
 #include "APIListing.h"
 #include "APIMarket.h"
 #include "APINFTWithStack.h"
@@ -34,8 +35,10 @@ public:
 
 	APINFTWithStack NftWithStack;
 	TOptional<APIMarket> Market;
-	/* List of open listings for the stack. */
+	/* List of open listings for the NFT. */
 	TArray<APIListing> Listings;
+	/* List of open bids for the NFT. */
+	TArray<APIBid> Bids;
 };
 
 }

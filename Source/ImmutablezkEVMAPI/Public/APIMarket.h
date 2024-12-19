@@ -13,6 +13,7 @@
 #pragma once
 
 #include "APIBaseModel.h"
+#include "APIBid.h"
 #include "APILastTrade.h"
 #include "APIListing.h"
 
@@ -33,6 +34,8 @@ public:
 
 	/* Cheapest active listing */
 	TOptional<APIListing> FloorListing;
+	/* Highest active big */
+	TOptional<APIBid> TopBid;
 	TOptional<APILastTrade> LastTrade;
 };
 

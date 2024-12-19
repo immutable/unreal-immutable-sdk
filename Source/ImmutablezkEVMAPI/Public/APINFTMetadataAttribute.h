@@ -44,12 +44,7 @@ public:
 	TOptional<DisplayTypeEnum> DisplayType;
 	/* The metadata trait type */
 	FString TraitType;
-
-	// -- DIVERGE
-	//APINFTMetadataAttributeValue Value;
-	// NOTE! Edited to FString but has to be OpenAPINFTMetadataAttributeValue; Currently OpenAPI generates empty OpenAPINFTMetadataAttributeValue structure
-	FString Value;
-	// -- DIVERGE
+	APINFTMetadataAttributeValue Value;
 };
 
 }
