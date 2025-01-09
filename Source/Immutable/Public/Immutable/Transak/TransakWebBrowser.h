@@ -12,8 +12,9 @@ class SWebBrowser;
 class SBluWebBrowser;
 #endif
 
+
 /**
- * 
+ * A custom web browser widget for Transak transactions.
  */
 UCLASS()
 class IMMUTABLE_API UTransakWebBrowser : public UWidget
@@ -24,9 +25,22 @@ public:
 	DECLARE_MULTICAST_DELEGATE(FOnWhenReady);
 
 public:
+	/**
+	 * Check if the web browser widget is ready to be loaded.
+	 *
+	 * @return True if the widget is ready, false otherwise.
+	 */
 	UFUNCTION(BlueprintPure)
 	bool IsReady() const;
 
+	/**
+	 * Loads Transak widget with provided user data.
+	 *
+	 * @param WalletAddress The wallet address to load.
+	 * @param Email The email associated with the user.
+	 * @param ProductsAvailed The products availed by the user.
+	 * @param ScreenTitle The title of the screen to load.
+	 */
 	UFUNCTION(BlueprintCallable)
 	void Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle);
 

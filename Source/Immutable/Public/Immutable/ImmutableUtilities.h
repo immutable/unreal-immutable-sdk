@@ -1,6 +1,6 @@
 #pragma once
 #include "ApplicationConfig.h"
-#include "TransakConfig.h"
+#include "Transak/TransakConfig.h"
 
 
 /** A wrapper struct around various Immutable namespace utility and support methods. */

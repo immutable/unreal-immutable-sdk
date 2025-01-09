@@ -2,7 +2,7 @@
 
 #include "Engine/DeveloperSettings.h"
 #include "ApplicationConfig.h"
-#include "TransakConfig.h"
+#include "Transak/TransakConfig.h"
 
 #include "ImmutablePluginSettings.generated.h"
 
