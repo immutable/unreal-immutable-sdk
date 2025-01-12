@@ -40,7 +40,7 @@ bool FImtblMessagesTest::RunTest(const FString& Parameters)
 	// string
 	{
 		const FString RedirectUri = "https://example.com";
-		const FImmutablePassportInitData InitData{ClientId, RedirectUri, ImmutablePassportAction::EnvSandbox};
+		const FImmutablePassportInitData InitData { ClientId, RedirectUri, ImmutablePassportEnvironmentConstants::EnvironmentSandbox };
 		FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"redirectUri\":\"https://" "example.com\",\"environment\":\"sandbox\"";
 		ExpectedJson += ",\"engineVersion\":{";
 		ExpectedJson += "\"engine\":\"unreal\"";
@@ -57,7 +57,7 @@ bool FImtblMessagesTest::RunTest(const FString& Parameters)
 	// an FImmutablePassportInitData with an empty redirectUri should leave the
 	// redirectUri field out of the json string when converted
 	{
-		const FImmutablePassportInitData InitData{ClientId, "", ImmutablePassportAction::EnvSandbox};
+		const FImmutablePassportInitData InitData { ClientId, "", ImmutablePassportEnvironmentConstants::EnvironmentSandbox };
 		FString ExpectedJson = "{\"clientId\":\"MyExampleClientId\",\"environment\":\"sandbox\"";
 		ExpectedJson += ",\"engineVersion\":{";
 		ExpectedJson += "\"engine\":\"unreal\"";

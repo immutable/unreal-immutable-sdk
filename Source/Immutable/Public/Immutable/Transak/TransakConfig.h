@@ -3,7 +3,7 @@
 #include "TransakConfig.generated.h"
 
 
-UENUM()
+UENUM(BlueprintType)
 enum class ETransakEnvironment : uint8
 {
 	Sandbox,

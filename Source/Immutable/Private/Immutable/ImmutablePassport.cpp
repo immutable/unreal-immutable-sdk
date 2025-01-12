@@ -60,7 +60,7 @@ void UImmutablePassport::Initialize(const FImtblPassportResponseDelegate& Respon
 	}
 
 	InitData.clientId = ApplicationConfig->GetClientID();
-	InitData.environment = ApplicationConfig->GetEnvironment();
+	InitData.environment = ApplicationConfig->GetEnvironmentString();
 	InitData.redirectUri = ApplicationConfig->GetRedirectURL();
 	InitData.logoutRedirectUri = ApplicationConfig->GetLogoutURL();
 

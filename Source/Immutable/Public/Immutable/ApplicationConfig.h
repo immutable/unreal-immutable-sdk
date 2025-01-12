@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "ImmutableEnums.h"
+#include "ImmutableNames.h"
 
 #include "ApplicationConfig.generated.h"
 
@@ -85,13 +87,20 @@ public:
 	}
 
 	/**
-	 * Retrieves the environment configuration used for Passport initialization.
+	 * Retrieves the environment configuration used for Passport initialization as FString .
 	 *
 	 * @return A constant reference to an FString representing the environment.
 	 */
-	const FString& GetEnvironment()
+	const FString& GetEnvironmentString() const
 	{
-		return Environment;
+		switch (Environment)
+		{
+		case EPassportEnvironment::Production:
+			return ImmutablePassportEnvironmentConstants::EnvironmentProduction;
+		default:
+		case EPassportEnvironment::Sandbox:
+			return ImmutablePassportEnvironmentConstants::EnvironmentProduction;
+		}
 	}
 
 	/**
@@ -144,9 +153,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Passport")
 	FString ClientID;
 
-	/** Environment used to initialize passport. Ex. sandbox or production */
+	/**
+	 * Environment used to initialize passport. Ex. sandbox or production.
+	 * @note The default environment is set to the Sandbox environment.
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Passport")
-	FString Environment;
+	EPassportEnvironment Environment = EPassportEnvironment::Sandbox;
 
 	/**
 	 * (Android, iOS, and macOS only)

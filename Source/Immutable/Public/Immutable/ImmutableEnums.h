@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-UENUM()
+UENUM(BlueprintType)
 enum class EPassportEnvironment : uint8
 {
 	Development,

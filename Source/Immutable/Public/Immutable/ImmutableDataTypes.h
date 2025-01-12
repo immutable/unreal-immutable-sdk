@@ -61,9 +61,11 @@ struct IMMUTABLE_API FImmutablePassportInitData
 	UPROPERTY()
 	FString logoutRedirectUri;
 
-	/** The environment to connect to. */
+	/** The environment to connect to.
+	 * @note Default value is "sandbox"
+	 */
 	UPROPERTY()
-	FString environment = ImmutablePassportAction::EnvSandbox;
+	FString environment = ImmutablePassportEnvironmentConstants::EnvironmentSandbox;
 
 	/** 
 	 * Whether silent logout is enabled.

@@ -83,7 +83,7 @@ FString UTransakWebBrowser::ComputePath(const FString& WalletAddress, const FStr
 
 	if (!TransakConfig)
 	{
-		return "";
+		return TEXT("");
 	}
 
 	FString Path = TransakConfig->GetURL();
@@ -167,3 +167,5 @@ bool UTransakWebBrowser::HandleOnBeforePopup(FString URL, FString Frame)
 	return false;
 }
 #endif
+
+#undef LOCTEXT_NAMESPACE
