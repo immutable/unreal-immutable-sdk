@@ -22,26 +22,33 @@ namespace ImmutablezkEVMAPI
 
 void APISalePaymentToken::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("contract_type")); WriteJsonValue(Writer, ContractType);
-	Writer->WriteIdentifierPrefix(TEXT("contract_address")); WriteJsonValue(Writer, ContractAddress);
-	Writer->WriteIdentifierPrefix(TEXT("symbol")); WriteJsonValue(Writer, Symbol);
-	Writer->WriteObjectEnd();
+	if (const APIActivityNativeToken* APIActivityNativeTokenValue = OneOf.TryGet<APIActivityNativeToken>())
+	{
+		WriteJsonValue(Writer, *APIActivityNativeTokenValue);
+	}
+	else if (const APIActivityToken* APIActivityTokenValue = OneOf.TryGet<APIActivityToken>())
+	{
+		WriteJsonValue(Writer, *APIActivityTokenValue);
+	}
 }
 
 bool APISalePaymentToken::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIActivityNativeToken APIActivityNativeTokenValue;
+	if (const bool bIsAPIActivityNativeToken = TryGetJsonValue(JsonValue, APIActivityNativeTokenValue))
+	{
+		OneOf.Set<APIActivityNativeToken>(APIActivityNativeTokenValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APIActivityToken APIActivityTokenValue;
+	if (const bool bIsAPIActivityToken = TryGetJsonValue(JsonValue, APIActivityTokenValue))
+	{
+		OneOf.Set<APIActivityToken>(APIActivityTokenValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_type"), ContractType);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_address"), ContractAddress);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("symbol"), Symbol);
-
-	return ParseSuccess;
+	return false;
 }
 
 }

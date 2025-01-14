@@ -22,28 +22,33 @@ namespace ImmutablezkEVMAPI
 
 void APIActivityAsset::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("contract_type")); WriteJsonValue(Writer, ContractType);
-	Writer->WriteIdentifierPrefix(TEXT("contract_address")); WriteJsonValue(Writer, ContractAddress);
-	Writer->WriteIdentifierPrefix(TEXT("token_id")); WriteJsonValue(Writer, TokenId);
-	Writer->WriteIdentifierPrefix(TEXT("amount")); WriteJsonValue(Writer, Amount);
-	Writer->WriteObjectEnd();
+	if (const APIActivityNFT* APIActivityNFTValue = OneOf.TryGet<APIActivityNFT>())
+	{
+		WriteJsonValue(Writer, *APIActivityNFTValue);
+	}
+	else if (const APIActivityToken* APIActivityTokenValue = OneOf.TryGet<APIActivityToken>())
+	{
+		WriteJsonValue(Writer, *APIActivityTokenValue);
+	}
 }
 
 bool APIActivityAsset::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIActivityNFT APIActivityNFTValue;
+	if (const bool bIsAPIActivityNFT = TryGetJsonValue(JsonValue, APIActivityNFTValue))
+	{
+		OneOf.Set<APIActivityNFT>(APIActivityNFTValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APIActivityToken APIActivityTokenValue;
+	if (const bool bIsAPIActivityToken = TryGetJsonValue(JsonValue, APIActivityTokenValue))
+	{
+		OneOf.Set<APIActivityToken>(APIActivityTokenValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_type"), ContractType);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_address"), ContractAddress);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("token_id"), TokenId);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("amount"), Amount);
-
-	return ParseSuccess;
+	return false;
 }
 
 }

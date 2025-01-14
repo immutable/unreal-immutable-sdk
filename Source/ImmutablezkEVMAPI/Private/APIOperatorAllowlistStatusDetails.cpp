@@ -22,26 +22,33 @@ namespace ImmutablezkEVMAPI
 
 void APIOperatorAllowlistStatusDetails::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("purpose")); WriteJsonValue(Writer, Purpose);
-	Writer->WriteIdentifierPrefix(TEXT("is_settlement_contract")); WriteJsonValue(Writer, IsSettlementContract);
-	Writer->WriteIdentifierPrefix(TEXT("reason")); WriteJsonValue(Writer, Reason);
-	Writer->WriteObjectEnd();
+	if (const APIOperatorAllowlistStatusRequested* APIOperatorAllowlistStatusRequestedValue = OneOf.TryGet<APIOperatorAllowlistStatusRequested>())
+	{
+		WriteJsonValue(Writer, *APIOperatorAllowlistStatusRequestedValue);
+	}
+	else if (const APIOperatorAllowlistStatusUpdated* APIOperatorAllowlistStatusUpdatedValue = OneOf.TryGet<APIOperatorAllowlistStatusUpdated>())
+	{
+		WriteJsonValue(Writer, *APIOperatorAllowlistStatusUpdatedValue);
+	}
 }
 
 bool APIOperatorAllowlistStatusDetails::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIOperatorAllowlistStatusRequested APIOperatorAllowlistStatusRequestedValue;
+	if (const bool bIsAPIOperatorAllowlistStatusRequested = TryGetJsonValue(JsonValue, APIOperatorAllowlistStatusRequestedValue))
+	{
+		OneOf.Set<APIOperatorAllowlistStatusRequested>(APIOperatorAllowlistStatusRequestedValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APIOperatorAllowlistStatusUpdated APIOperatorAllowlistStatusUpdatedValue;
+	if (const bool bIsAPIOperatorAllowlistStatusUpdated = TryGetJsonValue(JsonValue, APIOperatorAllowlistStatusUpdatedValue))
+	{
+		OneOf.Set<APIOperatorAllowlistStatusUpdated>(APIOperatorAllowlistStatusUpdatedValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("purpose"), Purpose);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("is_settlement_contract"), IsSettlementContract);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("reason"), Reason);
-
-	return ParseSuccess;
+	return false;
 }
 
 }
