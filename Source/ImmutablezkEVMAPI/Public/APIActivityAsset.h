@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Misc/TVariant.h"
+
 #include "APIBaseModel.h"
 #include "APIActivityNFT.h"
 #include "APIActivityToken.h"
@@ -32,13 +34,7 @@ public:
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
-	APITokenContractType ContractType;
-	/* The contract address */
-	FString ContractAddress;
-	/* An `uint256` token id as string */
-	FString TokenId;
-	/* (deprecated - will never be filled, use amount on Activity instead) The amount of tokens exchanged */
-	FString Amount;
+	TVariant<APIActivityNFT, APIActivityToken> OneOf;
 };
 
 }

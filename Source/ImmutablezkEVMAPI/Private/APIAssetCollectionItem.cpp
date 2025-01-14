@@ -75,26 +75,33 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIAssetCol
 
 void APIAssetCollectionItem::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("type")); WriteJsonValue(Writer, Type);
-	Writer->WriteIdentifierPrefix(TEXT("contract_address")); WriteJsonValue(Writer, ContractAddress);
-	Writer->WriteIdentifierPrefix(TEXT("amount")); WriteJsonValue(Writer, Amount);
-	Writer->WriteObjectEnd();
+	if (const APIERC1155CollectionItem* APIERC1155CollectionItemValue = OneOf.TryGet<APIERC1155CollectionItem>())
+	{
+		WriteJsonValue(Writer, *APIERC1155CollectionItemValue);
+	}
+	else if (const APIERC721CollectionItem* APIERC721CollectionItemValue = OneOf.TryGet<APIERC721CollectionItem>())
+	{
+		WriteJsonValue(Writer, *APIERC721CollectionItemValue);
+	}
 }
 
 bool APIAssetCollectionItem::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIERC1155CollectionItem APIERC1155CollectionItemValue;
+	if (const bool bIsAPIERC1155CollectionItem = TryGetJsonValue(JsonValue, APIERC1155CollectionItemValue))
+	{
+		OneOf.Set<APIERC1155CollectionItem>(APIERC1155CollectionItemValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APIERC721CollectionItem APIERC721CollectionItemValue;
+	if (const bool bIsAPIERC721CollectionItem = TryGetJsonValue(JsonValue, APIERC721CollectionItemValue))
+	{
+		OneOf.Set<APIERC721CollectionItem>(APIERC721CollectionItemValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("type"), Type);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_address"), ContractAddress);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("amount"), Amount);
-
-	return ParseSuccess;
+	return false;
 }
 
 }

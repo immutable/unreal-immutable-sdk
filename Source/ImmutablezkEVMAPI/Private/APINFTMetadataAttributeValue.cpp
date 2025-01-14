@@ -22,20 +22,44 @@ namespace ImmutablezkEVMAPI
 
 void APINFTMetadataAttributeValue::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteObjectEnd();
+	if (const FString* FStringValue = OneOf.TryGet<FString>())
+	{
+		WriteJsonValue(Writer, *FStringValue);
+	}
+	else if (const bool* BoolValue = OneOf.TryGet<bool>())
+	{
+		WriteJsonValue(Writer, *BoolValue);
+	}
+	else if (const double* DoubleValue = OneOf.TryGet<double>())
+	{
+		WriteJsonValue(Writer, *DoubleValue);
+	}
 }
 
 bool APINFTMetadataAttributeValue::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	FString FStringValue;
+	if (const bool bIsFString = TryGetJsonValue(JsonValue, FStringValue))
+	{
+		OneOf.Set<FString>(FStringValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	bool BoolValue;
+	if (const bool bIsBool = TryGetJsonValue(JsonValue, BoolValue))
+	{
+		OneOf.Set<bool>(BoolValue);
+		return true;
+	}
 
+	double DoubleValue;
+	if (const bool bIsDouble = TryGetJsonValue(JsonValue, DoubleValue))
+	{
+		OneOf.Set<double>(DoubleValue);
+		return true;
+	}
 
-	return ParseSuccess;
+	return false;
 }
 
 }
