@@ -136,6 +136,13 @@ void {{classname}}::WriteJson(JsonWriter& Writer) const
 	{{#isString}}
 	WriteJsonValue(Writer, Value);
 	{{/isString}}
+	{{#oneOf}}
+	{{^-first}}else {{/-first}}if (const {{.}}* {{#lambda.pascalcase}}{{.}}{{/lambda.pascalcase}}Value = OneOf.TryGet<{{.}}>())
+	{
+		WriteJsonValue(Writer, *{{#lambda.pascalcase}}{{.}}{{/lambda.pascalcase}}Value);
+	}
+	{{/oneOf}}
+	{{^oneOf}}
 	{{^isString}}
 	Writer->WriteObjectStart();
     {{#vars}}
@@ -151,6 +158,7 @@ void {{classname}}::WriteJson(JsonWriter& Writer) const
     {{/vars}}
 	Writer->WriteObjectEnd();
 	{{/isString}}
+	{{/oneOf}}
 }
 
 bool {{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
@@ -158,6 +166,19 @@ bool {{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	{{#isString}}
 	return TryGetJsonValue(JsonValue, Value);
 	{{/isString}}
+	{{#oneOf}}
+	{{.}} {{#lambda.pascalcase}}{{.}}{{/lambda.pascalcase}}Value;
+	if (const bool bIs{{#lambda.pascalcase}}{{.}}{{/lambda.pascalcase}} = TryGetJsonValue(JsonValue, {{#lambda.pascalcase}}{{.}}{{/lambda.pascalcase}}Value))
+	{
+		OneOf.Set<{{.}}>({{#lambda.pascalcase}}{{.}}{{/lambda.pascalcase}}Value);
+		return true;
+	}
+
+	{{#-last}}
+	return false;
+	{{/-last}}
+	{{/oneOf}}
+	{{^oneOf}}
 	{{^isString}}
 	const TSharedPtr<FJsonObject>* Object;
 	if (!JsonValue->TryGetObject(Object))
@@ -176,6 +197,7 @@ bool {{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 
 	return ParseSuccess;
 	{{/isString}}
+	{{/oneOf}}
 }
 
 {{/model}}

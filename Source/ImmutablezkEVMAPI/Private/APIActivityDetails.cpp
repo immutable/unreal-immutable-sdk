@@ -22,32 +22,77 @@ namespace ImmutablezkEVMAPI
 
 void APIActivityDetails::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("to")); WriteJsonValue(Writer, To);
-	Writer->WriteIdentifierPrefix(TEXT("amount")); WriteJsonValue(Writer, Amount);
-	Writer->WriteIdentifierPrefix(TEXT("asset")); WriteJsonValue(Writer, Asset);
-	Writer->WriteIdentifierPrefix(TEXT("from")); WriteJsonValue(Writer, From);
-	Writer->WriteIdentifierPrefix(TEXT("order_id")); WriteJsonValue(Writer, OrderId);
-	Writer->WriteIdentifierPrefix(TEXT("payment")); WriteJsonValue(Writer, Payment);
-	Writer->WriteObjectEnd();
+	if (const APIBurn* APIBurnValue = OneOf.TryGet<APIBurn>())
+	{
+		WriteJsonValue(Writer, *APIBurnValue);
+	}
+	else if (const APIDeposit* APIDepositValue = OneOf.TryGet<APIDeposit>())
+	{
+		WriteJsonValue(Writer, *APIDepositValue);
+	}
+	else if (const APIMint* APIMintValue = OneOf.TryGet<APIMint>())
+	{
+		WriteJsonValue(Writer, *APIMintValue);
+	}
+	else if (const APINFTSale* APINFTSaleValue = OneOf.TryGet<APINFTSale>())
+	{
+		WriteJsonValue(Writer, *APINFTSaleValue);
+	}
+	else if (const APITransfer* APITransferValue = OneOf.TryGet<APITransfer>())
+	{
+		WriteJsonValue(Writer, *APITransferValue);
+	}
+	else if (const APIWithdrawal* APIWithdrawalValue = OneOf.TryGet<APIWithdrawal>())
+	{
+		WriteJsonValue(Writer, *APIWithdrawalValue);
+	}
 }
 
 bool APIActivityDetails::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIBurn APIBurnValue;
+	if (const bool bIsAPIBurn = TryGetJsonValue(JsonValue, APIBurnValue))
+	{
+		OneOf.Set<APIBurn>(APIBurnValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APIDeposit APIDepositValue;
+	if (const bool bIsAPIDeposit = TryGetJsonValue(JsonValue, APIDepositValue))
+	{
+		OneOf.Set<APIDeposit>(APIDepositValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("to"), To);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("amount"), Amount);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("asset"), Asset);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("from"), From);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("order_id"), OrderId);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("payment"), Payment);
+	APIMint APIMintValue;
+	if (const bool bIsAPIMint = TryGetJsonValue(JsonValue, APIMintValue))
+	{
+		OneOf.Set<APIMint>(APIMintValue);
+		return true;
+	}
 
-	return ParseSuccess;
+	APINFTSale APINFTSaleValue;
+	if (const bool bIsAPINFTSale = TryGetJsonValue(JsonValue, APINFTSaleValue))
+	{
+		OneOf.Set<APINFTSale>(APINFTSaleValue);
+		return true;
+	}
+
+	APITransfer APITransferValue;
+	if (const bool bIsAPITransfer = TryGetJsonValue(JsonValue, APITransferValue))
+	{
+		OneOf.Set<APITransfer>(APITransferValue);
+		return true;
+	}
+
+	APIWithdrawal APIWithdrawalValue;
+	if (const bool bIsAPIWithdrawal = TryGetJsonValue(JsonValue, APIWithdrawalValue))
+	{
+		OneOf.Set<APIWithdrawal>(APIWithdrawalValue);
+		return true;
+	}
+
+	return false;
 }
 
 }
