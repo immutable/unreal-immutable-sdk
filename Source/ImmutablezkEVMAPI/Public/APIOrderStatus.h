@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Misc/TVariant.h"
+
 #include "APIBaseModel.h"
 #include "APIActiveOrderStatus.h"
 #include "APICancelledOrderStatus.h"
@@ -44,8 +46,6 @@ public:
 	static bool EnumFromString(const FString& EnumAsString, NameEnum& EnumValue);
 	/* A terminal order status indicating that an order cannot be fulfilled due to expiry. */
 	NameEnum Name;
-	/* Whether the cancellation of the order is pending */
-	bool Pending = false;
 	enum class CancellationTypeEnum
 	{
 		OnChain,
@@ -57,14 +57,7 @@ public:
 	static bool EnumFromString(const FString& EnumAsString, CancellationTypeEnum& EnumValue);
 	/* Whether the cancellation was done on-chain or off-chain or as a result of an underfunded account */
 	CancellationTypeEnum CancellationType;
-	/* Whether the order has been evaluated after its creation */
-	bool Evaluated = false;
-	/* Whether the order has reached its specified start time */
-	bool Started = false;
-	/* Whether the order offerer has sufficient approvals */
-	bool SufficientApprovals = false;
-	/* Whether the order offerer still has sufficient balance to complete the order */
-	bool SufficientBalances = false;
+	TVariant<APIActiveOrderStatus, APICancelledOrderStatus, APIExpiredOrderStatus, APIFilledOrderStatus, APIInactiveOrderStatus, APIPendingOrderStatus> OneOf;
 };
 
 }

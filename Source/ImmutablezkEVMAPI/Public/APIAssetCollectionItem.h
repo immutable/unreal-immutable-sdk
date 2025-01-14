@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Misc/TVariant.h"
+
 #include "APIBaseModel.h"
 #include "APIERC1155CollectionItem.h"
 #include "APIERC721CollectionItem.h"
@@ -41,10 +43,7 @@ public:
 	static bool EnumFromString(const FString& EnumAsString, TypeEnum& EnumValue);
 	/* Token type user is offering, which in this case is ERC721 */
 	TypeEnum Type;
-	/* Address of ERC1155 collection */
-	FString ContractAddress;
-	/* A string representing the price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum). */
-	FString Amount;
+	TVariant<APIERC1155CollectionItem, APIERC721CollectionItem> OneOf;
 };
 
 }

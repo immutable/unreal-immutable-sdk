@@ -1,6 +1,16 @@
 {{>licenseInfo}}
 #pragma once
 
+{{#models}}
+	{{#model}}
+		{{#oneOf}}
+			{{#-first}}
+#include "Misc/TVariant.h"
+
+			{{/-first}}
+		{{/oneOf}}
+	{{/model}}
+{{/models}}
 #include "{{modelNamePrefix}}BaseModel.h"
 {{#imports}}{{{import}}}
 {{/imports}}
@@ -61,10 +71,17 @@ public:
 	{{/description}}{{^required}}TOptional<{{/required}}{{{datatypeWithEnum}}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
 	{{^isEnum}}
+	{{^oneOf}}
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}{{{datatype}}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
+	{{/oneOf}}
 	{{/isEnum}}
     {{/vars}}
+	{{#oneOf}}
+	{{#-first}}
+	TVariant<{{#oneOf}}{{{.}}}{{^-last}}, {{/-last}}{{/oneOf}}> OneOf;
+	{{/-first}}
+	{{/oneOf}}
 };
 
 {{/model}}

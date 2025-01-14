@@ -128,34 +128,77 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIOrderSta
 
 void APIOrderStatus::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("name")); WriteJsonValue(Writer, Name);
-	Writer->WriteIdentifierPrefix(TEXT("pending")); WriteJsonValue(Writer, Pending);
-	Writer->WriteIdentifierPrefix(TEXT("cancellation_type")); WriteJsonValue(Writer, CancellationType);
-	Writer->WriteIdentifierPrefix(TEXT("evaluated")); WriteJsonValue(Writer, Evaluated);
-	Writer->WriteIdentifierPrefix(TEXT("started")); WriteJsonValue(Writer, Started);
-	Writer->WriteIdentifierPrefix(TEXT("sufficient_approvals")); WriteJsonValue(Writer, SufficientApprovals);
-	Writer->WriteIdentifierPrefix(TEXT("sufficient_balances")); WriteJsonValue(Writer, SufficientBalances);
-	Writer->WriteObjectEnd();
+	if (const APIActiveOrderStatus* APIActiveOrderStatusValue = OneOf.TryGet<APIActiveOrderStatus>())
+	{
+		WriteJsonValue(Writer, *APIActiveOrderStatusValue);
+	}
+	else if (const APICancelledOrderStatus* APICancelledOrderStatusValue = OneOf.TryGet<APICancelledOrderStatus>())
+	{
+		WriteJsonValue(Writer, *APICancelledOrderStatusValue);
+	}
+	else if (const APIExpiredOrderStatus* APIExpiredOrderStatusValue = OneOf.TryGet<APIExpiredOrderStatus>())
+	{
+		WriteJsonValue(Writer, *APIExpiredOrderStatusValue);
+	}
+	else if (const APIFilledOrderStatus* APIFilledOrderStatusValue = OneOf.TryGet<APIFilledOrderStatus>())
+	{
+		WriteJsonValue(Writer, *APIFilledOrderStatusValue);
+	}
+	else if (const APIInactiveOrderStatus* APIInactiveOrderStatusValue = OneOf.TryGet<APIInactiveOrderStatus>())
+	{
+		WriteJsonValue(Writer, *APIInactiveOrderStatusValue);
+	}
+	else if (const APIPendingOrderStatus* APIPendingOrderStatusValue = OneOf.TryGet<APIPendingOrderStatus>())
+	{
+		WriteJsonValue(Writer, *APIPendingOrderStatusValue);
+	}
 }
 
 bool APIOrderStatus::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIActiveOrderStatus APIActiveOrderStatusValue;
+	if (const bool bIsAPIActiveOrderStatus = TryGetJsonValue(JsonValue, APIActiveOrderStatusValue))
+	{
+		OneOf.Set<APIActiveOrderStatus>(APIActiveOrderStatusValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APICancelledOrderStatus APICancelledOrderStatusValue;
+	if (const bool bIsAPICancelledOrderStatus = TryGetJsonValue(JsonValue, APICancelledOrderStatusValue))
+	{
+		OneOf.Set<APICancelledOrderStatus>(APICancelledOrderStatusValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("name"), Name);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("pending"), Pending);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("cancellation_type"), CancellationType);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("evaluated"), Evaluated);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("started"), Started);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("sufficient_approvals"), SufficientApprovals);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("sufficient_balances"), SufficientBalances);
+	APIExpiredOrderStatus APIExpiredOrderStatusValue;
+	if (const bool bIsAPIExpiredOrderStatus = TryGetJsonValue(JsonValue, APIExpiredOrderStatusValue))
+	{
+		OneOf.Set<APIExpiredOrderStatus>(APIExpiredOrderStatusValue);
+		return true;
+	}
 
-	return ParseSuccess;
+	APIFilledOrderStatus APIFilledOrderStatusValue;
+	if (const bool bIsAPIFilledOrderStatus = TryGetJsonValue(JsonValue, APIFilledOrderStatusValue))
+	{
+		OneOf.Set<APIFilledOrderStatus>(APIFilledOrderStatusValue);
+		return true;
+	}
+
+	APIInactiveOrderStatus APIInactiveOrderStatusValue;
+	if (const bool bIsAPIInactiveOrderStatus = TryGetJsonValue(JsonValue, APIInactiveOrderStatusValue))
+	{
+		OneOf.Set<APIInactiveOrderStatus>(APIInactiveOrderStatusValue);
+		return true;
+	}
+
+	APIPendingOrderStatus APIPendingOrderStatusValue;
+	if (const bool bIsAPIPendingOrderStatus = TryGetJsonValue(JsonValue, APIPendingOrderStatusValue))
+	{
+		OneOf.Set<APIPendingOrderStatus>(APIPendingOrderStatusValue);
+		return true;
+	}
+
+	return false;
 }
 
 }
