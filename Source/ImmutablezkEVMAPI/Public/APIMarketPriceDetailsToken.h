@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Misc/TVariant.h"
+
 #include "APIBaseModel.h"
 #include "APIMarketPriceERC20Token.h"
 #include "APIMarketPriceNativeToken.h"
@@ -41,12 +43,7 @@ public:
 	static bool EnumFromString(const FString& EnumAsString, TypeEnum& EnumValue);
 	/* Token type user is offering, which in this case is the native IMX token */
 	TypeEnum Type;
-	/* The symbol of token */
-	TOptional<FString> Symbol;
-	/* Address of ERC20 token */
-	FString ContractAddress;
-	/* The decimals of token */
-	TOptional<int32> Decimals;
+	TVariant<APIMarketPriceERC20Token, APIMarketPriceNativeToken> OneOf;
 };
 
 }

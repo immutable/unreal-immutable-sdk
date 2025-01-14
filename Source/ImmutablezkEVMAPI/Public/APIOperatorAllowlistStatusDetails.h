@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Misc/TVariant.h"
+
 #include "APIBaseModel.h"
 #include "APIOperatorAllowlistStatusRequested.h"
 #include "APIOperatorAllowlistStatusUpdated.h"
@@ -31,12 +33,7 @@ public:
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
-	/* Reason this contract needs to be added */
-	FString Purpose;
-	/* Attestation of whether this contract is a settlement contract */
-	bool IsSettlementContract = false;
-	/* Why this action was performed */
-	FString Reason;
+	TVariant<APIOperatorAllowlistStatusRequested, APIOperatorAllowlistStatusUpdated> OneOf;
 };
 
 }

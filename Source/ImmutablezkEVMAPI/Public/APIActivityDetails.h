@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Misc/TVariant.h"
+
 #include "APIBaseModel.h"
 #include "APIActivityAsset.h"
 #include "APIBurn.h"
@@ -37,16 +39,7 @@ public:
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
-	/* The account address the asset was deposited to */
-	FString To;
-	/* The amount of assets withdrawn */
-	FString Amount;
-	APIActivityAsset Asset;
-	/* The account address the asset was withdrawn from */
-	FString From;
-	/* The id of order */
-	FString OrderId;
-	APISalePayment Payment;
+	TVariant<APIBurn, APIDeposit, APIMint, APINFTSale, APITransfer, APIWithdrawal> OneOf;
 };
 
 }

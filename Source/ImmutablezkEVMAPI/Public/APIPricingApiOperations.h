@@ -44,6 +44,8 @@ public:
 	FString ContractAddress;
 	/* List of token ids to get pricing data for */
 	TArray<FString> TokenId;
+	/* Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or 'NATIVE'. */
+	TOptional<FString> PaymentToken;
 	/* Encoded page cursor to retrieve previous or next page. Use the value returned in the response. */
 	TOptional<FString> PageCursor;
 };
@@ -75,6 +77,8 @@ public:
 	FString ContractAddress;
 	/* List of stack ids to get pricing data for */
 	TArray<FGuid> StackId;
+	/* Filters the active listings, bids, floor listing and top bid by the specified payment token, either the address of the payment token contract or 'NATIVE'. */
+	TOptional<FString> PaymentToken;
 	/* Encoded page cursor to retrieve previous or next page. Use the value returned in the response. */
 	TOptional<FString> PageCursor;
 };

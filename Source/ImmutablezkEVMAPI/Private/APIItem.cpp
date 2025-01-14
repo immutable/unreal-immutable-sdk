@@ -87,28 +87,77 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIItem::Ty
 
 void APIItem::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("type")); WriteJsonValue(Writer, Type);
-	Writer->WriteIdentifierPrefix(TEXT("amount")); WriteJsonValue(Writer, Amount);
-	Writer->WriteIdentifierPrefix(TEXT("contract_address")); WriteJsonValue(Writer, ContractAddress);
-	Writer->WriteIdentifierPrefix(TEXT("token_id")); WriteJsonValue(Writer, TokenId);
-	Writer->WriteObjectEnd();
+	if (const APIERC1155CollectionItem* APIERC1155CollectionItemValue = OneOf.TryGet<APIERC1155CollectionItem>())
+	{
+		WriteJsonValue(Writer, *APIERC1155CollectionItemValue);
+	}
+	else if (const APIERC1155Item* APIERC1155ItemValue = OneOf.TryGet<APIERC1155Item>())
+	{
+		WriteJsonValue(Writer, *APIERC1155ItemValue);
+	}
+	else if (const APIERC20Item* APIERC20ItemValue = OneOf.TryGet<APIERC20Item>())
+	{
+		WriteJsonValue(Writer, *APIERC20ItemValue);
+	}
+	else if (const APIERC721CollectionItem* APIERC721CollectionItemValue = OneOf.TryGet<APIERC721CollectionItem>())
+	{
+		WriteJsonValue(Writer, *APIERC721CollectionItemValue);
+	}
+	else if (const APIERC721Item* APIERC721ItemValue = OneOf.TryGet<APIERC721Item>())
+	{
+		WriteJsonValue(Writer, *APIERC721ItemValue);
+	}
+	else if (const APINativeItem* APINativeItemValue = OneOf.TryGet<APINativeItem>())
+	{
+		WriteJsonValue(Writer, *APINativeItemValue);
+	}
 }
 
 bool APIItem::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIERC1155CollectionItem APIERC1155CollectionItemValue;
+	if (const bool bIsAPIERC1155CollectionItem = TryGetJsonValue(JsonValue, APIERC1155CollectionItemValue))
+	{
+		OneOf.Set<APIERC1155CollectionItem>(APIERC1155CollectionItemValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APIERC1155Item APIERC1155ItemValue;
+	if (const bool bIsAPIERC1155Item = TryGetJsonValue(JsonValue, APIERC1155ItemValue))
+	{
+		OneOf.Set<APIERC1155Item>(APIERC1155ItemValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("type"), Type);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("amount"), Amount);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_address"), ContractAddress);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("token_id"), TokenId);
+	APIERC20Item APIERC20ItemValue;
+	if (const bool bIsAPIERC20Item = TryGetJsonValue(JsonValue, APIERC20ItemValue))
+	{
+		OneOf.Set<APIERC20Item>(APIERC20ItemValue);
+		return true;
+	}
 
-	return ParseSuccess;
+	APIERC721CollectionItem APIERC721CollectionItemValue;
+	if (const bool bIsAPIERC721CollectionItem = TryGetJsonValue(JsonValue, APIERC721CollectionItemValue))
+	{
+		OneOf.Set<APIERC721CollectionItem>(APIERC721CollectionItemValue);
+		return true;
+	}
+
+	APIERC721Item APIERC721ItemValue;
+	if (const bool bIsAPIERC721Item = TryGetJsonValue(JsonValue, APIERC721ItemValue))
+	{
+		OneOf.Set<APIERC721Item>(APIERC721ItemValue);
+		return true;
+	}
+
+	APINativeItem APINativeItemValue;
+	if (const bool bIsAPINativeItem = TryGetJsonValue(JsonValue, APINativeItemValue))
+	{
+		OneOf.Set<APINativeItem>(APINativeItemValue);
+		return true;
+	}
+
+	return false;
 }
 
 }

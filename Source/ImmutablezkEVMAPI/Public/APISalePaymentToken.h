@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Misc/TVariant.h"
+
 #include "APIBaseModel.h"
 #include "APIActivityNativeToken.h"
 #include "APIActivityToken.h"
@@ -32,11 +34,7 @@ public:
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
-	APITokenContractType ContractType;
-	/* The contract address */
-	FString ContractAddress;
-	/* The token symbol */
-	FString Symbol;
+	TVariant<APIActivityNativeToken, APIActivityToken> OneOf;
 };
 
 }

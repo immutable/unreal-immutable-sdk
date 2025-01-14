@@ -75,34 +75,33 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, APIMarketPr
 
 void APIMarketPriceDetailsToken::WriteJson(JsonWriter& Writer) const
 {
-	Writer->WriteObjectStart();
-	Writer->WriteIdentifierPrefix(TEXT("type")); WriteJsonValue(Writer, Type);
-	if (Symbol.IsSet())
+	if (const APIMarketPriceERC20Token* APIMarketPriceERC20TokenValue = OneOf.TryGet<APIMarketPriceERC20Token>())
 	{
-		Writer->WriteIdentifierPrefix(TEXT("symbol")); WriteJsonValue(Writer, Symbol.GetValue());
+		WriteJsonValue(Writer, *APIMarketPriceERC20TokenValue);
 	}
-	Writer->WriteIdentifierPrefix(TEXT("contract_address")); WriteJsonValue(Writer, ContractAddress);
-	if (Decimals.IsSet())
+	else if (const APIMarketPriceNativeToken* APIMarketPriceNativeTokenValue = OneOf.TryGet<APIMarketPriceNativeToken>())
 	{
-		Writer->WriteIdentifierPrefix(TEXT("decimals")); WriteJsonValue(Writer, Decimals.GetValue());
+		WriteJsonValue(Writer, *APIMarketPriceNativeTokenValue);
 	}
-	Writer->WriteObjectEnd();
 }
 
 bool APIMarketPriceDetailsToken::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonValue->TryGetObject(Object))
-		return false;
+	APIMarketPriceERC20Token APIMarketPriceERC20TokenValue;
+	if (const bool bIsAPIMarketPriceERC20Token = TryGetJsonValue(JsonValue, APIMarketPriceERC20TokenValue))
+	{
+		OneOf.Set<APIMarketPriceERC20Token>(APIMarketPriceERC20TokenValue);
+		return true;
+	}
 
-	bool ParseSuccess = true;
+	APIMarketPriceNativeToken APIMarketPriceNativeTokenValue;
+	if (const bool bIsAPIMarketPriceNativeToken = TryGetJsonValue(JsonValue, APIMarketPriceNativeTokenValue))
+	{
+		OneOf.Set<APIMarketPriceNativeToken>(APIMarketPriceNativeTokenValue);
+		return true;
+	}
 
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("type"), Type);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("symbol"), Symbol);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("contract_address"), ContractAddress);
-	ParseSuccess &= TryGetJsonValue(*Object, TEXT("decimals"), Decimals);
-
-	return ParseSuccess;
+	return false;
 }
 
 }
