@@ -6,12 +6,8 @@ on:
   schedule:
     - cron: '0 10 * * *'
 
-permissions:
-  pull-requests: write
-
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   update-api:
@@ -67,9 +63,6 @@ jobs:
         if: steps.comparison.outputs.difference == 'true'
         run: |
           rm openapi_remote.json
-
-      - name: Authenticate with GitHub CLI
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
       - name: Create a new branch
         if: steps.comparison.outputs.difference == 'true'
