@@ -30,7 +30,6 @@ public class Immutable : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-                "BluExtension",
                 "CoreUObject",
                 "Engine",
                 "Slate",
@@ -43,16 +42,17 @@ public class Immutable : ModuleRules
 			}
         );
 
-#if UE_5_0_OR_LATER
+#if UE_5_1_OR_LATER
         PublicDependencyModuleNames.Add("WebBrowserWidget");
 #else
+        PrivateDependencyModuleNames.Add("BluExtension");
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
             PublicDependencyModuleNames.Add("Blu");
         }
 #endif
 
-#if UE_5_0_OR_LATER
+#if UE_5_1_OR_LATER
 			PrivateDependencyModuleNames.Add("WebBrowser");
 			PublicDefinitions.Add("USING_BUNDLED_CEF=1");
 			PublicDefinitions.Add("USING_BLUI_CEF=0");
