@@ -21,7 +21,7 @@ jobs:
 
       - name: Get current date and time
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+        run: echo "name=date::$(date +'%Y-%m-%d-%H-%M-%S')" >> "$GITHUB_OUTPUT"
 
       - name: Download remote openapi.json
         run: curl -o openapi_remote.json https://imx-openapiv3-mr-sandbox.s3.us-east-2.amazonaws.com/openapi.json
@@ -37,10 +37,10 @@ jobs:
       - name: Compare remote openapi.json with local openapi.json
         id: comparison
         run: |
-          if diff openapi_remote.json ./Source/ImmutablezkEVMAPI/openapi-generator/openapi.json > /dev/null; then
-            echo "::set-output name=difference::false"
+          if diff "openapi_remote.json" "./Source/ImmutablezkEVMAPI/openapi-generator/openapi.json" > /dev/null; then
+            echo "name=difference::false" >> "$GITHUB_OUTPUT"
           else
-            echo "::set-output name=difference::true"
+            echo "name=difference::true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: NPM install OpenAPI Generator CLI globally
@@ -55,9 +55,9 @@ jobs:
       - name: Generate API if there are differences
         if: steps.comparison.outputs.difference == 'true'
         run: |
-          cd ./Source/ImmutablezkEVMAPI/openapi-generator/batch-files
+          cd "./Source/ImmutablezkEVMAPI/openapi-generator/batch-files"
           ./generate.sh
-          cd ../../../../
+          cd "../../../../"
 
       - name: Clean up
         if: steps.comparison.outputs.difference == 'true'
@@ -75,13 +75,13 @@ jobs:
         id: commit_changes
         if: steps.comparison.outputs.difference == 'true'
         run: |
-          git add ./Source/ImmutablezkEVMAPI/
+          git add "./Source/ImmutablezkEVMAPI/"
           if [ -n "$(git diff --cached)" ]; then
             git commit -m "feat: update immutable zkEVM API package"
-            echo "commit=true" >> $GITHUB_ENV
+            echo "commit=true" >> "$GITHUB_ENV"
           else
             echo "No changes to commit."
-            echo "commit=false" >> $GITHUB_ENV
+            echo "commit=false" >> "$GITHUB_ENV"
           fi
 
       - name: Push changes
