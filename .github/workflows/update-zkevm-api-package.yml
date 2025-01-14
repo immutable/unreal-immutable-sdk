@@ -1,0 +1,98 @@
+---
+name: Update zkEVM API Package
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 10 * * *'
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  update-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Pull files from Git LFS
+        run: git lfs pull
+
+      - name: Get current date and time
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+
+      - name: Download remote openapi.json
+        run: curl -o openapi_remote.json https://imx-openapiv3-mr-sandbox.s3.us-east-2.amazonaws.com/openapi.json
+
+      - name: Ensure local openapi.json exists (if not, assume it's blank)
+        run: |
+          if [ ! -f ./Source/ImmutablezkEVMAPI/openapi-generator/openapi.json ]; then
+            echo "Creating empty openapi.json file..."
+            mkdir -p ./Source/ImmutablezkEVMAPI/openapi-generator/
+            touch ./Source/ImmutablezkEVMAPI/openapi-generator/openapi.json
+          fi
+
+      - name: Compare remote openapi.json with local openapi.json
+        id: comparison
+        run: |
+          if diff openapi_remote.json ./Source/ImmutablezkEVMAPI/openapi-generator/openapi.json > /dev/null; then
+            echo "::set-output name=difference::false"
+          else
+            echo "::set-output name=difference::true"
+          fi
+
+      - name: NPM install OpenAPI Generator CLI globally
+        run: npm install -g @openapitools/openapi-generator-cli
+
+      - name: Set execute permission on generate.sh
+        run: chmod +x ./Source/ImmutablezkEVMAPI/openapi-generator/batch-files/generate.sh
+
+      - name: Convert line endings of generate.sh to Unix format
+        run: sed -i -e 's/\r$//' ./Source/ImmutablezkEVMAPI/openapi-generator/batch-files/generate.sh
+
+      - name: Generate API if there are differences
+        if: steps.comparison.outputs.difference == 'true'
+        run: |
+          cd ./Source/ImmutablezkEVMAPI/openapi-generator/batch-files
+          ./generate.sh
+          cd ../../../../
+
+      - name: Clean up
+        if: steps.comparison.outputs.difference == 'true'
+        run: |
+          rm openapi_remote.json
+
+      - name: Create a new branch
+        if: steps.comparison.outputs.difference == 'true'
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git checkout -b feat/update-zkevm-api-${{ steps.date.outputs.date }}
+
+      - name: Commit changes
+        id: commit_changes
+        if: steps.comparison.outputs.difference == 'true'
+        run: |
+          git add ./Source/ImmutablezkEVMAPI/
+          if [ -n "$(git diff --cached)" ]; then
+            git commit -m "feat: update immutable zkEVM API package"
+            echo "commit=true" >> $GITHUB_ENV
+          else
+            echo "No changes to commit."
+            echo "commit=false" >> $GITHUB_ENV
+          fi
+
+      - name: Push changes
+        if: env.commit == 'true'
+        run: |
+          git push origin feat/update-zkevm-api-${{ steps.date.outputs.date }}
+
+      - name: Create pull request
+        if: env.commit == 'true'
+        run: |
+          gh pr create --title "feat: update immutable zkEVM API package" \
+                        --body "Update Immutable zkEVM API package" \
+                        --base main \
+                        --head feat/update-zkevm-api-${{ steps.date.outputs.date }}
