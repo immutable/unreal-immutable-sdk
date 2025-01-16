@@ -2,7 +2,7 @@
 
 #include "Components/Widget.h"
 
-#include "TransakWebBrowser.generated.h"
+#include "OnRampWebBrowserWidget.generated.h"
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 enum class EWebBrowserConsoleLogSeverity;
