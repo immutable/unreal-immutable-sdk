@@ -11,7 +11,7 @@
  * This class contains settings that can be adjusted to control the behavior
  * of the Immutable plugin within the Unreal Engine environment.
  */
-UCLASS(config = Game, defaultconfig, meta = (DisplayName = "Immutable Plugin Settings"))
+UCLASS(config = Game, defaultconfig, meta = (DisplayName = "Immutable"))
 class IMMUTABLE_API UImmutableSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()

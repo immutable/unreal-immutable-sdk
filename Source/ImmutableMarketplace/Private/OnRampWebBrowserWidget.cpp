@@ -3,7 +3,7 @@
 #include "ImmutableMarketplaceSettings.h"
 #include "PlatformHttp.h"
 
-#include "OnRampConfig.h"
+#include "OnRampWidgetConfig.h"
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 #include "SWebBrowser.h"
@@ -15,12 +15,12 @@
 
 #define LOCTEXT_NAMESPACE "OnRampWebBrowser"
 
-bool UTransakWebBrowser::IsReady() const
+bool UOnRampWidget::IsReady() const
 {
 	return bIsReady;
 }
 
-void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
+void UOnRampWidget::Load(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
 {
 	if (!WebBrowserWidget.IsValid())
 	{
@@ -28,14 +28,14 @@ void UTransakWebBrowser::Load(const FString& WalletAddress, const FString& Email
 	}
 
 	FString UrlToLoad = ComputePath(WalletAddress, Email, ProductsAvailed, ScreenTitle);
-	CallAndRegister_OnWhenReady(UTransakWebBrowser::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad]()
+	CallAndRegister_OnWhenReady(UOnRampWidget::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, UrlToLoad]()
 	{
 		WebBrowserWidget->LoadURL(UrlToLoad);
 		OnWhenReady.RemoveAll(this);
 	}));
 }
 
-FDelegateHandle UTransakWebBrowser::CallAndRegister_OnWhenReady(FOnWhenReady::FDelegate Delegate)
+FDelegateHandle UOnRampWidget::CallAndRegister_OnWhenReady(FOnWhenReady::FDelegate Delegate)
 {
 	if (bIsReady)
 	{
@@ -45,7 +45,7 @@ FDelegateHandle UTransakWebBrowser::CallAndRegister_OnWhenReady(FOnWhenReady::FD
 	return OnWhenReady.Add(Delegate);
 }
 
-TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
+TSharedRef<SWidget> UOnRampWidget::RebuildWidget()
 {
 	if (IsDesignTime())
 	{
@@ -77,11 +77,11 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 	}
 }
 
-FString UTransakWebBrowser::ComputePath(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
+FString UOnRampWidget::ComputePath(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
 {
 	auto Settings = GetDefault<UImmutableMarketplaceSettings>();
 
-	UTransakConfig* TransakConfig = Settings->DefaultOnRampWidgetConfig.GetDefaultObject();
+	UOnRampWidgetConfig* TransakConfig = Settings->DefaultOnRampWidgetConfig.GetDefaultObject();
 
 	if (!TransakConfig)
 	{
@@ -149,7 +149,7 @@ FString UTransakWebBrowser::ComputePath(const FString& WalletAddress, const FStr
 	return Path;
 }
 
-void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
+void UOnRampWidget::HandleOnUrlChanged(const FText& Text)
 {
 	if (Text.EqualToCaseIgnored(FText::FromString(InitialURL)))
 	{
@@ -159,12 +159,12 @@ void UTransakWebBrowser::HandleOnUrlChanged(const FText& Text)
 }
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-void UTransakWebBrowser::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
+void UOnRampWidget::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
 {
 	IMTBL_LOG("Transak Web Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
 }
 
-bool UTransakWebBrowser::HandleOnBeforePopup(FString URL, FString Frame)
+bool UOnRampWidget::HandleOnBeforePopup(FString URL, FString Frame)
 {
 	return false;
 }
