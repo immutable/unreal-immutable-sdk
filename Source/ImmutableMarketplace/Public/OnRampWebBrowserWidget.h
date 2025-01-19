@@ -4,6 +4,9 @@
 
 #include "OnRampWebBrowserWidget.generated.h"
 
+
+DECLARE_LOG_CATEGORY_EXTERN(LogImmutableOnRampWidget, Log, All);
+
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 enum class EWebBrowserConsoleLogSeverity;
 
@@ -14,7 +17,7 @@ class SBluWebBrowser;
 
 
 /**
- * A custom web browser widget for Transak transactions.
+ * A custom web browser widget for Immutable On Ramp funds transactions.
  */
 UCLASS()
 class IMMUTABLEMARKETPLACE_API UOnRampWidget : public UWidget
@@ -34,7 +37,7 @@ public:
 	bool IsReady() const;
 
 	/**
-	 * Loads Transak widget with provided user data.
+	 * Loads on ramp widget with provided user data.
 	 *
 	 * @param WalletAddress The wallet address to load.
 	 * @param Email The email associated with the user.

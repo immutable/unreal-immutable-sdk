@@ -26,7 +26,14 @@ public class ImmutableMarketplace : ModuleRules
             }
         );
         
-#if! UE_5_1_OR_LATER
+#if UE_5_1_OR_LATER
+        PublicDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "WebBrowser",
+            }
+        );
+#else
         PrivateDependencyModuleNames.Add("BluExtension");
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {

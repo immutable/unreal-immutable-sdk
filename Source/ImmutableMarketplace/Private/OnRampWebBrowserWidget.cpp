@@ -7,13 +7,14 @@
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 #include "SWebBrowser.h"
-
-#include "Immutable/Misc/ImtblLogging.h"
 #else
 #include "UserInterface/BluWebBrowser.h"
 #endif
 
-#define LOCTEXT_NAMESPACE "OnRampWebBrowser"
+#define LOCTEXT_NAMESPACE "OnRampWidget"
+
+DEFINE_LOG_CATEGORY(LogImmutableOnRampWidget);
+
 
 bool UOnRampWidget::IsReady() const
 {
@@ -54,7 +55,7 @@ TSharedRef<SWidget> UOnRampWidget::RebuildWidget()
 			.VAlign(VAlign_Center)
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("Transak Web Browser", "Transak Web Browser"))
+				.Text(LOCTEXT("OnRamp Web Browser", "OnRamp Web Browser"))
 			];
 	}
 	else
@@ -81,26 +82,28 @@ FString UOnRampWidget::ComputePath(const FString& WalletAddress, const FString& 
 {
 	auto Settings = GetDefault<UImmutableMarketplaceSettings>();
 
-	UOnRampWidgetConfig* TransakConfig = Settings->DefaultOnRampWidgetConfig.GetDefaultObject();
+	UOnRampWidgetConfig* OnRampWidgetConfig = Settings->DefaultOnRampWidgetConfig.GetDefaultObject();
 
-	if (!TransakConfig)
+	if (!OnRampWidgetConfig)
 	{
+		UE_LOG(LogImmutableOnRampWidget, Error, TEXT("On ramp widget config is not assigned!"));
+		
 		return TEXT("");
 	}
 
-	FString Path = TransakConfig->GetURL();
+	FString Path = OnRampWidgetConfig->GetURL();
 	TArray<FString> QueryParams;
 
-	QueryParams.Add(FString(TEXT("apiKey=")) + FPlatformHttp::UrlEncode(TransakConfig->GetAPIKey()));
+	QueryParams.Add(FString(TEXT("apiKey=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetAPIKey()));
 	QueryParams.Add(FString(TEXT("email=")) + FPlatformHttp::UrlEncode(Email));
 	QueryParams.Add(FString(TEXT("walletAddress=")) + FPlatformHttp::UrlEncode(WalletAddress));
-	QueryParams.Add(FString(TEXT("themeColor=")) + FPlatformHttp::UrlEncode(TransakConfig->GetThemeColor().ToString()));
-	QueryParams.Add(FString(TEXT("isAutoFillUserData=")) + FPlatformHttp::UrlEncode(TransakConfig->IsAutoFillUserData() ? TEXT("true") : TEXT("false")));
-	QueryParams.Add(FString(TEXT("disableWalletAddressForm=")) + FPlatformHttp::UrlEncode(TransakConfig->DisableWalletAddressForm() ? TEXT("true") : TEXT("false")));
+	QueryParams.Add(FString(TEXT("themeColor=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetThemeColor().ToString()));
+	QueryParams.Add(FString(TEXT("isAutoFillUserData=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->IsAutoFillUserData() ? TEXT("true") : TEXT("false")));
+	QueryParams.Add(FString(TEXT("disableWalletAddressForm=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->DisableWalletAddressForm() ? TEXT("true") : TEXT("false")));
 
-	if (!TransakConfig->GetNetwork().IsEmpty())
+	if (!OnRampWidgetConfig->GetNetwork().IsEmpty())
 	{
-		QueryParams.Add(FString(TEXT("network=")) + FPlatformHttp::UrlEncode(TransakConfig->GetNetwork()));
+		QueryParams.Add(FString(TEXT("network=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetNetwork()));
 	}
 
 	if (!ProductsAvailed.IsEmpty())
@@ -113,34 +116,34 @@ FString UOnRampWidget::ComputePath(const FString& WalletAddress, const FString& 
 		QueryParams.Add(FString(TEXT("exchangeScreenTitle=")) + FPlatformHttp::UrlEncode(ScreenTitle));
 	}
 
-	if (!TransakConfig->GetDefaultCryptoCurrency().IsEmpty())
+	if (!OnRampWidgetConfig->GetDefaultCryptoCurrency().IsEmpty())
 	{
-		QueryParams.Add(FString(TEXT("defaultCryptoCurrency=")) + FPlatformHttp::UrlEncode(TransakConfig->GetDefaultCryptoCurrency()));
+		QueryParams.Add(FString(TEXT("defaultCryptoCurrency=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetDefaultCryptoCurrency()));
 	}
 
-	if (!TransakConfig->GetDefaultFiatAmount().IsEmpty())
+	if (!OnRampWidgetConfig->GetDefaultFiatAmount().IsEmpty())
 	{
-		QueryParams.Add(FString(TEXT("defaultFiatAmount=")) + FPlatformHttp::UrlEncode(TransakConfig->GetDefaultFiatAmount()));
+		QueryParams.Add(FString(TEXT("defaultFiatAmount=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetDefaultFiatAmount()));
 	}
 
-	if (!TransakConfig->GetDefaultFiatCurrency().IsEmpty())
+	if (!OnRampWidgetConfig->GetDefaultFiatCurrency().IsEmpty())
 	{
-		QueryParams.Add(FString(TEXT("defaultFiatCurrency=")) + FPlatformHttp::UrlEncode(TransakConfig->GetDefaultFiatCurrency()));
+		QueryParams.Add(FString(TEXT("defaultFiatCurrency=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetDefaultFiatCurrency()));
 	}
 
-	if (!TransakConfig->GetDefaultPaymentMethod().IsEmpty())
+	if (!OnRampWidgetConfig->GetDefaultPaymentMethod().IsEmpty())
 	{
-		QueryParams.Add(FString(TEXT("defaultPaymentMethod=")) + FPlatformHttp::UrlEncode(TransakConfig->GetDefaultPaymentMethod()));
+		QueryParams.Add(FString(TEXT("defaultPaymentMethod=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetDefaultPaymentMethod()));
 	}
 
-	if (TransakConfig->GetCryptoCurrencyList().Num() > 0)
+	if (OnRampWidgetConfig->GetCryptoCurrencyList().Num() > 0)
 	{
-		QueryParams.Add(FString(TEXT("cryptoCurrencyList=")) + FPlatformHttp::UrlEncode(FString::Join(TransakConfig->GetCryptoCurrencyList(), TEXT(","))));
+		QueryParams.Add(FString(TEXT("cryptoCurrencyList=")) + FPlatformHttp::UrlEncode(FString::Join(OnRampWidgetConfig->GetCryptoCurrencyList(), TEXT(","))));
 	}
 
-	if (TransakConfig->GetDisablePaymentMethods().Num() > 0)
+	if (OnRampWidgetConfig->GetDisablePaymentMethods().Num() > 0)
 	{
-		QueryParams.Add(FString(TEXT("disablePaymentMethods=")) + FPlatformHttp::UrlEncode(FString::Join(TransakConfig->GetDisablePaymentMethods(), TEXT(","))));
+		QueryParams.Add(FString(TEXT("disablePaymentMethods=")) + FPlatformHttp::UrlEncode(FString::Join(OnRampWidgetConfig->GetDisablePaymentMethods(), TEXT(","))));
 	}
 
 	Path += TEXT("?");
@@ -161,7 +164,7 @@ void UOnRampWidget::HandleOnUrlChanged(const FText& Text)
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 void UOnRampWidget::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
 {
-	IMTBL_LOG("Transak Web Browser console message: %s, Source: %s, Line: %d", *Message, *Source, Line);
+	UE_LOG(LogImmutableOnRampWidget, Log, TEXT("Web Browser console message: %s, Source: %s, Line: %d"), *Message, *Source, Line);
 }
 
 bool UOnRampWidget::HandleOnBeforePopup(FString URL, FString Frame)

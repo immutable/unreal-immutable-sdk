@@ -20,10 +20,6 @@ public class Immutable : ModuleRules
             {
                 "Core",
                 "JsonUtilities", 
-#if UE_5_1_OR_LATER
-                "WebBrowser",
-                "WebBrowserWidget",
-#endif
 			}
         );
         
@@ -43,7 +39,13 @@ public class Immutable : ModuleRules
         );
 
 #if UE_5_1_OR_LATER
-        PublicDependencyModuleNames.Add("WebBrowserWidget");
+        PublicDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "WebBrowser",
+                "WebBrowserWidget"
+            }
+        );
 #else
         PrivateDependencyModuleNames.Add("BluExtension");
         if (Target.Platform == UnrealTargetPlatform.Win64)

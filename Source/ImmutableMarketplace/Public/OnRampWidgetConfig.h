@@ -192,7 +192,7 @@ protected:
 	* If the network selected is not supported by a product type (BUY/SELL) then the default widget will
 	* all supported networks will be shown.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category = "Transak")
+	UPROPERTY(EditDefaultsOnly, Category = "Blockchain")
 	FString Network;
 
 	/**

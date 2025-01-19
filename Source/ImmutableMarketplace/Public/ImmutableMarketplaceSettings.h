@@ -20,6 +20,6 @@ public:
 	/// The default on ramp widget configuration class.
 	/// This property holds a reference to a subclass of UTransakConfig,
 	/// which is used to load on ramp widget in web browser.
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Transak")
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UOnRampWidgetConfig> DefaultOnRampWidgetConfig;
 };
