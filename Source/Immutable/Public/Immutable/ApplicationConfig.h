@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "ImmutableEnums.h"
 #include "ImmutableNames.h"
 
@@ -11,7 +12,7 @@
  * client IDs, and environment settings for the zkEVM API, Orderbook API, and Passport.
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = Immutable)
-class UApplicationConfig : public UObject
+class IMMUTABLE_API UApplicationConfig : public UObject
 {
 	GENERATED_BODY()
 

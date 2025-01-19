@@ -4,13 +4,11 @@
 
 #include "ImmutableAnalytics.h"
 #include "Immutable/Misc/ImtblLogging.h"
-#include "Immutable/ImmutableResponses.h"
 #include "Immutable/ImtblJSConnector.h"
 #include "JsonObjectConverter.h"
 #include "Immutable/ImmutableSaveGame.h"
-#include "Immutable/ImmutableUtilities.h"
+#include "Immutable/ImmutableSettings.h"
 #include "Kismet/GameplayStatics.h"
-#include "Policies/CondensedJsonPrintPolicy.h"
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC
 #include "GenericPlatform/GenericPlatformHttp.h"
@@ -49,8 +47,17 @@ void UImmutablePassport::Initialize(const FImmutablePassportInitData& Data, cons
 void UImmutablePassport::Initialize(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	check(JSConnector.IsValid());
+
+	auto Settings = GetDefault<UImmutableSettings>();
+
+	if (Settings)
+	{
+		ResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, "Failed to find Immutable Settings"});
+		
+		return;
+	}
 	
-	UApplicationConfig* ApplicationConfig = FImmutableUtilities::GetDefaultApplicationConfig();
+	UApplicationConfig* ApplicationConfig = Settings->DefaultApplicationConfig.GetDefaultObject();
 
 	if (!ApplicationConfig)
 	{

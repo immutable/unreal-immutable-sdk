@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "TransakConfig.generated.h"
+#include "OnRampConfig.generated.h"
 
 
 UENUM(BlueprintType)
@@ -11,11 +11,11 @@ enum class ETransakEnvironment : uint8
 };
 
 /**
- * @class UTransakConfig
+ * @class UOnRampConfig
  * @brief Configuration settings for Transak widget.
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = Immutable)
-class UTransakConfig : public UObject
+class IMMUTABLEMARKETPLACE_API UTransakConfig : public UObject
 {
 	GENERATED_BODY()
 

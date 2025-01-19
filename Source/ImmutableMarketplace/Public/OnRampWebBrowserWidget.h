@@ -17,7 +17,7 @@ class SBluWebBrowser;
  * A custom web browser widget for Transak transactions.
  */
 UCLASS()
-class IMMUTABLE_API UTransakWebBrowser : public UWidget
+class IMMUTABLEMARKETPLACE_API UTransakWebBrowser : public UWidget
 {
 	GENERATED_BODY()
 

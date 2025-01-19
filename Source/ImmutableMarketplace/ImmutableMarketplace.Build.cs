@@ -10,6 +10,7 @@ public class ImmutableMarketplace : ModuleRules
             new string[]
             {
                 "Core",
+                "UMG"
             }
         );
 
@@ -19,8 +20,18 @@ public class ImmutableMarketplace : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "Slate",
-                "SlateCore"
+                "SlateCore",
+                "DeveloperSettings",
+                "HTTP"
             }
         );
+        
+#if! UE_5_1_OR_LATER
+        PrivateDependencyModuleNames.Add("BluExtension");
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            PublicDependencyModuleNames.Add("Blu");
+        }
+#endif
     }
 }

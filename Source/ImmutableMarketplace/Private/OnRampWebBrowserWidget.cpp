@@ -1,9 +1,9 @@
 ﻿#include "OnRampWebBrowserWidget.h"
 
+#include "ImmutableMarketplaceSettings.h"
 #include "PlatformHttp.h"
 
-#include "Immutable/ImmutableUtilities.h"
-#include "Immutable/Transak/TransakConfig.h"
+#include "OnRampConfig.h"
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
 #include "SWebBrowser.h"
@@ -13,7 +13,7 @@
 #include "UserInterface/BluWebBrowser.h"
 #endif
 
-#define LOCTEXT_NAMESPACE "TransakWebBrowser"
+#define LOCTEXT_NAMESPACE "OnRampWebBrowser"
 
 bool UTransakWebBrowser::IsReady() const
 {
@@ -79,7 +79,9 @@ TSharedRef<SWidget> UTransakWebBrowser::RebuildWidget()
 
 FString UTransakWebBrowser::ComputePath(const FString& WalletAddress, const FString& Email, const FString& ProductsAvailed, const FString& ScreenTitle)
 {
-	UTransakConfig* TransakConfig = FImmutableUtilities::GetDefaultTransakConfig();
+	auto Settings = GetDefault<UImmutableMarketplaceSettings>();
+
+	UTransakConfig* TransakConfig = Settings->DefaultOnRampWidgetConfig.GetDefaultObject();
 
 	if (!TransakConfig)
 	{

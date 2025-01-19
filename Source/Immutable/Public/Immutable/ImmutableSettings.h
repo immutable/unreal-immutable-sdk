@@ -2,18 +2,17 @@
 
 #include "Engine/DeveloperSettings.h"
 #include "ApplicationConfig.h"
-#include "Transak/TransakConfig.h"
 
-#include "ImmutablePluginSettings.generated.h"
+#include "ImmutableSettings.generated.h"
 
 
 /**
- * ImmutablePluginSettings is a configuration class for the Immutable plugin.
+ * Immutable developer settings is a configuration class for the Immutable plugin.
  * This class contains settings that can be adjusted to control the behavior
  * of the Immutable plugin within the Unreal Engine environment.
  */
 UCLASS(config = Game, defaultconfig, meta = (DisplayName = "Immutable Plugin Settings"))
-class IMMUTABLE_API UImmutablePluginSettings : public UDeveloperSettings
+class IMMUTABLE_API UImmutableSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
@@ -24,6 +23,4 @@ public:
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
 	TSubclassOf<UApplicationConfig> DefaultApplicationConfig;
 
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Transak")
-	TSubclassOf<UTransakConfig> DefaultTransakConfig;
 };
