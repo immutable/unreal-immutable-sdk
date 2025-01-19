@@ -56,7 +56,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return Network as FString
 	 */
-	const FString& GetNetwork()
+	const FString& GetNetwork() const
 	{
 		return Network;
 	}
@@ -65,7 +65,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return DefaultFiatCurrency as FString
 	 */
-	const FString& GetDefaultFiatCurrency()
+	const FString& GetDefaultFiatCurrency() const
 	{
 		return DefaultFiatCurrency;
 	}
@@ -74,7 +74,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return DefaultFiatAmount as FString
 	 */
-	const FString& GetDefaultFiatAmount()
+	const FString& GetDefaultFiatAmount() const
 	{
 		return DefaultFiatAmount;
 	}
@@ -83,7 +83,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return DefaultCryptoCurrency as FString
 	 */
-	const FString& GetDefaultCryptoCurrency()
+	const FString& GetDefaultCryptoCurrency() const
 	{
 		return DefaultCryptoCurrency;
 	}
@@ -92,7 +92,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return DefaultPaymentMethod as FString
 	 */
-	const FString& GetDefaultPaymentMethod()
+	const FString& GetDefaultPaymentMethod() const
 	{
 		return DefaultPaymentMethod;
 	}
@@ -101,7 +101,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return DisablePaymentMethods as array of FString
 	 */
-	const TArray<FString>& GetDisablePaymentMethods()
+	const TArray<FString>& GetDisablePaymentMethods() const
 	{
 		return DisablePaymentMethods;
 	}
@@ -110,7 +110,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return bIsAutoFillUserData as bool
 	 */
-	bool IsAutoFillUserData()
+	bool IsAutoFillUserData() const
 	{
 		return bIsAutoFillUserData;
 	}
@@ -119,7 +119,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return bDisableWalletAddressForm as bool
 	 */
-	bool DisableWalletAddressForm()
+	bool IsDisableWalletAddressForm() const
 	{
 		return bDisableWalletAddressForm;
 	}
@@ -128,7 +128,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return CryptoCurrencyList as array of FString
 	 */
-	const TArray<FString>& GetCryptoCurrencyList()
+	const TArray<FString>& GetCryptoCurrencyList() const
 	{
 		return CryptoCurrencyList;
 	}
@@ -137,7 +137,7 @@ public:
 	 * @details More details could be found under the class parameter   
 	 * @return ThemeColor as FLinearColor
 	 */
-	const FLinearColor& GetThemeColor()
+	const FLinearColor& GetThemeColor() const
 	{
 		return ThemeColor;
 	}

@@ -99,7 +99,7 @@ FString UOnRampWidget::ComputePath(const FString& WalletAddress, const FString& 
 	QueryParams.Add(FString(TEXT("walletAddress=")) + FPlatformHttp::UrlEncode(WalletAddress));
 	QueryParams.Add(FString(TEXT("themeColor=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->GetThemeColor().ToString()));
 	QueryParams.Add(FString(TEXT("isAutoFillUserData=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->IsAutoFillUserData() ? TEXT("true") : TEXT("false")));
-	QueryParams.Add(FString(TEXT("disableWalletAddressForm=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->DisableWalletAddressForm() ? TEXT("true") : TEXT("false")));
+	QueryParams.Add(FString(TEXT("disableWalletAddressForm=")) + FPlatformHttp::UrlEncode(OnRampWidgetConfig->IsDisableWalletAddressForm() ? TEXT("true") : TEXT("false")));
 
 	if (!OnRampWidgetConfig->GetNetwork().IsEmpty())
 	{
@@ -158,6 +158,7 @@ void UOnRampWidget::HandleOnUrlChanged(const FText& Text)
 	{
 		bIsReady = true;
 		OnWhenReady.Broadcast();
+		OnWhenReady.Clear();
 	}
 }
 
