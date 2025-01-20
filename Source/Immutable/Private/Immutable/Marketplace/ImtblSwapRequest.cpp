@@ -4,13 +4,24 @@
 
 FString FImtblSwapRequestQueryParams::GetPercentEncodedUrl() const
 {
-	return FString::Printf
-	(
-		TEXT("%s=%s&%s=%s&%s=%s"),
-		TEXT("publishableKey"), *FGenericPlatformHttp::UrlEncode(PublishableKey),
-		TEXT("fromTokenAddress"), *FGenericPlatformHttp::UrlEncode(FromTokenAddress),
-		TEXT("toTokenAddress"), *FGenericPlatformHttp::UrlEncode(ToTokenAddress)
-	);
+	TArray<FString> QueryParams;
+
+	if (!PublishableKey.IsEmpty())
+	{
+		QueryParams.Add(FString::Printf(TEXT("%s=%s"), TEXT("publishableKey"), *FGenericPlatformHttp::UrlEncode(PublishableKey)));
+	}
+
+	if (!FromTokenAddress.IsEmpty())
+	{
+		QueryParams.Add(FString::Printf(TEXT("%s=%s"), TEXT("fromTokenAddress"), *FGenericPlatformHttp::UrlEncode(FromTokenAddress)));
+	}
+
+	if (!ToTokenAddress.IsEmpty())
+	{
+		QueryParams.Add(FString::Printf(TEXT("%s=%s"), TEXT("toTokenAddress"), *FGenericPlatformHttp::UrlEncode(ToTokenAddress)));
+	}
+
+	return FString::Join(QueryParams, TEXT("&"));
 }
 
 bool UImtblSwapRequest::GetBaseUrl(EImtblEnvironment Environment, FString& BaseUrl) const
@@ -37,7 +48,7 @@ bool UImtblSwapRequest::GetApiKey(EImtblEnvironment Environment, FString& ApiKey
 	return false;
 }
 
-bool UImtblSwapRequest::ComputePath(EImtblEnvironment Environment, FString FromTokenAddress, FString ToTokenAddress, FString& ComputedPath) const
+bool UImtblSwapRequest::ComputePath(FString& ComputedPath, EImtblEnvironment Environment, FString FromTokenAddress, FString ToTokenAddress) const
 {
 	FString BaseUrl;
 	bool bFoundBaseUrl = GetBaseUrl(Environment, BaseUrl);
@@ -64,8 +75,10 @@ bool UImtblSwapRequest::ComputePath(EImtblEnvironment Environment, FString FromT
 
 	ComputedPath = FString::Printf
 	(
-		TEXT("%s?%s"),
-		*BaseUrl, *QueryParamsPercentEncodedUrl
+		TEXT("%s%s%s"),
+		*BaseUrl,
+		!QueryParamsPercentEncodedUrl.IsEmpty() ? TEXT("?") : TEXT(""),
+		*QueryParamsPercentEncodedUrl
 	);
 
 	return true;
