@@ -19,7 +19,7 @@ public class Immutable : ModuleRules
             new string[]
             {
                 "Core",
-                "JsonUtilities",
+                "JsonUtilities", 
 			}
         );
         
@@ -34,19 +34,27 @@ public class Immutable : ModuleRules
                 "UMG",
                 "Projects", 
                 "DeveloperSettings",
+                "HTTP",
 			}
         );
 
-#if UE_5_0_OR_LATER
-        PublicDependencyModuleNames.Add("WebBrowserWidget");
+#if UE_5_1_OR_LATER
+        PublicDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "WebBrowser",
+                "WebBrowserWidget"
+            }
+        );
 #else
+        PrivateDependencyModuleNames.Add("BluExtension");
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
             PublicDependencyModuleNames.Add("Blu");
         }
 #endif
 
-#if UE_5_0_OR_LATER
+#if UE_5_1_OR_LATER
 			PrivateDependencyModuleNames.Add("WebBrowser");
 			PublicDefinitions.Add("USING_BUNDLED_CEF=1");
 			PublicDefinitions.Add("USING_BLUI_CEF=0");
