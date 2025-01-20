@@ -1,10 +1,11 @@
 ﻿#pragma once
 
 UENUM(BlueprintType)
-enum class EPassportEnvironment : uint8
+enum class EImtblEnvironment : uint8
 {
-	Development,
 	Sandbox,
 	Production,
+	MAX
 };
 
+ENUM_RANGE_BY_COUNT(EImtblEnvironment, EImtblEnvironment::MAX)

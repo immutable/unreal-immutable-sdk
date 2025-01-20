@@ -96,10 +96,10 @@ public:
 	{
 		switch (Environment)
 		{
-		case EPassportEnvironment::Production:
+		case EImtblEnvironment::Production:
 			return ImmutablePassportEnvironmentConstants::EnvironmentProduction;
 		default:
-		case EPassportEnvironment::Sandbox:
+		case EImtblEnvironment::Sandbox:
 			return ImmutablePassportEnvironmentConstants::EnvironmentProduction;
 		}
 	}
@@ -159,7 +159,7 @@ protected:
 	 * @note The default environment is set to the Sandbox environment.
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Passport")
-	EPassportEnvironment Environment = EPassportEnvironment::Sandbox;
+	EImtblEnvironment Environment = EImtblEnvironment::Sandbox;
 
 	/**
 	 * (Android, iOS, and macOS only)
