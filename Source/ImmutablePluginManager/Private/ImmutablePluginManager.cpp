@@ -19,12 +19,14 @@ class FImmutablePluginManagerInternal
 public:
 	FImmutablePluginManagerInternal()
 	{
+#if WITH_EDITOR
 #if ENGINE_MAJOR_VERSION <= 4
 		FImmutablePluginManagerModule::EnablePlugin(TEXT("BLUI"));
 		FImmutablePluginManagerModule::DisablePlugin(TEXT("WebBrowserWidget"));
 #else
 		FImmutablePluginManagerModule::DisablePlugin(TEXT("BLUI"));
 		FImmutablePluginManagerModule::EnablePlugin(TEXT("WebBrowserWidget"));
+#endif
 #endif
 	}
 };
