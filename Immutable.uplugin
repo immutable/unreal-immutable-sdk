@@ -22,6 +22,11 @@
 			"LoadingPhase": "Default"
 		},
 		{
+			"Name": "ImmutableCore",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
 			"Name": "ImmutableEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
