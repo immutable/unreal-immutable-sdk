@@ -10,19 +10,20 @@ struct IMMUTABLEMARKETPLACE_API FImmutableOnRampQueryParams
 {
 	GENERATED_BODY()
 
+public:
 	/** The cryptocurrency to purchase (default: "IMX"). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Immutable|Marketplace")
-	FString DefaultCryptoCurrency;
+	FString DefaultCryptoCurrency = TEXT("IMX");
 
 	/** The amount of fiat currency to spend when purchasing cryptocurrency (default: "50"). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Immutable|Marketplace")
-	FString DefaultFiatAmount;
+	FString DefaultFiatAmount = TEXT("50");
 
 	/** The fiat currency to use (default: "USD"). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Immutable|Marketplace")
-	FString DefaultFiatCurrency;
+	FString DefaultFiatCurrency = TEXT("USD");
 
 	/** A comma-separated list of available cryptocurrencies for purchase (default: "imx,eth,usdc"). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Immutable|Marketplace")
-	FString CryptoCurrencyList;
+	FString CryptoCurrencyList = TEXT("imx,eth,usdc");
 };

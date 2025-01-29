@@ -11,11 +11,11 @@ struct IMMUTABLEMARKETPLACE_API FImmutableSwapQueryParams
 	GENERATED_BODY()
 
 public:
-	/** The address of the token being swapped from (default is null). */
+	/** The address of the token being swapped from (default: ""). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Immutable|Marketplace")
 	FString FromTokenAddress;
 
-	/** The address of the token being swapped to (default is null). */
+	/** The address of the token being swapped to (default: ""). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Immutable|Marketplace")
 	FString ToTokenAddress;
 };
