@@ -1,4 +1,4 @@
-﻿#include "OnRampWebBrowserWidget.h"
+﻿#include "OnRamp/ImmutableMarketplaceOnRampWidget.h"
 
 #include "PlatformHttp.h"
 
@@ -14,7 +14,7 @@
 
 DEFINE_LOG_CATEGORY(LogImmutableOnRampWidget);
 
-UOnRampWidget::UOnRampWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UImmutableMarketplaceOnRampWidget::UImmutableMarketplaceOnRampWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	QueryParams.DefaultCryptoCurrency = TEXT("IMX");
 	QueryParams.DefaultFiatAmount = TEXT("50");
@@ -22,12 +22,12 @@ UOnRampWidget::UOnRampWidget(const FObjectInitializer& ObjectInitializer) : Supe
 	QueryParams.CryptoCurrencyList = TEXT("imx,eth,usdc");
 }
 
-bool UOnRampWidget::IsReady() const
+bool UImmutableMarketplaceOnRampWidget::IsReady() const
 {
 	return bIsReady;
 }
 
-void UOnRampWidget::Load(const FString& WalletAddress, const FString& Email)
+void UImmutableMarketplaceOnRampWidget::Load(const FString& WalletAddress, const FString& Email)
 {
 	if (!WebBrowserWidget.IsValid())
 	{
@@ -36,14 +36,14 @@ void UOnRampWidget::Load(const FString& WalletAddress, const FString& Email)
 
 	const FString OnRampLink = UImmutableMarketplaceLinkFactory::GenerateOnRampLink(Environment, Email, WalletAddress, QueryParams, ExtraQueryParams);
 
-	CallAndRegister_OnWhenReady(UOnRampWidget::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, OnRampLink]()
+	CallAndRegister_OnWhenReady(UImmutableMarketplaceOnRampWidget::FOnWhenReady::FDelegate::CreateWeakLambda(this, [this, OnRampLink]()
 	{
 		WebBrowserWidget->LoadURL(OnRampLink);
 		OnWhenReady.RemoveAll(this);
 	}));
 }
 
-FDelegateHandle UOnRampWidget::CallAndRegister_OnWhenReady(FOnWhenReady::FDelegate Delegate)
+FDelegateHandle UImmutableMarketplaceOnRampWidget::CallAndRegister_OnWhenReady(FOnWhenReady::FDelegate Delegate)
 {
 	if (bIsReady)
 	{
@@ -53,7 +53,7 @@ FDelegateHandle UOnRampWidget::CallAndRegister_OnWhenReady(FOnWhenReady::FDelega
 	return OnWhenReady.Add(Delegate);
 }
 
-TSharedRef<SWidget> UOnRampWidget::RebuildWidget()
+TSharedRef<SWidget> UImmutableMarketplaceOnRampWidget::RebuildWidget()
 {
 	if (IsDesignTime())
 	{
@@ -85,7 +85,7 @@ TSharedRef<SWidget> UOnRampWidget::RebuildWidget()
 	}
 }
 
-void UOnRampWidget::HandleOnUrlChanged(const FText& Text)
+void UImmutableMarketplaceOnRampWidget::HandleOnUrlChanged(const FText& Text)
 {
 	if (Text.EqualToCaseIgnored(FText::FromString(InitialURL)))
 	{
