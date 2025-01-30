@@ -5,7 +5,7 @@
 #include "ImmutableEnums.h"
 #include "OnRamp/ImmutableOnRampQueryParams.h"
 
-#include "OnRampWebBrowserWidget.generated.h"
+#include "ImmutableMarketplaceOnRampWidget.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogImmutableOnRampWidget, Log, All);
 
@@ -21,7 +21,7 @@ class SBluWebBrowser;
  * A custom web browser widget for Immutable On Ramp funds transactions.
  */
 UCLASS()
-class IMMUTABLEMARKETPLACE_API UOnRampWidget : public UWidget
+class IMMUTABLEMARKETPLACE_API UImmutableMarketplaceOnRampWidget : public UWidget
 {
 	GENERATED_BODY()
 
@@ -29,7 +29,7 @@ public:
 	DECLARE_MULTICAST_DELEGATE(FOnWhenReady);
 
 public:
-	UOnRampWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UImmutableMarketplaceOnRampWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/**
 	 * Check if the web browser widget is ready to be loaded.
