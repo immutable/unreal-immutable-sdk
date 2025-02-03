@@ -44,15 +44,18 @@ jobs:
           fi
 
       - name: NPM install OpenAPI Generator CLI globally
+        if: steps.comparison.outputs.difference == 'true'
         run: npm install -g @openapitools/openapi-generator-cli
 
       - name: Set execute permission on generate.sh
+        if: steps.comparison.outputs.difference == 'true'
         run: chmod +x ./Source/ImmutablezkEVMAPI/openapi-generator/batch-files/generate.sh
 
       - name: Convert line endings of generate.sh to Unix format
+        if: steps.comparison.outputs.difference == 'true'
         run: sed -i -e 's/\r$//' ./Source/ImmutablezkEVMAPI/openapi-generator/batch-files/generate.sh
 
-      - name: Generate API if there are differences
+      - name: Generate API
         if: steps.comparison.outputs.difference == 'true'
         run: |
           cd "./Source/ImmutablezkEVMAPI/openapi-generator/batch-files"
