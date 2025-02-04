@@ -40,11 +40,11 @@ struct {{dllapi}} HttpRetryParams
 		const FRetryDomainsPtr& InRetryDomains = FRetryDomainsPtr()
 	);
 
-	FRetryLimitCountSetting              RetryLimitCountOverride;
-	FRetryTimeoutRelativeSecondsSetting  RetryTimeoutRelativeSecondsOverride;
-	FRetryResponseCodes					 RetryResponseCodes;
-	FRetryVerbs                          RetryVerbs;
-	FRetryDomainsPtr					 RetryDomains;
+	FRetryLimitCountSetting RetryLimitCountOverride;
+	FRetryTimeoutRelativeSecondsSetting RetryTimeoutRelativeSecondsOverride;
+	FRetryResponseCodes RetryResponseCodes;
+	FRetryVerbs RetryVerbs;
+	FRetryDomainsPtr RetryDomains;
 };
 
 class {{dllapi}} Model

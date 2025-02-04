@@ -145,7 +145,7 @@ void {{classname}}::WriteJson(JsonWriter& Writer) const
 	{{^oneOf}}
 	{{^isString}}
 	Writer->WriteObjectStart();
-    {{#vars}}
+	{{#vars}}
 	{{#required}}
 	Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}});
 	{{/required}}
@@ -155,7 +155,7 @@ void {{classname}}::WriteJson(JsonWriter& Writer) const
 		Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}}.GetValue());
 	}
 	{{/required}}
-    {{/vars}}
+	{{/vars}}
 	Writer->WriteObjectEnd();
 	{{/isString}}
 	{{/oneOf}}

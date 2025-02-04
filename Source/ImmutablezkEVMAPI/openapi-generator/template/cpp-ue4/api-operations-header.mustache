@@ -21,7 +21,7 @@ namespace {{this}}
 class {{dllapi}} {{classname}}::{{operationIdCamelCase}}Request : public Request
 {
 public:
-    virtual ~{{operationIdCamelCase}}Request() {}
+	virtual ~{{operationIdCamelCase}}Request() {}
 	void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const final;
 	FString ComputePath() const final;
 
@@ -33,7 +33,7 @@ public:
 		{{#enumVars}}
 		{{name}},
 		{{/enumVars}}
-  	};
+	};
 	{{/allowableValues}}
 
 	static FString EnumToString(const {{{enumName}}}& EnumValue);
@@ -45,19 +45,19 @@ public:
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}{{{dataType}}}{{^required}}>{{/required}} {{paramName}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
-    {{/allParams}}
+	{{/allParams}}
 };
 
 class {{dllapi}} {{classname}}::{{operationIdCamelCase}}Response : public Response
 {
 public:
-    virtual ~{{operationIdCamelCase}}Response() {}
+	virtual ~{{operationIdCamelCase}}Response() {}
 	{{#responses.0}}
 	void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) final;
 	{{/responses.0}}
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 
-    {{#returnType}}{{{.}}} Content;{{/returnType}}
+	{{#returnType}}{{{.}}} Content;{{/returnType}}
 };
 
 {{/operation}}

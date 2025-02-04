@@ -30,7 +30,7 @@ namespace {{this}}
 class {{dllapi}} {{classname}} : public Model
 {
 public:
-    virtual ~{{classname}}() {}
+	virtual ~{{classname}}() {}
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
@@ -42,7 +42,7 @@ public:
 		{{#enumVars}}
 		{{name}},
 		{{/enumVars}}
-  	};
+	};
 
 	Values Value{{#defaultValue}} = {{{.}}}{{/defaultValue}};
 	{{/allowableValues}}
@@ -54,7 +54,7 @@ public:
 	FString Value{{#defaultValue}} = {{{.}}}{{/defaultValue}};
 	{{/isEnum}}
 	{{/isString}}
-    {{#vars}}
+	{{#vars}}
 	{{#isEnum}}
 	{{#allowableValues}}
 	enum class {{{enumName}}}
@@ -62,7 +62,7 @@ public:
 		{{#enumVars}}
 		{{name}},
 		{{/enumVars}}
-  	};
+	};
 	{{/allowableValues}}
 
 	static FString EnumToString(const {{{enumName}}}& EnumValue);
@@ -76,7 +76,7 @@ public:
 	{{/description}}{{^required}}TOptional<{{/required}}{{{datatype}}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/oneOf}}
 	{{/isEnum}}
-    {{/vars}}
+	{{/vars}}
 	{{#oneOf}}
 	{{#-first}}
 	TVariant<{{#oneOf}}{{{.}}}{{^-last}}, {{/-last}}{{/oneOf}}> OneOf;

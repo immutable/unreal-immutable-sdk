@@ -26,11 +26,11 @@ public:
 	explicit HttpFileInput(const FString& InFilePath);
 
 	// This will automatically set the content type if not already set
-    void SetFilePath(const TCHAR* InFilePath);
+	void SetFilePath(const TCHAR* InFilePath);
 	void SetFilePath(const FString& InFilePath);
 
-    // Optional if it can be deduced from the FilePath
-    void SetContentType(const TCHAR* ContentType);
+	// Optional if it can be deduced from the FilePath
+	void SetContentType(const TCHAR* ContentType);
 
 	HttpFileInput& operator=(const HttpFileInput& Other) = default;
 	HttpFileInput& operator=(const FString& InFilePath) { SetFilePath(*InFilePath); return*this; }
@@ -43,8 +43,8 @@ public:
 	FString GetFilename() const;
 
 private:
-    FString FilePath;
-    FString ContentType;
+	FString FilePath;
+	FString ContentType;
 };
 
 //////////////////////////////////////////////////////////////////////////
