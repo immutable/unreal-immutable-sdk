@@ -154,28 +154,18 @@ void F{{classname}}::WriteJson(JsonWriter& Writer) const
 
 bool F{{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	{{#isString}}
-	return TryGetJsonValue(JsonValue, Value);
-	{{/isString}}
-	{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}} {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value;
+	{{#isString}}return TryGetJsonValue(JsonValue, Value);{{/isString}}{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}} {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value;
 	if (const bool bIs{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}} = TryGetJsonValue(JsonValue, {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value))
 	{
 		OneOf.Set<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>({{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value);
 		return true;
 	}
 
-	{{/oneOf}}{{/composedSchemas}}
-
-	{{#oneOf}}
-	{{#-last}}
-	return false;
-	{{/-last}}
-	{{/oneOf}}
-	{{^oneOf}}
-	{{^isString}}
-	const TSharedPtr<FJsonObject>* Object;
+	{{/oneOf}}{{/composedSchemas}}{{#oneOf}}{{#-last}}return false;{{/-last}}{{/oneOf}}{{^oneOf}}{{^isString}}const TSharedPtr<FJsonObject>* Object;
 	if (!JsonValue->TryGetObject(Object))
+	{
 		return false;
+	}
 
 	bool ParseSuccess = true;
 
