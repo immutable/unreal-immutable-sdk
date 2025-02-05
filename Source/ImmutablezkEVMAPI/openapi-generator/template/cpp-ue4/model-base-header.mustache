@@ -66,10 +66,10 @@ private:
 	TOptional<HttpRetryParams> RetryParams;
 };
 
-class {{dllapi}} Response
+class {{dllapi}} F{{unrealModuleName}}Response
 {
 public:
-	virtual ~Response() {}
+	virtual ~F{{unrealModuleName}}Response() {}
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) = 0;
 
 	void SetSuccessful(bool InSuccessful) { Successful = InSuccessful; }

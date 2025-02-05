@@ -38,7 +38,7 @@ private:
 	{{/operation}}{{/operations}}
 	FHttpRequestRef CreateHttpRequest(const F{{unrealModuleName}}Request& Request) const;
 	bool IsValid() const;
-	void HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, Response& InOutResponse) const;
+	void HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, F{{unrealModuleName}}Response& InOutResponse) const;
 
 	FString Url;
 	TMap<FString,FString> AdditionalHeaderParams;

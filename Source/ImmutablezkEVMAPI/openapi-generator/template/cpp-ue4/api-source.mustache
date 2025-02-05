@@ -76,7 +76,7 @@ FHttpRequestRef {{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Requ
 	}
 }
 
-void {{classname}}::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, Response& InOutResponse) const
+void {{classname}}::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, F{{unrealModuleName}}Response& InOutResponse) const
 {
 	InOutResponse.SetHttpResponse(HttpResponse);
 	InOutResponse.SetSuccessful(bSucceeded);

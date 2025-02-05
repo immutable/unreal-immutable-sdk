@@ -24,7 +24,7 @@ HttpRetryParams::HttpRetryParams
 {
 }
 
-void Response::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
+void F{{unrealModuleName}}Response::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
 {
 	ResponseCode = InHttpResponseCode;
 	SetSuccessful(EHttpResponseCodes::IsOk(InHttpResponseCode));

@@ -297,7 +297,7 @@ void {{classname}}::{{operationIdCamelCase}}Request::SetupHttpRequest(const FHtt
 {{#responses.0}}
 void {{classname}}::{{operationIdCamelCase}}Response::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
 {
-	Response::SetHttpResponseCode(InHttpResponseCode);
+	F{{unrealModuleName}}Response::SetHttpResponseCode(InHttpResponseCode);
 	switch ((int)InHttpResponseCode)
 	{
 	{{#responses}}
