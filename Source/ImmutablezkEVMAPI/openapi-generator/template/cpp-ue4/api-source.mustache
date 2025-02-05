@@ -67,7 +67,7 @@ FHttpRequestRef {{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Requ
 		if (!RetryManager)
 		{
 			// Create default retry manager if none was specified
-			DefaultRetryManager = MakeUnique<HttpRetryManager>(6, 60);
+			DefaultRetryManager = MakeUnique<F{{unrealModuleName}}HttpRetryManager>(6, 60);
 			RetryManager = DefaultRetryManager.Get();
 		}
 

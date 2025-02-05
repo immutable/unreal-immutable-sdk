@@ -13,7 +13,7 @@
 typedef TSharedRef<TJsonWriter<>> JsonWriter;
 using namespace FHttpRetrySystem;
 
-struct {{dllapi}} HttpRetryManager
+struct {{dllapi}} F{{unrealModuleName}}HttpRetryManager
 	: public FManager
 #if ENGINE_MAJOR_VERSION <= 4
 	, public FTickerObjectBase

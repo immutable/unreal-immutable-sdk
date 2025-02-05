@@ -43,5 +43,5 @@ private:
 	FString Url;
 	TMap<FString,FString> AdditionalHeaderParams;
 	mutable FHttpRetrySystem::FManager* RetryManager = nullptr;
-	mutable TUniquePtr<HttpRetryManager> DefaultRetryManager;
+	mutable TUniquePtr<F{{unrealModuleName}}HttpRetryManager> DefaultRetryManager;
 };
