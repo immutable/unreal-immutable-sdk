@@ -20,14 +20,14 @@
 {{#model}}
 
 /*
- * {{classname}}
+ * F{{classname}}
  *
  * {{description}}
  */
-class {{dllapi}} {{classname}} : public F{{unrealModuleName}}Model
+class {{dllapi}} F{{classname}} : public F{{unrealModuleName}}Model
 {
 public:
-	virtual ~{{classname}}() {}
+	virtual ~F{{classname}}() {}
 	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
 	void WriteJson(JsonWriter& Writer) const final;
 
@@ -70,13 +70,13 @@ public:
 	{{^isEnum}}
 	{{^oneOf}}
 	{{#description}}/* {{{.}}} */
-	{{/description}}{{^required}}TOptional<{{/required}}{{{datatype}}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
+	{{/description}}{{^required}}TOptional<{{/required}}{{#isPrimitiveType}}{{{datatype}}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isContainer}}{{{baseType}}}<F{{{complexType}}}>{{/isContainer}}{{^isContainer}}F{{{datatype}}}{{/isContainer}}{{/isPrimitiveType}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/oneOf}}
 	{{/isEnum}}
 	{{/vars}}
 	{{#oneOf}}
 	{{#-first}}
-	TVariant<{{#oneOf}}{{{.}}}{{^-last}}, {{/-last}}{{/oneOf}}> OneOf;
+	TVariant<{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}{{^-last}}, {{/-last}}{{/oneOf}}{{/composedSchemas}}> OneOf;
 	{{/-first}}
 	{{/oneOf}}
 };

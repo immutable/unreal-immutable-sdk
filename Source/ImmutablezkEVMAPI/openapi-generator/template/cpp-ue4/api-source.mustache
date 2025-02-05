@@ -8,40 +8,40 @@
 #include "HttpModule.h"
 #include "Serialization/JsonSerializer.h"
 
-{{classname}}::{{classname}}()
+F{{classname}}::F{{classname}}()
 : Url(TEXT("{{basePath}}"))
 {
 }
 
-{{classname}}::~{{classname}}() {}
+F{{classname}}::~F{{classname}}() {}
 
-void {{classname}}::SetURL(const FString& InUrl)
+void F{{classname}}::SetURL(const FString& InUrl)
 {
 	Url = InUrl;
 }
 
-void {{classname}}::AddHeaderParam(const FString& Key, const FString& Value)
+void F{{classname}}::AddHeaderParam(const FString& Key, const FString& Value)
 {
 	AdditionalHeaderParams.Add(Key, Value);
 }
 
-void {{classname}}::ClearHeaderParams()
+void F{{classname}}::ClearHeaderParams()
 {
 	AdditionalHeaderParams.Reset();
 }
 
-bool {{classname}}::IsValid() const
+bool F{{classname}}::IsValid() const
 {
 	if (Url.IsEmpty())
 	{
-		UE_LOG(Log{{unrealModuleName}}, Error, TEXT("{{classname}}: Endpoint Url is not set, request cannot be performed"));
+		UE_LOG(Log{{unrealModuleName}}, Error, TEXT("F{{classname}}: Endpoint Url is not set, request cannot be performed"));
 		return false;
 	}
 
 	return true;
 }
 
-void {{classname}}::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManager)
+void F{{classname}}::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManager)
 {
 	if (RetryManager != &InRetryManager)
 	{
@@ -50,13 +50,13 @@ void {{classname}}::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManag
 	}
 }
 
-FHttpRetrySystem::FManager& {{classname}}::GetHttpRetryManager()
+FHttpRetrySystem::FManager& F{{classname}}::GetHttpRetryManager()
 {
-	checkf(RetryManager, TEXT("{{classname}}: RetryManager is null.  You may have meant to set it with SetHttpRetryManager first, or you may not be using a custom RetryManager at all."))
+	checkf(RetryManager, TEXT("F{{classname}}: RetryManager is null.  You may have meant to set it with SetHttpRetryManager first, or you may not be using a custom RetryManager at all."))
 	return *RetryManager;
 }
 
-FHttpRequestRef {{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Request& Request) const
+FHttpRequestRef F{{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Request& Request) const
 {
 	if (!Request.GetRetryParams().IsSet())
 	{
@@ -76,7 +76,7 @@ FHttpRequestRef {{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Requ
 	}
 }
 
-void {{classname}}::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, F{{unrealModuleName}}Response& InOutResponse) const
+void F{{classname}}::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, F{{unrealModuleName}}Response& InOutResponse) const
 {
 	InOutResponse.SetHttpResponse(HttpResponse);
 	InOutResponse.SetSuccessful(bSucceeded);
@@ -122,7 +122,7 @@ void {{classname}}::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceede
 
 {{#operations}}
 {{#operation}}
-FHttpRequestPtr {{classname}}::{{operationIdCamelCase}}(const {{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate /*= F{{operationIdCamelCase}}Delegate()*/) const
+FHttpRequestPtr F{{classname}}::{{operationIdCamelCase}}(const {{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate /*= F{{operationIdCamelCase}}Delegate()*/) const
 {
 	if (!IsValid())
 		return nullptr;
@@ -137,12 +137,12 @@ FHttpRequestPtr {{classname}}::{{operationIdCamelCase}}(const {{operationIdCamel
 
 	Request.SetupHttpRequest(HttpRequest);
 
-	HttpRequest->OnProcessRequestComplete().BindRaw(this, &{{classname}}::On{{operationIdCamelCase}}Response, Delegate);
+	HttpRequest->OnProcessRequestComplete().BindRaw(this, &F{{classname}}::On{{operationIdCamelCase}}Response, Delegate);
 	HttpRequest->ProcessRequest();
 	return HttpRequest;
 }
 
-void {{classname}}::On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, F{{operationIdCamelCase}}Delegate Delegate) const
+void F{{classname}}::On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, F{{operationIdCamelCase}}Delegate Delegate) const
 {
 	{{operationIdCamelCase}}Response Response;
 	HandleResponse(HttpResponse, bSucceeded, Response);
