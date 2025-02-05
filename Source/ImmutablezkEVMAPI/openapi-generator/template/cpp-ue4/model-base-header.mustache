@@ -43,10 +43,10 @@ struct {{dllapi}} HttpRetryParams
 	FRetryDomainsPtr RetryDomains;
 };
 
-class {{dllapi}} Model
+class {{dllapi}} F{{unrealModuleName}}Model
 {
 public:
-	virtual ~Model() {}
+	virtual ~F{{unrealModuleName}}Model() {}
 	virtual void WriteJson(JsonWriter& Writer) const = 0;
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) = 0;
 };

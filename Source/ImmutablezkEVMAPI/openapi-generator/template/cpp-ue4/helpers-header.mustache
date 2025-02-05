@@ -104,7 +104,7 @@ inline auto ToString(const T& EnumModelValue)
 	return T::EnumToString(EnumModelValue.Value);
 }
 
-inline FString ToString(const Model& Value)
+inline FString ToString(const F{{unrealModuleName}}Model& Value)
 {
 	FString String;
 	JsonWriter Writer = TJsonWriterFactory<>::Create(&String);
@@ -260,12 +260,12 @@ inline void WriteJsonValue(JsonWriter& Writer, const FGuid& Value)
 	Writer->WriteValue(Value.ToString(EGuidFormats::DigitsWithHyphens));
 }
 
-inline void WriteJsonValue(JsonWriter& Writer, const Model& Value)
+inline void WriteJsonValue(JsonWriter& Writer, const F{{unrealModuleName}}Model& Value)
 {
 	Value.WriteJson(Writer);
 }
 
-template<typename T, typename std::enable_if<!std::is_base_of<Model, T>::value, int>::type = 0>
+template<typename T, typename std::enable_if<!std::is_base_of<F{{unrealModuleName}}Model, T>::value, int>::type = 0>
 inline void WriteJsonValue(JsonWriter& Writer, const T& Value)
 {
 	Writer->WriteValue(Value);
@@ -384,12 +384,12 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, TArray<uint
 		return false;
 }
 
-inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, Model& Value)
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, F{{unrealModuleName}}Model& Value)
 {
 	return Value.FromJson(JsonValue);
 }
 
-template<typename T, typename std::enable_if<!std::is_base_of<Model, T>::value, int>::type = 0>
+template<typename T, typename std::enable_if<!std::is_base_of<F{{unrealModuleName}}Model, T>::value, int>::type = 0>
 inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, T& Value)
 {
 	T TmpValue;
