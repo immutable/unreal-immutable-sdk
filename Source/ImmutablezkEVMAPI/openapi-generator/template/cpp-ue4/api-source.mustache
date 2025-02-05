@@ -56,7 +56,7 @@ FHttpRetrySystem::FManager& {{classname}}::GetHttpRetryManager()
 	return *RetryManager;
 }
 
-FHttpRequestRef {{classname}}::CreateHttpRequest(const Request& Request) const
+FHttpRequestRef {{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Request& Request) const
 {
 	if (!Request.GetRetryParams().IsSet())
 	{

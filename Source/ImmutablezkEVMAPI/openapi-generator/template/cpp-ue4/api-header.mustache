@@ -12,7 +12,7 @@ public:
 	~{{classname}}();
 
 	/* Sets the URL Endpoint.
-	* Note: several fallback endpoints can be configured in request retry policies, see Request::SetShouldRetry */
+	* Note: several fallback endpoints can be configured in request retry policies, see F{{unrealModuleName}}Request::SetShouldRetry */
 	void SetURL(const FString& Url);
 
 	/* Adds global header params to all requests */
@@ -21,7 +21,7 @@ public:
 
 	/* Sets the retry manager to the user-defined retry manager. User must manage the lifetime of the retry manager.
 	* If no retry manager is specified and a request needs retries, a default retry manager will be used.
-	* See also: Request::SetShouldRetry */
+	* See also: F{{unrealModuleName}}Request::SetShouldRetry */
 	void SetHttpRetryManager(FHttpRetrySystem::FManager& RetryManager);
 	FHttpRetrySystem::FManager& GetHttpRetryManager();
 
@@ -36,7 +36,7 @@ public:
 private:
 	{{#operations}}{{#operation}}void On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, F{{operationIdCamelCase}}Delegate Delegate) const;
 	{{/operation}}{{/operations}}
-	FHttpRequestRef CreateHttpRequest(const Request& Request) const;
+	FHttpRequestRef CreateHttpRequest(const F{{unrealModuleName}}Request& Request) const;
 	bool IsValid() const;
 	void HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, Response& InOutResponse) const;
 

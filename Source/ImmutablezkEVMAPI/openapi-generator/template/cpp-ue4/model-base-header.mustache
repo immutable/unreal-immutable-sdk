@@ -51,10 +51,10 @@ public:
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) = 0;
 };
 
-class {{dllapi}} Request
+class {{dllapi}} F{{unrealModuleName}}Request
 {
 public:
-	virtual ~Request() {}
+	virtual ~F{{unrealModuleName}}Request() {}
 	virtual void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const = 0;
 	virtual FString ComputePath() const = 0;
 

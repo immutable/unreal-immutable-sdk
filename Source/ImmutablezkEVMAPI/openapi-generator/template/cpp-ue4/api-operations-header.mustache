@@ -14,7 +14,7 @@
 {{#notes}} *
  * {{.}}{{/notes}}
 */
-class {{dllapi}} {{classname}}::{{operationIdCamelCase}}Request : public Request
+class {{dllapi}} {{classname}}::{{operationIdCamelCase}}Request : public F{{unrealModuleName}}Request
 {
 public:
 	virtual ~{{operationIdCamelCase}}Request() {}
