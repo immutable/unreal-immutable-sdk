@@ -206,7 +206,7 @@ void {{classname}}::{{operationIdCamelCase}}Request::SetupHttpRequest(const FHtt
 	else if (Consumes.Contains(TEXT("multipart/form-data")))
 	{
 		{{#formParams.0}}
-		HttpMultipartFormData FormData;
+		F{{unrealModuleName}}HttpMultipartFormData FormData;
 		{{#formParams}}
 		{{#isContainer}}
 		UE_LOG(Log{{unrealModuleName}}, Error, TEXT("Form parameter ({{baseName}}) was ignored, Collections are not supported in multipart form"));

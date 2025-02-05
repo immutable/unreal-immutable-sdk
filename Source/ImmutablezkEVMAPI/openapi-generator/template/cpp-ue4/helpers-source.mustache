@@ -45,16 +45,16 @@ FString F{{unrealModuleName}}HttpFileInput::GetFilename() const
 
 //////////////////////////////////////////////////////////////////////////
 
-const TCHAR* HttpMultipartFormData::Delimiter = TEXT("--");
-const TCHAR* HttpMultipartFormData::Newline = TEXT("\r\n");
+const TCHAR* F{{unrealModuleName}}HttpMultipartFormData::Delimiter = TEXT("--");
+const TCHAR* F{{unrealModuleName}}HttpMultipartFormData::Newline = TEXT("\r\n");
 
-void HttpMultipartFormData::SetBoundary(const TCHAR* InBoundary)
+void F{{unrealModuleName}}HttpMultipartFormData::SetBoundary(const TCHAR* InBoundary)
 {
 	checkf(Boundary.IsEmpty(), TEXT("Boundary must be set before usage"));
 	Boundary = InBoundary;
 }
 
-const FString& HttpMultipartFormData::GetBoundary() const
+const FString& F{{unrealModuleName}}HttpMultipartFormData::GetBoundary() const
 {
 	if (Boundary.IsEmpty())
 	{
@@ -66,7 +66,7 @@ const FString& HttpMultipartFormData::GetBoundary() const
 	return Boundary;
 }
 
-void HttpMultipartFormData::SetupHttpRequest(const FHttpRequestRef& HttpRequest)
+void F{{unrealModuleName}}HttpMultipartFormData::SetupHttpRequest(const FHttpRequestRef& HttpRequest)
 {
 	if(HttpRequest->GetVerb() != TEXT("POST"))
 	{
@@ -82,7 +82,7 @@ void HttpMultipartFormData::SetupHttpRequest(const FHttpRequestRef& HttpRequest)
 	HttpRequest->SetContent(FormData);
 }
 
-void HttpMultipartFormData::AddStringPart(const TCHAR* Name, const TCHAR* Data)
+void F{{unrealModuleName}}HttpMultipartFormData::AddStringPart(const TCHAR* Name, const TCHAR* Data)
 {
 	// Add boundary
 	AppendString(Delimiter);
@@ -103,7 +103,7 @@ void HttpMultipartFormData::AddStringPart(const TCHAR* Name, const TCHAR* Data)
 	AppendString(Newline);
 }
 
-void HttpMultipartFormData::AddJsonPart(const TCHAR* Name, const FString& JsonString)
+void F{{unrealModuleName}}HttpMultipartFormData::AddJsonPart(const TCHAR* Name, const FString& JsonString)
 {
 	// Add boundary
 	AppendString(Delimiter);
@@ -124,7 +124,7 @@ void HttpMultipartFormData::AddJsonPart(const TCHAR* Name, const FString& JsonSt
 	AppendString(Newline);
 }
 
-void HttpMultipartFormData::AddBinaryPart(const TCHAR* Name, const TArray<uint8>& ByteArray)
+void F{{unrealModuleName}}HttpMultipartFormData::AddBinaryPart(const TCHAR* Name, const TArray<uint8>& ByteArray)
 {
 	// Add boundary
 	AppendString(Delimiter);
@@ -145,7 +145,7 @@ void HttpMultipartFormData::AddBinaryPart(const TCHAR* Name, const TArray<uint8>
 	AppendString(Newline);
 }
 
-void HttpMultipartFormData::AddFilePart(const TCHAR* Name, const F{{unrealModuleName}}HttpFileInput& File)
+void F{{unrealModuleName}}HttpMultipartFormData::AddFilePart(const TCHAR* Name, const F{{unrealModuleName}}HttpFileInput& File)
 {
 	TArray<uint8> FileContents;
 	if (!FFileHelper::LoadFileToArray(FileContents, *File.GetFilePath()))
@@ -173,7 +173,7 @@ void HttpMultipartFormData::AddFilePart(const TCHAR* Name, const F{{unrealModule
 	AppendString(Newline);
 }
 
-void HttpMultipartFormData::AppendString(const TCHAR* Str)
+void F{{unrealModuleName}}HttpMultipartFormData::AppendString(const TCHAR* Str)
 {
 	FTCHARToUTF8 utf8Str(Str);
 	FormData.Append((uint8*)utf8Str.Get(), utf8Str.Length());
