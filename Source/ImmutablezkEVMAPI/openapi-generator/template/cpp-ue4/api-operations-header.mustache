@@ -8,11 +8,6 @@
 {{#imports}}{{{import}}}
 {{/imports}}
 
-{{#cppNamespaceDeclarations}}
-namespace {{this}}
-{
-{{/cppNamespaceDeclarations}}
-
 {{#operations}}
 {{#operation}}
 /* {{summary}}
@@ -63,6 +58,3 @@ public:
 
 {{/operation}}
 {{/operations}}
-{{#cppNamespaceDeclarations}}
-}
-{{/cppNamespaceDeclarations}}

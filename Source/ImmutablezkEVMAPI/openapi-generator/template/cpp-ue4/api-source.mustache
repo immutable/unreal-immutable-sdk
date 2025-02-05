@@ -8,11 +8,6 @@
 #include "HttpModule.h"
 #include "Serialization/JsonSerializer.h"
 
-{{#cppNamespaceDeclarations}}
-namespace {{this}}
-{
-{{/cppNamespaceDeclarations}}
-
 {{classname}}::{{classname}}()
 : Url(TEXT("{{basePath}}"))
 {
@@ -156,6 +151,3 @@ void {{classname}}::On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpReque
 
 {{/operation}}
 {{/operations}}
-{{#cppNamespaceDeclarations}}
-}
-{{/cppNamespaceDeclarations}}

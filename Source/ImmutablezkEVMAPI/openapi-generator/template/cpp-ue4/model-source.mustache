@@ -7,10 +7,6 @@
 
 #include "Templates/SharedPointer.h"
 
-{{#cppNamespaceDeclarations}}
-namespace {{this}}
-{
-{{/cppNamespaceDeclarations}}
 {{#models}}{{#model}}
 {{#isEnum}}
 inline FString ToString(const {{classname}}::Values& Value)
@@ -203,6 +199,3 @@ bool {{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 
 {{/model}}
 {{/models}}
-{{#cppNamespaceDeclarations}}
-}
-{{/cppNamespaceDeclarations}}

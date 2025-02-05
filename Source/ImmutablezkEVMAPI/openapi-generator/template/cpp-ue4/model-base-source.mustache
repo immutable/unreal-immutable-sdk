@@ -2,11 +2,6 @@
 
 #include "{{modelNamePrefix}}BaseModel.h"
 
-{{#cppNamespaceDeclarations}}
-namespace {{this}}
-{
-{{/cppNamespaceDeclarations}}
-
 bool HttpRetryManager::Tick(float DeltaTime)
 {
 	FManager::Update();
@@ -38,7 +33,3 @@ void Response::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
 		SetResponseString(TEXT("Request Timeout"));
 	}
 }
-
-{{#cppNamespaceDeclarations}}
-}
-{{/cppNamespaceDeclarations}}

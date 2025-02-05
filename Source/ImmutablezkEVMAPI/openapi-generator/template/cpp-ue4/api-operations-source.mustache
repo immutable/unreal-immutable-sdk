@@ -10,10 +10,6 @@
 #include "HttpModule.h"
 #include "PlatformHttp.h"
 
-{{#cppNamespaceDeclarations}}
-namespace {{this}}
-{
-{{/cppNamespaceDeclarations}}
 {{#operations}}{{#operation}}
 {{#allParams}}
 {{#isEnum}}
@@ -326,6 +322,3 @@ bool {{classname}}::{{operationIdCamelCase}}Response::FromJson(const TSharedPtr<
 	{{/returnType}}
 }
 {{/operation}}{{/operations}}
-{{#cppNamespaceDeclarations}}
-}
-{{/cppNamespaceDeclarations}}

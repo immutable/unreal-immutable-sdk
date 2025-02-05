@@ -10,11 +10,6 @@
 #include "Containers/Ticker.h"
 #include "Runtime/Launch/Resources/Version.h"
 
-{{#cppNamespaceDeclarations}}
-namespace {{this}}
-{
-{{/cppNamespaceDeclarations}}
-
 typedef TSharedRef<TJsonWriter<>> JsonWriter;
 using namespace FHttpRetrySystem;
 
@@ -95,7 +90,3 @@ private:
 	FString ResponseString;
 	FHttpResponsePtr HttpResponse;
 };
-
-{{#cppNamespaceDeclarations}}
-}
-{{/cppNamespaceDeclarations}}

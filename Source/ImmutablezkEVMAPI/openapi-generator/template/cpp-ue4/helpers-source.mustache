@@ -9,11 +9,6 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 
-{{#cppNamespaceDeclarations}}
-namespace {{this}}
-{
-{{/cppNamespaceDeclarations}}
-
 HttpFileInput::HttpFileInput(const TCHAR* InFilePath)
 {
 	SetFilePath(InFilePath);
@@ -221,7 +216,3 @@ bool ParseDateTime(const FString& DateTimeString, FDateTime& OutDateTime)
 
 	return FDateTime::Parse(DateTimeString, OutDateTime);
 }
-
-{{#cppNamespaceDeclarations}}
-}
-{{/cppNamespaceDeclarations}}
