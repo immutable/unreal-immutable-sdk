@@ -71,7 +71,7 @@ FHttpRequestRef {{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Requ
 			RetryManager = DefaultRetryManager.Get();
 		}
 
-		const HttpRetryParams& Params = Request.GetRetryParams().GetValue();
+		const F{{unrealModuleName}}HttpRetryParams& Params = Request.GetRetryParams().GetValue();
 		return RetryManager->CreateRequest(Params.RetryLimitCountOverride, Params.RetryTimeoutRelativeSecondsOverride, Params.RetryResponseCodes, Params.RetryVerbs, Params.RetryDomains);
 	}
 }

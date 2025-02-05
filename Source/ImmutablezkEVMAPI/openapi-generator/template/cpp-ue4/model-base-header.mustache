@@ -26,9 +26,9 @@ struct {{dllapi}} HttpRetryManager
 	bool Tick(float DeltaTime) final;
 };
 
-struct {{dllapi}} HttpRetryParams
+struct {{dllapi}} F{{unrealModuleName}}HttpRetryParams
 {
-	HttpRetryParams(
+	F{{unrealModuleName}}HttpRetryParams(
 		const FRetryLimitCountSetting& InRetryLimitCountOverride = FRetryLimitCountSetting(),
 		const FRetryTimeoutRelativeSecondsSetting& InRetryTimeoutRelativeSecondsOverride = FRetryTimeoutRelativeSecondsSetting(),
 		const FRetryResponseCodes& InRetryResponseCodes = FRetryResponseCodes(),
@@ -59,11 +59,11 @@ public:
 	virtual FString ComputePath() const = 0;
 
 	/* Enables retry and optionally sets a retry policy for this request */
-	void SetShouldRetry(const HttpRetryParams& Params = HttpRetryParams()) { RetryParams = Params; }
-	const TOptional<HttpRetryParams>& GetRetryParams() const { return RetryParams; }
+	void SetShouldRetry(const F{{unrealModuleName}}HttpRetryParams& Params = F{{unrealModuleName}}HttpRetryParams()) { RetryParams = Params; }
+	const TOptional<F{{unrealModuleName}}HttpRetryParams>& GetRetryParams() const { return RetryParams; }
 
 private:
-	TOptional<HttpRetryParams> RetryParams;
+	TOptional<F{{unrealModuleName}}HttpRetryParams> RetryParams;
 };
 
 class {{dllapi}} F{{unrealModuleName}}Response
