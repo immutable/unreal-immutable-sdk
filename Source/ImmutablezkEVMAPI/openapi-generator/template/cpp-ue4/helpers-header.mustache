@@ -15,11 +15,11 @@ typedef TSharedRef<TJsonWriter<>> JsonWriter;
 
 //////////////////////////////////////////////////////////////////////////
 
-class {{dllapi}} HttpFileInput
+class {{dllapi}} F{{unrealModuleName}}HttpFileInput
 {
 public:
-	explicit HttpFileInput(const TCHAR* InFilePath);
-	explicit HttpFileInput(const FString& InFilePath);
+	explicit F{{unrealModuleName}}HttpFileInput(const TCHAR* InFilePath);
+	explicit F{{unrealModuleName}}HttpFileInput(const FString& InFilePath);
 
 	// This will automatically set the content type if not already set
 	void SetFilePath(const TCHAR* InFilePath);
@@ -28,9 +28,9 @@ public:
 	// Optional if it can be deduced from the FilePath
 	void SetContentType(const TCHAR* ContentType);
 
-	HttpFileInput& operator=(const HttpFileInput& Other) = default;
-	HttpFileInput& operator=(const FString& InFilePath) { SetFilePath(*InFilePath); return*this; }
-	HttpFileInput& operator=(const TCHAR* InFilePath) { SetFilePath(InFilePath); return*this; }
+	F{{unrealModuleName}}HttpFileInput& operator=(const F{{unrealModuleName}}HttpFileInput& Other) = default;
+	F{{unrealModuleName}}HttpFileInput& operator=(const FString& InFilePath) { SetFilePath(*InFilePath); return*this; }
+	F{{unrealModuleName}}HttpFileInput& operator=(const TCHAR* InFilePath) { SetFilePath(InFilePath); return*this; }
 
 	const FString& GetFilePath() const { return FilePath; }
 	const FString& GetContentType() const { return ContentType; }
@@ -54,7 +54,7 @@ public:
 	void AddStringPart(const TCHAR* Name, const TCHAR* Data);
 	void AddJsonPart(const TCHAR* Name, const FString& JsonString);
 	void AddBinaryPart(const TCHAR* Name, const TArray<uint8>& ByteArray);
-	void AddFilePart(const TCHAR* Name, const HttpFileInput& File);
+	void AddFilePart(const TCHAR* Name, const F{{unrealModuleName}}HttpFileInput& File);
 
 private:
 	void AppendString(const TCHAR* Str);

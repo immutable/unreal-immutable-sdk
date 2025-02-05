@@ -9,17 +9,17 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 
-HttpFileInput::HttpFileInput(const TCHAR* InFilePath)
+F{{unrealModuleName}}HttpFileInput::F{{unrealModuleName}}HttpFileInput(const TCHAR* InFilePath)
 {
 	SetFilePath(InFilePath);
 }
 
-HttpFileInput::HttpFileInput(const FString& InFilePath)
+F{{unrealModuleName}}HttpFileInput::F{{unrealModuleName}}HttpFileInput(const FString& InFilePath)
 {
 	SetFilePath(InFilePath);
 }
 
-void HttpFileInput::SetFilePath(const TCHAR* InFilePath)
+void F{{unrealModuleName}}HttpFileInput::SetFilePath(const TCHAR* InFilePath)
 {
 	FilePath = InFilePath;
 	if(ContentType.IsEmpty())
@@ -28,17 +28,17 @@ void HttpFileInput::SetFilePath(const TCHAR* InFilePath)
 	}
 }
 
-void HttpFileInput::SetFilePath(const FString& InFilePath)
+void F{{unrealModuleName}}HttpFileInput::SetFilePath(const FString& InFilePath)
 {
 	SetFilePath(*InFilePath);
 }
 
-void HttpFileInput::SetContentType(const TCHAR* InContentType)
+void F{{unrealModuleName}}HttpFileInput::SetContentType(const TCHAR* InContentType)
 {
 	ContentType = InContentType;
 }
 
-FString HttpFileInput::GetFilename() const
+FString F{{unrealModuleName}}HttpFileInput::GetFilename() const
 {
 	return FPaths::GetCleanFilename(FilePath);
 }
@@ -145,7 +145,7 @@ void HttpMultipartFormData::AddBinaryPart(const TCHAR* Name, const TArray<uint8>
 	AppendString(Newline);
 }
 
-void HttpMultipartFormData::AddFilePart(const TCHAR* Name, const HttpFileInput& File)
+void HttpMultipartFormData::AddFilePart(const TCHAR* Name, const F{{unrealModuleName}}HttpFileInput& File)
 {
 	TArray<uint8> FileContents;
 	if (!FFileHelper::LoadFileToArray(FileContents, *File.GetFilePath()))
