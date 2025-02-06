@@ -57,7 +57,6 @@ public:
 	virtual ~F{{classname}}() override {}
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;
 	virtual void WriteJson(JsonWriter& Writer) const override final;
-
 	{{#isString}}
 	{{#isEnum}}
 	{{#allowableValues}}
@@ -70,11 +69,13 @@ public:
 	{{/isString}}
 	{{#vars}}
 	{{#isEnum}}
+
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}E{{classname}}_{{name}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
 	{{^isEnum}}
 	{{^oneOf}}
+
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}{{#isPrimitiveType}}{{{datatype}}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isContainer}}{{{baseType}}}<F{{{complexType}}}>{{/isContainer}}{{^isContainer}}F{{{datatype}}}{{/isContainer}}{{/isPrimitiveType}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/oneOf}}

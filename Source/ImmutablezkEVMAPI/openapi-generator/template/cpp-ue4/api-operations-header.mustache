@@ -36,13 +36,14 @@ public:
 	virtual ~{{operationIdCamelCase}}Request() override;
 	virtual void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const override final;
 	virtual FString ComputePath() const override final;
-
 	{{#allParams}}
 	{{#isEnum}}
+
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}{{^required}}>{{/required}} {{paramName}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
 	{{^isEnum}}
+
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}{{^isContainer}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}{{^required}}>{{/required}}{{/isContainer}}{{#isContainer}}{{#content}}{{#application/json}}{{#schema}}{{baseType}}{{#isPrimitiveType}}<{{/isPrimitiveType}}{{^isPrimitiveType}}<F{{/isPrimitiveType}}{{/schema}}{{/application/json}}{{/content}}{{^content}}{{#schema}}{{baseType}}{{#isPrimitiveType}}<{{/isPrimitiveType}}{{^isPrimitiveType}}<F{{/isPrimitiveType}}{{/schema}}{{/content}}{{complexType}}>{{^required}}>{{/required}}{{/isContainer}} {{paramName}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
