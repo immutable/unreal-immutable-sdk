@@ -1,66 +1,29 @@
 {{>licenseInfo}}
 
 #include "{{classname}}.h"
-
-#include "{{unrealModuleName}}Module.h"
-#include "{{modelNamePrefix}}Helpers.h"
-
+{{#models}}{{#model}}{{#isEnum}}
+#include "UObject/Class.h"{{/isEnum}}{{#hasEnums}}#include "UObject/Class.h"{{/hasEnums}}{{/model}}{{/models}}
 #include "Templates/SharedPointer.h"
 
-{{#models}}{{#model}}
+#include "{{modelNamePrefix}}Helpers.h"
+
+{{#models}}
+{{#model}}
 {{#isEnum}}
-inline FString ToString(const F{{classname}}::Values& Value)
+inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{name}}_Values Value)
+{
+	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{name}}_Values>()->GetNameStringByValue(static_cast<int64>(Value)));
+}
+
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}}_Values Value)
 {
 	{{#allowableValues}}
-	switch (Value)
+	FString EnumNameString;
+	if (JsonValue->TryGetString(EnumNameString))
 	{
-	{{#enumVars}}
-	case F{{classname}}::Values::{{name}}:
-		return TEXT("{{{value}}}");
-	{{/enumVars}}
+		return StaticEnum<E{{classname}}_{{name}}_Values>()->GetIndexByNameString(EnumNameString) != INDEX_NONE;
 	}
-	{{/allowableValues}}
 
-	UE_LOG(Log{{unrealModuleName}}, Error, TEXT("Invalid F{{classname}}::Values Value (%d)"), (int)Value);
-	return TEXT("");
-}
-
-FString F{{classname}}::EnumToString(const F{{classname}}::Values& EnumValue)
-{
-	return ToString(EnumValue);
-}
-
-inline bool FromString(const FString& EnumAsString, F{{classname}}::Values& Value)
-{
-	static TMap<FString, F{{classname}}::Values> StringToEnum = { {{#allowableValues}}{{#enumVars}}
-		{ TEXT("{{{value}}}"), F{{classname}}::Values::{{name}} },{{/enumVars}}{{/allowableValues}} };
-
-	const auto Found = StringToEnum.Find(EnumAsString);
-	if(Found)
-		Value = *Found;
-
-	return Found != nullptr;
-}
-
-bool F{{classname}}::EnumFromString(const FString& EnumAsString, F{{classname}}::Values& EnumValue)
-{
-	return FromString(EnumAsString, EnumValue);
-}
-
-inline void WriteJsonValue(JsonWriter& Writer, const F{{classname}}::Values& Value)
-{
-	WriteJsonValue(Writer, ToString(Value));
-}
-
-inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, F{{classname}}::Values& Value)
-{
-	{{#allowableValues}}
-	FString TmpValue;
-	if (JsonValue->TryGetString(TmpValue))
-	{
-		if(FromString(TmpValue, Value))
-			return true;
-	}
 	{{/allowableValues}}
 	return false;
 }
@@ -69,58 +32,20 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, F{{classnam
 {{#hasEnums}}
 {{#vars}}
 {{#isEnum}}
-inline FString ToString(const F{{classname}}::{{{enumName}}}& Value)
+inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{name}} Value)
+{
+	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{name}}>()->GetNameStringByValue(static_cast<int64>(Value)));
+}
+
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}} Value)
 {
 	{{#allowableValues}}
-	switch (Value)
+	FString EnumNameString;
+	if (JsonValue->TryGetString(EnumNameString))
 	{
-	{{#enumVars}}
-	case F{{classname}}::{{{enumName}}}::{{name}}:
-		return TEXT("{{{value}}}");
-	{{/enumVars}}
+		return StaticEnum<E{{classname}}_{{name}}>()->GetIndexByNameString(EnumNameString) != INDEX_NONE;
 	}
-	{{/allowableValues}}
 
-	UE_LOG(Log{{unrealModuleName}}, Error, TEXT("Invalid F{{classname}}::{{{enumName}}} Value (%d)"), (int)Value);
-	return TEXT("");
-}
-
-FString F{{classname}}::EnumToString(const F{{classname}}::{{{enumName}}}& EnumValue)
-{
-	return ToString(EnumValue);
-}
-
-inline bool FromString(const FString& EnumAsString, F{{classname}}::{{{enumName}}}& Value)
-{
-	static TMap<FString, F{{classname}}::{{{enumName}}}> StringToEnum = { {{#allowableValues}}{{#enumVars}}
-		{ TEXT("{{{value}}}"), F{{classname}}::{{{enumName}}}::{{name}} },{{/enumVars}}{{/allowableValues}} };
-
-	const auto Found = StringToEnum.Find(EnumAsString);
-	if(Found)
-		Value = *Found;
-
-	return Found != nullptr;
-}
-
-bool F{{classname}}::EnumFromString(const FString& EnumAsString, F{{classname}}::{{{enumName}}}& EnumValue)
-{
-	return FromString(EnumAsString, EnumValue);
-}
-
-inline void WriteJsonValue(JsonWriter& Writer, const F{{classname}}::{{{enumName}}}& Value)
-{
-	WriteJsonValue(Writer, ToString(Value));
-}
-
-inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, F{{classname}}::{{{enumName}}}& Value)
-{
-	{{#allowableValues}}
-	FString TmpValue;
-	if (JsonValue->TryGetString(TmpValue))
-	{
-		if(FromString(TmpValue, Value))
-			return true;
-	}
 	{{/allowableValues}}
 	return false;
 }
@@ -178,10 +103,5 @@ bool F{{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	{{/required}}
 	{{/vars}}
 
-	return ParseSuccess;
-	{{/isString}}
-	{{/oneOf}}
-}
-
-{{/model}}
-{{/models}}
+	return ParseSuccess;{{/isString}}{{/oneOf}}
+}{{/model}}{{/models}}

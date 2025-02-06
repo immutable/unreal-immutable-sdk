@@ -478,14 +478,14 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonObject>& JsonObject, const FSt
 	const TSharedPtr<FJsonValue> JsonValue = JsonObject->TryGetField(Key);
 	if (JsonValue.IsValid() && !JsonValue->IsNull())
 	{
-		T Value;
+		T Value = {};
 		if (TryGetJsonValue(JsonValue, Value))
 		{
 			OptionalValue = Value;
 			return true;
 		}
-		else
-			return false;
+
+		return false;
 	}
 	// Absence of optional value is not a parsing error.
 	// Nullable is handled like optional.

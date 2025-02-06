@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UObject/ObjectMacros.h"
+
 #include "{{modelNamePrefix}}BaseModel.h"
 #include "{{classname}}.h"
 
@@ -10,6 +12,20 @@
 
 {{#operations}}
 {{#operation}}
+{{#allParams}}
+{{#isEnum}}
+{{#allowableValues}}
+UENUM(BlueprintType)
+enum class E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} : uint8
+{
+	{{#enumVars}}
+	{{name}} UMETA(DisplayName = "{{value}}"){{^-last}},{{/-last}}
+	{{/enumVars}}
+};
+
+{{/allowableValues}}
+{{/isEnum}}
+{{/allParams}}
 /* {{summary}}
 {{#notes}} *
  * {{.}}{{/notes}}
@@ -23,19 +39,8 @@ public:
 
 	{{#allParams}}
 	{{#isEnum}}
-	{{#allowableValues}}
-	enum class {{{enumName}}}
-	{
-		{{#enumVars}}
-		{{name}},
-		{{/enumVars}}
-	};
-	{{/allowableValues}}
-
-	static FString EnumToString(const {{{enumName}}}& EnumValue);
-	static bool EnumFromString(const FString& EnumAsString, {{{enumName}}}& EnumValue);
 	{{#description}}/* {{{.}}} */
-	{{/description}}{{^required}}TOptional<{{/required}}{{{datatypeWithEnum}}}{{^required}}>{{/required}} {{paramName}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
+	{{/description}}{{^required}}TOptional<{{/required}}E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}{{^required}}>{{/required}} {{paramName}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
 	{{^isEnum}}
 	{{#description}}/* {{{.}}} */
