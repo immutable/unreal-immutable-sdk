@@ -33,7 +33,7 @@ enum class E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} : uint8
 class {{dllapi}} F{{classname}}::{{operationIdCamelCase}}Request : public F{{unrealModuleName}}Request
 {
 public:
-	virtual ~{{operationIdCamelCase}}Request() {}
+	virtual ~{{operationIdCamelCase}}Request() override;
 	void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const final;
 	FString ComputePath() const final;
 
@@ -52,7 +52,7 @@ public:
 class {{dllapi}} F{{classname}}::{{operationIdCamelCase}}Response : public F{{unrealModuleName}}Response
 {
 public:
-	virtual ~{{operationIdCamelCase}}Response() {}
+	virtual ~{{operationIdCamelCase}}Response() override;
 	{{#responses.0}}
 	void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) final;
 	{{/responses.0}}

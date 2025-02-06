@@ -98,6 +98,10 @@ FString F{{classname}}::{{operationIdCamelCase}}Request::ComputePath() const
 	return Path;
 }
 
+F{{classname}}::{{operationIdCamelCase}}Request::~{{operationIdCamelCase}}Request()
+{
+}
+
 void F{{classname}}::{{operationIdCamelCase}}Request::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
 {
 	static const TArray<FString> Consumes = { {{#consumes}}TEXT("{{{mediaType}}}"){{^-last}}, {{/-last}}{{/consumes}} };
@@ -264,6 +268,10 @@ void F{{classname}}::{{operationIdCamelCase}}Request::SetupHttpRequest(const FHt
 		UE_LOG(Log{{unrealModuleName}}, Error, TEXT("Request ContentType not supported (%s)"), *FString::Join(Consumes, TEXT(",")));
 	}
 	{{/isBodyAllowed}}
+}
+
+F{{classname}}::{{operationIdCamelCase}}Response::~{{operationIdCamelCase}}Response()
+{
 }
 
 {{#responses.0}}
