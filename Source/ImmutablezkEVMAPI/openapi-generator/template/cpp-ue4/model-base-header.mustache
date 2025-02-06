@@ -23,7 +23,7 @@ struct {{dllapi}} F{{unrealModuleName}}HttpRetryManager
 {
 	using FManager::FManager;
 
-	bool Tick(float DeltaTime) final;
+	virtual bool Tick(float DeltaTime) override final;
 };
 
 struct {{dllapi}} F{{unrealModuleName}}HttpRetryParams

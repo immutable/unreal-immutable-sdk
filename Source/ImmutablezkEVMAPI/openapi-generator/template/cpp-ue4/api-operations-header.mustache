@@ -34,8 +34,8 @@ class {{dllapi}} F{{classname}}::{{operationIdCamelCase}}Request : public F{{unr
 {
 public:
 	virtual ~{{operationIdCamelCase}}Request() override;
-	void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const final;
-	FString ComputePath() const final;
+	virtual void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const override final;
+	virtual FString ComputePath() const override final;
 
 	{{#allParams}}
 	{{#isEnum}}
@@ -54,9 +54,9 @@ class {{dllapi}} F{{classname}}::{{operationIdCamelCase}}Response : public F{{un
 public:
 	virtual ~{{operationIdCamelCase}}Response() override;
 	{{#responses.0}}
-	void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) final;
+	virtual void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) override final;
 	{{/responses.0}}
-	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
+	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;
 
 	{{#returnProperty}}{{#isContainer}}{{baseType}}<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{complexType}}>{{/isContainer}}{{^isContainer}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{baseType}}{{/isContainer}} Content;{{/returnProperty}}
 };

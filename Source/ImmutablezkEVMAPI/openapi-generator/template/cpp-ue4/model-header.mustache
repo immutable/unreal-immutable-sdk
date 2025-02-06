@@ -55,8 +55,8 @@ class {{dllapi}} F{{classname}} : public F{{unrealModuleName}}Model
 {
 public:
 	virtual ~F{{classname}}() override {}
-	bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) final;
-	void WriteJson(JsonWriter& Writer) const final;
+	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;
+	virtual void WriteJson(JsonWriter& Writer) const override final;
 
 	{{#isString}}
 	{{#isEnum}}
