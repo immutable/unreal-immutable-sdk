@@ -4,9 +4,15 @@ name: "Update engine SDK version in ImmutableDataTypes.h"
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to update to (e.g. 1.20.0)'
+      upgrade_type:
+        type: choice
+        description: Upgrade Type
+        options:
+          - patch
+          - minor
+          # - major
         required: true
+        default: patch
 
 jobs:
   update:
@@ -34,7 +40,24 @@ jobs:
       run: |
         FILE=./Source/Immutable/Public/Immutable/ImmutableDataTypes.h
         VERSION=${{ github.event.inputs.version }}
-        sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+\"\)/#define ENGINE_SDK_VERSION TEXT(\"$VERSION\")/g" $FILE
+        UPGRADE_TYPE=${{ github.event.inputs.upgrade_type }}
+        
+        # Split version into components
+        IFS='.' read -r major minor patch <<< "$VERSION"
+    
+        # Update version based on upgrade_type
+        if [ "$UPGRADE_TYPE" == "patch" ]; then
+          patch=$((patch + 1))  # Increment patch version
+        elif [ "$UPGRADE_TYPE" == "minor" ]; then
+          minor=$((minor + 1))  # Increment minor version and reset patch
+          patch=0
+        fi
+    
+        # Format the updated version
+        UPDATED_VERSION="$major.$minor.$patch"
+    
+        # Replace the version string in the file
+        sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+\"\)/#define ENGINE_SDK_VERSION TEXT(\"$UPDATED_VERSION\")/g" $FILE
 
     - uses: gr2m/create-or-update-pull-request-action@v1
       env:
