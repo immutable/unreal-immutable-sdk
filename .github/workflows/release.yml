@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-          
+
       - name: Extract TS SDK version from index.js
         id: extract_ts_sdk_version
         run: |
@@ -28,7 +28,7 @@ jobs:
           version=$(echo "$version" | tr -d '\r\n')
 
           echo "VERSION=${version}" >> "$GITHUB_ENV"
-          
+
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v3
@@ -52,9 +52,8 @@ jobs:
       - name: Create Release
         uses: mikepenz/action-gh-release@v0.2.0-a03
         with:
+            tag_name: ${{ env.VERSION }}
             body: |
               ${{steps.github_release.outputs.changelog}}
 
               Game bridge built from Immutable Typescript SDK version ${{ env.VERSION }}
-            
-      
