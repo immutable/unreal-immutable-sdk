@@ -13,6 +13,11 @@ on:
           # - major
         required: true
         default: patch
+      mark_as_alpha:
+        type: boolean
+        description: Mark as alpha release
+        required: false
+        default: false
 
 jobs:
   update:
@@ -40,26 +45,23 @@ jobs:
       run: |
         FILE=./Source/Immutable/Public/Immutable/ImmutableDataTypes.h
         UPGRADE_TYPE=${{ github.event.inputs.upgrade_type }}
+        MARK_AS_ALPHA=${{ github.event.inputs.mark_as_alpha }}
     
         RAW_VERSION=$(grep -oP '#define ENGINE_SDK_VERSION TEXT\("\K[0-9]+\.[0-9]+\.[0-9]+(\.[a-zA-Z]+)?' $FILE)
-    
         VERSION=$(echo "$RAW_VERSION" | grep -oP '^[0-9]+\.[0-9]+\.[0-9]+')
+        HAS_ALPHA=$(echo "$RAW_VERSION" | grep -q "\.alpha" && echo "true" || echo "false")
     
         IFS='.' read -r major minor patch <<< "$VERSION"
     
-        # If the version had an alpha suffix, adjust the version bump behavior
-        if [[ "$RAW_VERSION" == *".alpha" ]]; then
+        if [[ "$HAS_ALPHA" == "true" ]]; then
           if [ "$UPGRADE_TYPE" == "patch" ]; then
-            # Remove alpha suffix, keep the same version
             UPDATED_VERSION="$major.$minor.$patch"
           elif [ "$UPGRADE_TYPE" == "minor" ]; then
-            # E.g. skip 1.3.0, go directly to 1.4.0
             minor=$((minor + 1))
             patch=0
             UPDATED_VERSION="$major.$minor.$patch"
           fi
         else
-          # Increment patch or minor
           if [ "$UPGRADE_TYPE" == "patch" ]; then
             patch=$((patch + 1))
           elif [ "$UPGRADE_TYPE" == "minor" ]; then
@@ -67,6 +69,10 @@ jobs:
             patch=0
           fi
           UPDATED_VERSION="$major.$minor.$patch"
+        fi
+    
+        if [[ "$MARK_AS_ALPHA" == "true" && "$HAS_ALPHA" == "false" ]]; then
+          UPDATED_VERSION="$UPDATED_VERSION.alpha"
         fi
     
         sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+(\.[a-zA-Z]+)?\"\)/#define ENGINE_SDK_VERSION TEXT(\"$UPDATED_VERSION\")/g" $FILE
