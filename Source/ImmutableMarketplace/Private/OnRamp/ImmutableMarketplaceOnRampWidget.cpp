@@ -96,12 +96,12 @@ void UImmutableMarketplaceOnRampWidget::HandleOnUrlChanged(const FText& Text)
 }
 
 #if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 1)
-void UOnRampWidget::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
+void UImmutableMarketplaceOnRampWidget::HandleOnConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
 {
 	UE_LOG(LogImmutableOnRampWidget, Log, TEXT("Web Browser console message: %s, Source: %s, Line: %d"), *Message, *Source, Line);
 }
 
-bool UOnRampWidget::HandleOnBeforePopup(FString URL, FString Frame)
+bool UImmutableMarketplaceOnRampWidget::HandleOnBeforePopup(FString URL, FString Frame)
 {
 	return false;
 }
