@@ -72,6 +72,7 @@ jobs:
         sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+(\.[a-zA-Z]+)?\"\)/#define ENGINE_SDK_VERSION TEXT(\"$UPDATED_VERSION\")/g" $FILE
     
         echo "Updated version: $UPDATED_VERSION"
+        echo "version=$UPDATED_VERSION" >> "$GITHUB_OUTPUT"
 
     - uses: gr2m/create-or-update-pull-request-action@v1
       env:
@@ -79,6 +80,6 @@ jobs:
       with:
         title: "chore: update version"
         body: "Update version in ImmutableDataTypes.h"
-        branch: "chore/update-version-${{ github.event.inputs.version }}"
+        branch: "chore/update-version-${{ steps.replace_engine_sdk_version.outputs.version }}"
         commit-message: "chore: update version"
         labels: release
