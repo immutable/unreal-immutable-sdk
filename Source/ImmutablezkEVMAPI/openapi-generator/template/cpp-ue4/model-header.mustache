@@ -14,14 +14,15 @@
 {{/models}}
 
 #include "{{modelNamePrefix}}BaseModel.h"
-{{#imports}}{{{import}}}
+{{#imports}}
+{{{import}}}
 {{/imports}}
-
 {{#models}}
 {{#model}}
 {{#isString}}
 {{#isEnum}}
 {{#allowableValues}}
+
 UENUM(BlueprintType)
 enum class E{{classname}}_{{name}}_Values : uint8
 {
@@ -35,6 +36,7 @@ enum class E{{classname}}_{{name}}_Values : uint8
 {{#vars}}
 {{#isEnum}}
 {{#allowableValues}}
+
 UENUM(BlueprintType)
 enum class E{{classname}}_{{name}} : uint8
 {
@@ -42,7 +44,7 @@ enum class E{{classname}}_{{name}} : uint8
 	{{name}} UMETA(DisplayName = "{{value}}"){{^-last}},{{/-last}}
 	{{/enumVars}}
 };
-	{{/allowableValues}}
+{{/allowableValues}}
 {{/isEnum}}
 {{/vars}}
 
@@ -55,12 +57,16 @@ class {{dllapi}} F{{classname}} : public F{{unrealModuleName}}Model
 {
 public:
 	virtual ~F{{classname}}() override {}
+
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;
 	virtual void WriteJson(JsonWriter& Writer) const override final;
+
+public:
 	{{#isString}}
+	{{#description}}/* {{{.}}} */
+	{{/description}}
 	{{#isEnum}}
-	{{#allowableValues}}
-	E{{classname}}_{{name}}_Values Value{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+	{{#allowableValues}}E{{classname}}_{{name}}_Values Value{{#defaultValue}} = {{{.}}}{{/defaultValue}};
 	{{/allowableValues}}
 	{{/isEnum}}
 	{{^isEnum}}
@@ -69,24 +75,28 @@ public:
 	{{/isString}}
 	{{#vars}}
 	{{#isEnum}}
+	{{^-first}}
 
+	{{/-first}}
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}E{{classname}}_{{name}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
 	{{^isEnum}}
 	{{^oneOf}}
+	{{^-first}}
 
+	{{/-first}}
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}{{#isPrimitiveType}}{{{datatype}}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isContainer}}{{{baseType}}}<F{{{complexType}}}>{{/isContainer}}{{^isContainer}}F{{{datatype}}}{{/isContainer}}{{/isPrimitiveType}}{{^required}}>{{/required}} {{name}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/oneOf}}
 	{{/isEnum}}
 	{{/vars}}
 	{{#oneOf}}
+	{{/oneOf}}
+	{{#oneOf}}
 	{{#-first}}
-	TVariant<{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}{{^-last}}, {{/-last}}{{/oneOf}}{{/composedSchemas}}> OneOf;
+	{{#description}}/* {{{.}}} */
+	{{/description}}TVariant<{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}{{^-last}}, {{/-last}}{{/oneOf}}{{/composedSchemas}}> OneOf;
 	{{/-first}}
 	{{/oneOf}}
-};
-
-{{/model}}
-{{/models}}
+};{{/model}}{{/models}}

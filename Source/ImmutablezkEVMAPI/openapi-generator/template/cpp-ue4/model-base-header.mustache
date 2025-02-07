@@ -47,6 +47,7 @@ class {{dllapi}} F{{unrealModuleName}}Model
 {
 public:
 	virtual ~F{{unrealModuleName}}Model() {}
+
 	virtual void WriteJson(JsonWriter& Writer) const = 0;
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) = 0;
 };
@@ -55,6 +56,7 @@ class {{dllapi}} F{{unrealModuleName}}Request
 {
 public:
 	virtual ~F{{unrealModuleName}}Request() {}
+
 	virtual void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const = 0;
 	virtual FString ComputePath() const = 0;
 
@@ -70,6 +72,7 @@ class {{dllapi}} F{{unrealModuleName}}Response
 {
 public:
 	virtual ~F{{unrealModuleName}}Response() {}
+
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) = 0;
 
 	void SetSuccessful(bool InSuccessful) { Successful = InSuccessful; }
