@@ -2,6 +2,7 @@
 name: 'Create Release'
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Tag Release"]
     types:
@@ -9,12 +10,17 @@ on:
 
 jobs:
   release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-          
+
+      - name: Get the latest tag
+        run: |
+          git fetch --tags
+          LATEST_TAG="$(git describe --tags "$(git rev-list --tags --max-count=1)")"
+          echo "LATEST_TAG=${LATEST_TAG}" >> "$GITHUB_ENV"
+
       - name: Extract TS SDK version from index.js
         id: extract_ts_sdk_version
         run: |
@@ -28,7 +34,7 @@ jobs:
           version=$(echo "$version" | tr -d '\r\n')
 
           echo "VERSION=${version}" >> "$GITHUB_ENV"
-          
+
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v3
@@ -52,9 +58,8 @@ jobs:
       - name: Create Release
         uses: mikepenz/action-gh-release@v0.2.0-a03
         with:
+            tag_name: ${{ env.LATEST_TAG }}
             body: |
               ${{steps.github_release.outputs.changelog}}
 
               Game bridge built from Immutable Typescript SDK version ${{ env.VERSION }}
-            
-      
