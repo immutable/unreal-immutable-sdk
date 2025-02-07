@@ -4,9 +4,15 @@ name: "Update engine SDK version in ImmutableDataTypes.h"
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to update to (e.g. 1.20.0)'
+      upgrade_type:
+        type: choice
+        description: Upgrade Type
+        options:
+          - patch
+          - minor
+          # - major
         required: true
+        default: patch
 
 jobs:
   update:
@@ -33,8 +39,40 @@ jobs:
       id: replace_engine_sdk_version
       run: |
         FILE=./Source/Immutable/Public/Immutable/ImmutableDataTypes.h
-        VERSION=${{ github.event.inputs.version }}
-        sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+\"\)/#define ENGINE_SDK_VERSION TEXT(\"$VERSION\")/g" $FILE
+        UPGRADE_TYPE=${{ github.event.inputs.upgrade_type }}
+    
+        RAW_VERSION=$(grep -oP '#define ENGINE_SDK_VERSION TEXT\("\K[0-9]+\.[0-9]+\.[0-9]+(\.[a-zA-Z]+)?' $FILE)
+    
+        VERSION=$(echo "$RAW_VERSION" | grep -oP '^[0-9]+\.[0-9]+\.[0-9]+')
+    
+        IFS='.' read -r major minor patch <<< "$VERSION"
+    
+        # If the version had an alpha suffix, adjust the version bump behavior
+        if [[ "$RAW_VERSION" == *".alpha" ]]; then
+          if [ "$UPGRADE_TYPE" == "patch" ]; then
+            # Remove alpha suffix, keep the same version
+            UPDATED_VERSION="$major.$minor.$patch"
+          elif [ "$UPGRADE_TYPE" == "minor" ]; then
+            # E.g. skip 1.3.0, go directly to 1.4.0
+            minor=$((minor + 1))
+            patch=0
+            UPDATED_VERSION="$major.$minor.$patch"
+          fi
+        else
+          # Increment patch or minor
+          if [ "$UPGRADE_TYPE" == "patch" ]; then
+            patch=$((patch + 1))
+          elif [ "$UPGRADE_TYPE" == "minor" ]; then
+            minor=$((minor + 1))
+            patch=0
+          fi
+          UPDATED_VERSION="$major.$minor.$patch"
+        fi
+    
+        sed -i -E "s/#define ENGINE_SDK_VERSION TEXT\(\"[0-9]+\.[0-9]+\.[0-9]+(\.[a-zA-Z]+)?\"\)/#define ENGINE_SDK_VERSION TEXT(\"$UPDATED_VERSION\")/g" $FILE
+    
+        echo "Updated version: $UPDATED_VERSION"
+        echo "version=$UPDATED_VERSION" >> "$GITHUB_OUTPUT"
 
     - uses: gr2m/create-or-update-pull-request-action@v1
       env:
@@ -42,6 +80,6 @@ jobs:
       with:
         title: "chore: update version"
         body: "Update version in ImmutableDataTypes.h"
-        branch: "chore/update-version-${{ github.event.inputs.version }}"
+        branch: "chore/update-version-${{ steps.replace_engine_sdk_version.outputs.version }}"
         commit-message: "chore: update version"
         labels: release
