@@ -50,9 +50,9 @@ enum class E{{classname}}_{{name}} : uint8
 
 /*
  * F{{classname}}
- *
- * {{description}}
- */
+{{#description}} *
+ * {{.}}
+{{/description}} */
 class {{dllapi}} F{{classname}} : public F{{unrealModuleName}}Model
 {
 public:

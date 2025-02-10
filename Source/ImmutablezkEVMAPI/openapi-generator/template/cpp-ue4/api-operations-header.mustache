@@ -26,10 +26,10 @@ enum class E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} : uint8
 {{/isEnum}}
 {{/allParams}}
 
-/* {{summary}}
+/* F{{classname}}::F{{operationIdCamelCase}}Request
 {{#notes}} *
- * {{.}}{{/notes}}
-*/
+ * {{.}}
+{{/notes}} */
 class {{dllapi}} F{{classname}}::F{{operationIdCamelCase}}Request : public F{{unrealModuleName}}Request
 {
 public:
