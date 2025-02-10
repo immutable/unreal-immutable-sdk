@@ -56,7 +56,7 @@ enum class E{{classname}}_{{name}} : uint8
 class {{dllapi}} F{{classname}} : public F{{unrealModuleName}}Model
 {
 public:
-	virtual ~F{{classname}}() override {}
+	virtual ~F{{classname}}() override;
 
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;
 	virtual void WriteJson(JsonWriter& Writer) const override final;

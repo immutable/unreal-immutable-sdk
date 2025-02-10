@@ -81,6 +81,10 @@ void F{{classname}}::WriteJson(JsonWriter& Writer) const
 	Writer->WriteObjectEnd();{{/isString}}{{/oneOf}}
 }
 
+F{{classname}}::~F{{classname}}()
+{
+}
+
 bool F{{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
 	{{#isString}}return TryGetJsonValue(JsonValue, Value);{{/isString}}{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}} {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value;
