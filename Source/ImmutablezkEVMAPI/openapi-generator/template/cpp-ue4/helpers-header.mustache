@@ -47,6 +47,10 @@ protected:
 
 class F{{unrealModuleName}}HttpMultipartFormData
 {
+protected:
+	static const TCHAR* Delimiter;
+	static const TCHAR* Newline;
+
 public:
 	void SetBoundary(const TCHAR* InBoundary);
 	void SetupHttpRequest(const FHttpRequestRef& HttpRequest);
@@ -63,9 +67,6 @@ protected:
 protected:
 	mutable FString Boundary;
 	TArray<uint8> FormData;
-
-	static const TCHAR* Delimiter;
-	static const TCHAR* Newline;
 };
 
 //////////////////////////////////////////////////////////////////////////

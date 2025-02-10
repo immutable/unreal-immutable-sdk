@@ -5,16 +5,16 @@
 #include "UObject/ObjectMacros.h"
 
 #include "{{modelNamePrefix}}BaseModel.h"
-#include "{{classname}}.h"
 
+#include "{{classname}}.h"
 {{#imports}}{{{import}}}
 {{/imports}}
-
 {{#operations}}
 {{#operation}}
 {{#allParams}}
 {{#isEnum}}
 {{#allowableValues}}
+
 UENUM(BlueprintType)
 enum class E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} : uint8
 {
@@ -22,10 +22,10 @@ enum class E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} : uint8
 	{{name}} UMETA(DisplayName = "{{value}}"){{^-last}},{{/-last}}
 	{{/enumVars}}
 };
-
 {{/allowableValues}}
 {{/isEnum}}
 {{/allParams}}
+
 /* {{summary}}
 {{#notes}} *
  * {{.}}{{/notes}}
@@ -34,11 +34,11 @@ class {{dllapi}} F{{classname}}::F{{operationIdCamelCase}}Request : public F{{un
 {
 public:
 	virtual ~F{{operationIdCamelCase}}Request() override;
+
 	virtual void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const override final;
 	virtual FString ComputePath() const override final;
-	{{#allParams}}
-	{{#isEnum}}
 
+public:{{#allParams}}{{#isEnum}}
 	{{#description}}/* {{{.}}} */
 	{{/description}}{{^required}}TOptional<{{/required}}E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}{{^required}}>{{/required}} {{paramName}}{{#required}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/required}};
 	{{/isEnum}}
@@ -55,12 +55,13 @@ class {{dllapi}} F{{classname}}::F{{operationIdCamelCase}}Response : public F{{u
 public:
 	virtual ~F{{operationIdCamelCase}}Response() override;
 	{{#responses.0}}
+
+public:
 	virtual void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) override final;
 	{{/responses.0}}
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;
 
+public:
 	{{#returnProperty}}{{#isContainer}}{{baseType}}<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{complexType}}>{{/isContainer}}{{^isContainer}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{baseType}}{{/isContainer}} Content;{{/returnProperty}}
-};
-
-{{/operation}}
-{{/operations}}
+};{{^-last}}
+{{/-last}}{{/operation}}{{/operations}}
