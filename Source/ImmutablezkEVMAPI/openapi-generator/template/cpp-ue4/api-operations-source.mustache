@@ -8,14 +8,12 @@
 #include "{{modelNamePrefix}}Helpers.h"
 
 #include "Dom/JsonObject.h"
-#include "Templates/SharedPointer.h"
 #include "HttpModule.h"
 #include "PlatformHttp.h"
+#include "Templates/SharedPointer.h"
 
-{{#operations}}{{#operation}}
-{{#allParams}}
-{{#isEnum}}
-inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} Value)
+{{#operations}}
+{{#operation}}{{#allParams}}{{#isEnum}}inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} Value)
 {
 	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>()->GetNameStringByValue(static_cast<int64>(Value)));
 }

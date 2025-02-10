@@ -1,10 +1,14 @@
 {{>licenseInfo}}
 
 #include "{{classname}}.h"
-{{#models}}{{#model}}{{#isEnum}}
-#include "UObject/Class.h"{{/isEnum}}{{#hasEnums}}#include "UObject/Class.h"{{/hasEnums}}{{/model}}{{/models}}
-#include "Templates/SharedPointer.h"
 
+#include "Templates/SharedPointer.h"
+{{#models}}
+{{#model}}
+{{#hasEnums}}
+#include "UObject/Class.h"
+{{/hasEnums}}{{/model}}
+{{/models}}
 #include "{{modelNamePrefix}}Helpers.h"
 
 {{#models}}
