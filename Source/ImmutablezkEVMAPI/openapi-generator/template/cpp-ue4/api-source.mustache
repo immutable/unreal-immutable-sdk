@@ -49,7 +49,7 @@ void F{{classname}}::ClearHeaderParams()
 
 {{#operations}}
 {{#operation}}
-FHttpRequestPtr F{{classname}}::{{operationIdCamelCase}}(const {{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate /*= F{{operationIdCamelCase}}Delegate()*/) const
+FHttpRequestPtr F{{classname}}::{{operationIdCamelCase}}(const F{{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate /*= F{{operationIdCamelCase}}Delegate()*/) const
 {
 	if (!IsValid())
 		return nullptr;
@@ -76,7 +76,7 @@ FHttpRequestPtr F{{classname}}::{{operationIdCamelCase}}(const {{operationIdCame
 {{#operation}}
 void F{{classname}}::On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, F{{operationIdCamelCase}}Delegate Delegate) const
 {
-	{{operationIdCamelCase}}Response Response;
+	F{{operationIdCamelCase}}Response Response;
 	HandleResponse(HttpResponse, bSucceeded, Response);
 	Delegate.ExecuteIfBound(Response);
 }

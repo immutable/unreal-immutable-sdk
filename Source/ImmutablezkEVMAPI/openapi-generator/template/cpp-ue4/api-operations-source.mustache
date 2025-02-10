@@ -35,7 +35,7 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classnam
 
 {{/isEnum}}
 {{/allParams}}
-FString F{{classname}}::{{operationIdCamelCase}}Request::ComputePath() const
+FString F{{classname}}::F{{operationIdCamelCase}}Request::ComputePath() const
 {
 	{{^pathParams.0}}
 	FString Path(TEXT("{{{path}}}"));
@@ -98,11 +98,11 @@ FString F{{classname}}::{{operationIdCamelCase}}Request::ComputePath() const
 	return Path;
 }
 
-F{{classname}}::{{operationIdCamelCase}}Request::~{{operationIdCamelCase}}Request()
+F{{classname}}::F{{operationIdCamelCase}}Request::~F{{operationIdCamelCase}}Request()
 {
 }
 
-void F{{classname}}::{{operationIdCamelCase}}Request::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
+void F{{classname}}::F{{operationIdCamelCase}}Request::SetupHttpRequest(const FHttpRequestRef& HttpRequest) const
 {
 	static const TArray<FString> Consumes = { {{#consumes}}TEXT("{{{mediaType}}}"){{^-last}}, {{/-last}}{{/consumes}} };
 	//static const TArray<FString> Produces = { {{#produces}}TEXT("{{{mediaType}}}"){{^-last}}, {{/-last}}{{/produces}} };
@@ -270,12 +270,12 @@ void F{{classname}}::{{operationIdCamelCase}}Request::SetupHttpRequest(const FHt
 	{{/isBodyAllowed}}
 }
 
-F{{classname}}::{{operationIdCamelCase}}Response::~{{operationIdCamelCase}}Response()
+F{{classname}}::F{{operationIdCamelCase}}Response::~F{{operationIdCamelCase}}Response()
 {
 }
 
 {{#responses.0}}
-void F{{classname}}::{{operationIdCamelCase}}Response::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
+void F{{classname}}::F{{operationIdCamelCase}}Response::SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode)
 {
 	F{{unrealModuleName}}Response::SetHttpResponseCode(InHttpResponseCode);
 	switch ((int)InHttpResponseCode)
@@ -292,7 +292,7 @@ void F{{classname}}::{{operationIdCamelCase}}Response::SetHttpResponseCode(EHttp
 }
 {{/responses.0}}
 
-bool F{{classname}}::{{operationIdCamelCase}}Response::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
+bool F{{classname}}::F{{operationIdCamelCase}}Response::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
 	{{#returnType}}
 	return TryGetJsonValue(JsonValue, Content);

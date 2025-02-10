@@ -11,14 +11,14 @@ class {{dllapi}} F{{classname}}
 public:
 	{{#operations}}
 	{{#operation}}
-	class {{operationIdCamelCase}}Request;
-	class {{operationIdCamelCase}}Response;
+	class F{{operationIdCamelCase}}Request;
+	class F{{operationIdCamelCase}}Response;
 
 	{{/operation}}
 	{{/operations}}
 	{{#operations}}
 	{{#operation}}
-	DECLARE_DELEGATE_OneParam(F{{operationIdCamelCase}}Delegate, const {{operationIdCamelCase}}Response&);
+	DECLARE_DELEGATE_OneParam(F{{operationIdCamelCase}}Delegate, const F{{operationIdCamelCase}}Response&);
 	{{/operation}}
 	{{/operations}}
 
@@ -45,7 +45,7 @@ public:
 	{{#operations}}
 	{{#operation}}
 	{{#description}}/* {{{.}}} */
-	{{/description}}FHttpRequestPtr {{operationIdCamelCase}}(const {{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate = F{{operationIdCamelCase}}Delegate()) const;
+	{{/description}}FHttpRequestPtr {{operationIdCamelCase}}(const F{{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate = F{{operationIdCamelCase}}Delegate()) const;
 	{{/operation}}
 	{{/operations}}
 

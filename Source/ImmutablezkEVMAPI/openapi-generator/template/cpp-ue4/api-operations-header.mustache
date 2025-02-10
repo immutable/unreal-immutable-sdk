@@ -30,10 +30,10 @@ enum class E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} : uint8
 {{#notes}} *
  * {{.}}{{/notes}}
 */
-class {{dllapi}} F{{classname}}::{{operationIdCamelCase}}Request : public F{{unrealModuleName}}Request
+class {{dllapi}} F{{classname}}::F{{operationIdCamelCase}}Request : public F{{unrealModuleName}}Request
 {
 public:
-	virtual ~{{operationIdCamelCase}}Request() override;
+	virtual ~F{{operationIdCamelCase}}Request() override;
 	virtual void SetupHttpRequest(const FHttpRequestRef& HttpRequest) const override final;
 	virtual FString ComputePath() const override final;
 	{{#allParams}}
@@ -50,10 +50,10 @@ public:
 	{{/allParams}}
 };
 
-class {{dllapi}} F{{classname}}::{{operationIdCamelCase}}Response : public F{{unrealModuleName}}Response
+class {{dllapi}} F{{classname}}::F{{operationIdCamelCase}}Response : public F{{unrealModuleName}}Response
 {
 public:
-	virtual ~{{operationIdCamelCase}}Response() override;
+	virtual ~F{{operationIdCamelCase}}Response() override;
 	{{#responses.0}}
 	virtual void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) override final;
 	{{/responses.0}}
