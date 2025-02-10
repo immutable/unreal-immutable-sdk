@@ -64,7 +64,7 @@ public:
 	void SetShouldRetry(const F{{unrealModuleName}}HttpRetryParams& Params = F{{unrealModuleName}}HttpRetryParams()) { RetryParams = Params; }
 	const TOptional<F{{unrealModuleName}}HttpRetryParams>& GetRetryParams() const { return RetryParams; }
 
-private:
+protected:
 	TOptional<F{{unrealModuleName}}HttpRetryParams> RetryParams;
 };
 
@@ -87,7 +87,7 @@ public:
 	void SetHttpResponse(const FHttpResponsePtr& InHttpResponse) { HttpResponse = InHttpResponse; }
 	const FHttpResponsePtr& GetHttpResponse() const { return HttpResponse; }
 
-private:
+protected:
 	bool Successful;
 	EHttpResponseCodes::Type ResponseCode;
 	FString ResponseString;

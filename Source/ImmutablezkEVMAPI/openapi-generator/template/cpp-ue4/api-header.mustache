@@ -49,7 +49,7 @@ public:
 	{{/operation}}
 	{{/operations}}
 
-private:
+protected:
 	{{#operations}}
 	{{#operation}}
 	void On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, F{{operationIdCamelCase}}Delegate Delegate) const;
@@ -61,6 +61,7 @@ private:
 	bool IsValid() const;
 	void HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, F{{unrealModuleName}}Response& InOutResponse) const;
 
+protected:
 	FString Url;
 	TMap<FString,FString> AdditionalHeaderParams;
 	mutable FHttpRetrySystem::FManager* RetryManager = nullptr;

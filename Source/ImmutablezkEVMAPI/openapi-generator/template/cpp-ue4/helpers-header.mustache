@@ -38,7 +38,7 @@ public:
 	// Returns the filename with extension
 	FString GetFilename() const;
 
-private:
+protected:
 	FString FilePath;
 	FString ContentType;
 };
@@ -56,10 +56,11 @@ public:
 	void AddBinaryPart(const TCHAR* Name, const TArray<uint8>& ByteArray);
 	void AddFilePart(const TCHAR* Name, const F{{unrealModuleName}}HttpFileInput& File);
 
-private:
+protected:
 	void AppendString(const TCHAR* Str);
 	const FString& GetBoundary() const;
 
+protected:
 	mutable FString Boundary;
 	TArray<uint8> FormData;
 
