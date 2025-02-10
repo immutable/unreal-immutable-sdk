@@ -2,18 +2,35 @@
 
 #include "{{classname}}.h"
 
-#include "{{classname}}Operations.h"
-#include "{{unrealModuleName}}Module.h"
-
 #include "HttpModule.h"
 #include "Serialization/JsonSerializer.h"
 
+#include "{{classname}}Operations.h"
+#include "{{unrealModuleName}}Module.h"
+
 F{{classname}}::F{{classname}}()
-: Url(TEXT("{{basePath}}"))
+	: Url(TEXT("{{basePath}}"))
 {
 }
 
-F{{classname}}::~F{{classname}}() {}
+F{{classname}}::~F{{classname}}()
+{
+}
+
+FHttpRetrySystem::FManager& F{{classname}}::GetHttpRetryManager()
+{
+	checkf(RetryManager, TEXT("F{{classname}}: RetryManager is null.  You may have meant to set it with SetHttpRetryManager first, or you may not be using a custom RetryManager at all."))
+	return *RetryManager;
+}
+
+void F{{classname}}::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManager)
+{
+	if (RetryManager != &InRetryManager)
+	{
+		DefaultRetryManager.Reset();
+		RetryManager = &InRetryManager;
+	}
+}
 
 void F{{classname}}::SetURL(const FString& InUrl)
 {
@@ -30,32 +47,42 @@ void F{{classname}}::ClearHeaderParams()
 	AdditionalHeaderParams.Reset();
 }
 
-bool F{{classname}}::IsValid() const
+{{#operations}}
+{{#operation}}
+FHttpRequestPtr F{{classname}}::{{operationIdCamelCase}}(const {{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate /*= F{{operationIdCamelCase}}Delegate()*/) const
 {
-	if (Url.IsEmpty())
+	if (!IsValid())
+		return nullptr;
+
+	FHttpRequestRef HttpRequest = CreateHttpRequest(Request);
+	HttpRequest->SetURL(*(Url + Request.ComputePath()));
+
+	for(const auto& It : AdditionalHeaderParams)
 	{
-		UE_LOG(Log{{unrealModuleName}}, Error, TEXT("F{{classname}}: Endpoint Url is not set, request cannot be performed"));
-		return false;
+		HttpRequest->SetHeader(It.Key, It.Value);
 	}
 
-	return true;
-}
+	Request.SetupHttpRequest(HttpRequest);
 
-void F{{classname}}::SetHttpRetryManager(FHttpRetrySystem::FManager& InRetryManager)
+	HttpRequest->OnProcessRequestComplete().BindRaw(this, &F{{classname}}::On{{operationIdCamelCase}}Response, Delegate);
+	HttpRequest->ProcessRequest();
+	return HttpRequest;
+}
+{{^-last}}
+
+{{/-last}}
+{{/operation}}{{/operations}}
+{{#operations}}
+{{#operation}}
+void F{{classname}}::On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, F{{operationIdCamelCase}}Delegate Delegate) const
 {
-	if (RetryManager != &InRetryManager)
-	{
-		DefaultRetryManager.Reset();
-		RetryManager = &InRetryManager;
-	}
+	{{operationIdCamelCase}}Response Response;
+	HandleResponse(HttpResponse, bSucceeded, Response);
+	Delegate.ExecuteIfBound(Response);
 }
+{{^-last}}
 
-FHttpRetrySystem::FManager& F{{classname}}::GetHttpRetryManager()
-{
-	checkf(RetryManager, TEXT("F{{classname}}: RetryManager is null.  You may have meant to set it with SetHttpRetryManager first, or you may not be using a custom RetryManager at all."))
-	return *RetryManager;
-}
-
+{{/-last}}{{/operation}}{{/operations}}
 FHttpRequestRef F{{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Request& Request) const
 {
 	if (!Request.GetRetryParams().IsSet())
@@ -74,6 +101,17 @@ FHttpRequestRef F{{classname}}::CreateHttpRequest(const F{{unrealModuleName}}Req
 		const F{{unrealModuleName}}HttpRetryParams& Params = Request.GetRetryParams().GetValue();
 		return RetryManager->CreateRequest(Params.RetryLimitCountOverride, Params.RetryTimeoutRelativeSecondsOverride, Params.RetryResponseCodes, Params.RetryVerbs, Params.RetryDomains);
 	}
+}
+
+bool F{{classname}}::IsValid() const
+{
+	if (Url.IsEmpty())
+	{
+		UE_LOG(Log{{unrealModuleName}}, Error, TEXT("F{{classname}}: Endpoint Url is not set, request cannot be performed"));
+		return false;
+	}
+
+	return true;
 }
 
 void F{{classname}}::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceeded, F{{unrealModuleName}}Response& InOutResponse) const
@@ -119,35 +157,3 @@ void F{{classname}}::HandleResponse(FHttpResponsePtr HttpResponse, bool bSucceed
 	// By default, assume we failed to establish connection
 	InOutResponse.SetHttpResponseCode(EHttpResponseCodes::RequestTimeout);
 }
-
-{{#operations}}
-{{#operation}}
-FHttpRequestPtr F{{classname}}::{{operationIdCamelCase}}(const {{operationIdCamelCase}}Request& Request, const F{{operationIdCamelCase}}Delegate& Delegate /*= F{{operationIdCamelCase}}Delegate()*/) const
-{
-	if (!IsValid())
-		return nullptr;
-
-	FHttpRequestRef HttpRequest = CreateHttpRequest(Request);
-	HttpRequest->SetURL(*(Url + Request.ComputePath()));
-
-	for(const auto& It : AdditionalHeaderParams)
-	{
-		HttpRequest->SetHeader(It.Key, It.Value);
-	}
-
-	Request.SetupHttpRequest(HttpRequest);
-
-	HttpRequest->OnProcessRequestComplete().BindRaw(this, &F{{classname}}::On{{operationIdCamelCase}}Response, Delegate);
-	HttpRequest->ProcessRequest();
-	return HttpRequest;
-}
-
-void F{{classname}}::On{{operationIdCamelCase}}Response(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded, F{{operationIdCamelCase}}Delegate Delegate) const
-{
-	{{operationIdCamelCase}}Response Response;
-	HandleResponse(HttpResponse, bSucceeded, Response);
-	Delegate.ExecuteIfBound(Response);
-}
-
-{{/operation}}
-{{/operations}}
