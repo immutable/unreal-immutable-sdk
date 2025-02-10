@@ -195,7 +195,6 @@ inline FString CollectionToUrlString_multi(const TArray<T>& Collection, const TC
 	return Output;
 }
 
-
 template <typename T>
 inline FString CollectionToUrlString_multi(const TSet<T>& Collection, const TCHAR* BaseName)
 {
@@ -217,94 +216,6 @@ inline FString CollectionToUrlString_multi(const TSet<T>& Collection, const TCHA
 		Output += FString::Format(TEXT("&{0}={1}"), { FStringFormatArg(BaseName), ToUrlString(*Iter) });
 	}
 	return Output;
-}
-	
-//////////////////////////////////////////////////////////////////////////
-
-inline void WriteJsonValue(JsonWriter& Writer, const TSharedPtr<FJsonValue>& Value)
-{
-	if (Value.IsValid())
-	{
-		FJsonSerializer::Serialize(Value.ToSharedRef(), "", Writer, false);
-	}
-	else
-	{
-		Writer->WriteObjectStart();
-		Writer->WriteObjectEnd();
-	}
-}
-
-inline void WriteJsonValue(JsonWriter& Writer, const TSharedPtr<FJsonObject>& Value)
-{
-	if (Value.IsValid())
-	{
-		FJsonSerializer::Serialize(Value.ToSharedRef(), Writer, false);
-	}
-	else
-	{
-		Writer->WriteObjectStart();
-		Writer->WriteObjectEnd();
-	}
-}
-
-inline void WriteJsonValue(JsonWriter& Writer, const TArray<uint8>& Value)
-{
-	Writer->WriteValue(FBase64::Encode(Value));
-}
-
-inline void WriteJsonValue(JsonWriter& Writer, const FDateTime& Value)
-{
-	Writer->WriteValue(Value.ToIso8601());
-}
-
-inline void WriteJsonValue(JsonWriter& Writer, const FGuid& Value)
-{
-	Writer->WriteValue(Value.ToString(EGuidFormats::DigitsWithHyphens));
-}
-
-inline void WriteJsonValue(JsonWriter& Writer, const F{{unrealModuleName}}Model& Value)
-{
-	Value.WriteJson(Writer);
-}
-
-template<typename T, typename std::enable_if<!std::is_base_of<F{{unrealModuleName}}Model, T>::value, int>::type = 0>
-inline void WriteJsonValue(JsonWriter& Writer, const T& Value)
-{
-	Writer->WriteValue(Value);
-}
-
-template<typename T>
-inline void WriteJsonValue(JsonWriter& Writer, const TArray<T>& Value)
-{
-	Writer->WriteArrayStart();
-	for (const auto& Element : Value)
-	{
-		WriteJsonValue(Writer, Element);
-	}
-	Writer->WriteArrayEnd();
-}
-
-template <typename T>
-inline void WriteJsonValue(JsonWriter& Writer, const TSet<T>& Value)
-{
-	Writer->WriteArrayStart();
-	for (const auto& Element : Value)
-	{
-		WriteJsonValue(Writer, Element);
-	}
-	Writer->WriteArrayEnd();
-}
-
-template<typename T>
-inline void WriteJsonValue(JsonWriter& Writer, const TMap<FString, T>& Value)
-{
-	Writer->WriteObjectStart();
-	for (const auto& It : Value)
-	{
-		Writer->WriteIdentifierPrefix(It.Key);
-		WriteJsonValue(Writer, It.Value);
-	}
-	Writer->WriteObjectEnd();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -492,4 +403,92 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonObject>& JsonObject, const FSt
 	// Absence of optional value is not a parsing error.
 	// Nullable is handled like optional.
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+inline void WriteJsonValue(JsonWriter& Writer, const TSharedPtr<FJsonValue>& Value)
+{
+	if (Value.IsValid())
+	{
+		FJsonSerializer::Serialize(Value.ToSharedRef(), "", Writer, false);
+	}
+	else
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteObjectEnd();
+	}
+}
+
+inline void WriteJsonValue(JsonWriter& Writer, const TSharedPtr<FJsonObject>& Value)
+{
+	if (Value.IsValid())
+	{
+		FJsonSerializer::Serialize(Value.ToSharedRef(), Writer, false);
+	}
+	else
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteObjectEnd();
+	}
+}
+
+inline void WriteJsonValue(JsonWriter& Writer, const TArray<uint8>& Value)
+{
+	Writer->WriteValue(FBase64::Encode(Value));
+}
+
+inline void WriteJsonValue(JsonWriter& Writer, const FDateTime& Value)
+{
+	Writer->WriteValue(Value.ToIso8601());
+}
+
+inline void WriteJsonValue(JsonWriter& Writer, const FGuid& Value)
+{
+	Writer->WriteValue(Value.ToString(EGuidFormats::DigitsWithHyphens));
+}
+
+inline void WriteJsonValue(JsonWriter& Writer, const F{{unrealModuleName}}Model& Value)
+{
+	Value.WriteJson(Writer);
+}
+
+template<typename T, typename std::enable_if<!std::is_base_of<F{{unrealModuleName}}Model, T>::value, int>::type = 0>
+inline void WriteJsonValue(JsonWriter& Writer, const T& Value)
+{
+	Writer->WriteValue(Value);
+}
+
+template<typename T>
+inline void WriteJsonValue(JsonWriter& Writer, const TArray<T>& Value)
+{
+	Writer->WriteArrayStart();
+	for (const auto& Element : Value)
+	{
+		WriteJsonValue(Writer, Element);
+	}
+	Writer->WriteArrayEnd();
+}
+
+template <typename T>
+inline void WriteJsonValue(JsonWriter& Writer, const TSet<T>& Value)
+{
+	Writer->WriteArrayStart();
+	for (const auto& Element : Value)
+	{
+		WriteJsonValue(Writer, Element);
+	}
+	Writer->WriteArrayEnd();
+}
+
+template<typename T>
+inline void WriteJsonValue(JsonWriter& Writer, const TMap<FString, T>& Value)
+{
+	Writer->WriteObjectStart();
+	for (const auto& It : Value)
+	{
+		Writer->WriteIdentifierPrefix(It.Key);
+		WriteJsonValue(Writer, It.Value);
+	}
+	Writer->WriteObjectEnd();
 }

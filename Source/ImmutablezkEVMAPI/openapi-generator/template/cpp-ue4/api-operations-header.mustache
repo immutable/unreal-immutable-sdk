@@ -56,7 +56,6 @@ public:
 	virtual ~F{{operationIdCamelCase}}Response() override;
 	{{#responses.0}}
 
-public:
 	virtual void SetHttpResponseCode(EHttpResponseCodes::Type InHttpResponseCode) override final;
 	{{/responses.0}}
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;

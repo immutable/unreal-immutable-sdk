@@ -14,11 +14,6 @@
 {{#models}}
 {{#model}}
 {{#isEnum}}
-inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{name}}_Values Value)
-{
-	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{name}}_Values>()->GetNameStringByValue(static_cast<int64>(Value)));
-}
-
 inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}}_Values Value)
 {
 	{{#allowableValues}}
@@ -32,15 +27,15 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classnam
 	return false;
 }
 
+inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{name}}_Values Value)
+{
+	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{name}}_Values>()->GetNameStringByValue(static_cast<int64>(Value)));
+}
+
 {{/isEnum}}
 {{#hasEnums}}
 {{#vars}}
 {{#isEnum}}
-inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{name}} Value)
-{
-	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{name}}>()->GetNameStringByValue(static_cast<int64>(Value)));
-}
-
 inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}} Value)
 {
 	{{#allowableValues}}
@@ -54,33 +49,14 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classnam
 	return false;
 }
 
+inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{name}} Value)
+{
+	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{name}}>()->GetNameStringByValue(static_cast<int64>(Value)));
+}
+
 {{/isEnum}}
 {{/vars}}
 {{/hasEnums}}
-void F{{classname}}::WriteJson(JsonWriter& Writer) const
-{
-	{{#isString}}WriteJsonValue(Writer, Value);{{/isString}}{{#composedSchemas}}{{#oneOf}}{{^-first}}
-	else {{/-first}}if (const {{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}* {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value = OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>())
-	{
-		WriteJsonValue(Writer, *{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value);
-	}{{/oneOf}}{{/composedSchemas}}{{^oneOf}}{{^isString}}Writer->WriteObjectStart();
-
-	{{#vars}}
-	{{#required}}
-	Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}});
-	{{/required}}
-	{{^required}}
-
-	if ({{name}}.IsSet())
-	{
-		Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}}.GetValue());
-	}
-	{{/required}}
-	{{/vars}}
-
-	Writer->WriteObjectEnd();{{/isString}}{{/oneOf}}
-}
-
 F{{classname}}::~F{{classname}}()
 {
 }
@@ -112,4 +88,28 @@ bool F{{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	{{/vars}}
 
 	return ParseSuccess;{{/isString}}{{/oneOf}}
+}
+
+void F{{classname}}::WriteJson(JsonWriter& Writer) const
+{
+	{{#isString}}WriteJsonValue(Writer, Value);{{/isString}}{{#composedSchemas}}{{#oneOf}}{{^-first}}
+	else {{/-first}}if (const {{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}* {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value = OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>())
+	{
+		WriteJsonValue(Writer, *{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value);
+	}{{/oneOf}}{{/composedSchemas}}{{^oneOf}}{{^isString}}Writer->WriteObjectStart();
+
+	{{#vars}}
+	{{#required}}
+	Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}});
+	{{/required}}
+	{{^required}}
+
+	if ({{name}}.IsSet())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}}.GetValue());
+	}
+	{{/required}}
+	{{/vars}}
+
+	Writer->WriteObjectEnd();{{/isString}}{{/oneOf}}
 }{{/model}}{{/models}}

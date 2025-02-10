@@ -2,19 +2,17 @@
 
 #include "{{classname}}Operations.h"
 
+#include "HttpModule.h"
+#include "Templates/SharedPointer.h"
 #include "UObject/Class.h"
 
 #include "{{unrealModuleName}}Module.h"
 #include "{{modelNamePrefix}}Helpers.h"
 
-#include "HttpModule.h"
-#include "Templates/SharedPointer.h"
-
 {{#operations}}
-{{#operation}}{{#allParams}}{{#isEnum}}inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} Value)
-{
-	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>()->GetNameStringByValue(static_cast<int64>(Value)));
-}
+{{#operation}}
+{{#allParams}}
+{{#isEnum}}
 
 inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} Value)
 {
@@ -29,71 +27,13 @@ inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classnam
 	return false;
 }
 
-{{/isEnum}}
-{{/allParams}}
-FString F{{classname}}::F{{operationIdCamelCase}}Request::ComputePath() const
+inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} Value)
 {
-	{{^pathParams.0}}
-	FString Path(TEXT("{{{path}}}"));
-	{{/pathParams.0}}
-	{{#pathParams.0}}
-	TMap<FString, FStringFormatArg> PathParams = { {{#pathParams}}
-	{ TEXT("{{baseName}}"), FStringFormatArg(ToUrlString({{paramName}})) }{{^-last}},{{/-last}}{{/pathParams}} };
-
-	FString Path = FString::Format(TEXT("{{{path}}}"), PathParams);
-
-	{{/pathParams.0}}
-	{{#queryParams.0}}
-	TArray<FString> QueryParams;
-	{{#queryParams}}
-	{{#required}}
-	{{^collectionFormat}}
-	QueryParams.Add(FString(TEXT("{{baseName}}=")) + ToUrlString({{paramName}}));
-	{{/collectionFormat}}
-	{{#collectionFormat}}
-	{{#isCollectionFormatMulti}}
-	QueryParams.Add(CollectionToUrlString_{{collectionFormat}}({{paramName}}, TEXT("{{baseName}}")));
-	{{/isCollectionFormatMulti}}
-	{{^isCollectionFormatMulti}}
-	QueryParams.Add(FString(TEXT("{{baseName}}=")) + CollectionToUrlString_{{collectionFormat}}({{paramName}}, TEXT("{{baseName}}")));
-	{{/isCollectionFormatMulti}}
-	{{/collectionFormat}}
-	{{/required}}
-	{{^required}}
-	{{^collectionFormat}}
-	{{#isEnum}}
-	if({{paramName}}.IsSet())
-	{
-		QueryParams.Add(FString(TEXT("{{baseName}}=")) + StaticEnum<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>()->GetNameStringByValue(static_cast<int64>({{paramName}}.GetValue())));
-	}
-	{{/isEnum}}
-	{{^isEnum}}
-	if({{paramName}}.IsSet())
-	{
-		QueryParams.Add(FString(TEXT("{{baseName}}=")) + ToUrlString({{paramName}}.GetValue()));
-	}
-	{{/isEnum}}
-	{{/collectionFormat}}
-	{{#collectionFormat}}
-	if({{paramName}}.IsSet())
-	{
-		{{#isCollectionFormatMulti}}
-		QueryParams.Add(CollectionToUrlString_{{collectionFormat}}({{paramName}}.GetValue(), TEXT("{{baseName}}")));
-		{{/isCollectionFormatMulti}}
-		{{^isCollectionFormatMulti}}
-		QueryParams.Add(FString(TEXT("{{baseName}}=")) + CollectionToUrlString_{{collectionFormat}}({{paramName}}.GetValue(), TEXT("{{baseName}}")));
-		{{/isCollectionFormatMulti}}
-	}
-	{{/collectionFormat}}
-	{{/required}}
-	{{/queryParams}}
-	Path += TCHAR('?');
-	Path += FString::Join(QueryParams, TEXT("&"));
-
-	{{/queryParams.0}}
-	return Path;
+	WriteJsonValue(Writer, StaticEnum<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>()->GetNameStringByValue(static_cast<int64>(Value)));
 }
-
+{{/isEnum}}
+{{/allParams}}{{^-first}}
+{{/-first}}
 F{{classname}}::F{{operationIdCamelCase}}Request::~F{{operationIdCamelCase}}Request()
 {
 }
@@ -105,9 +45,9 @@ void F{{classname}}::F{{operationIdCamelCase}}Request::SetupHttpRequest(const FH
 
 	HttpRequest->SetVerb(TEXT("{{httpMethod}}"));
 	{{#headerParams.0}}
-
 	// Header parameters
 	{{#headerParams}}
+
 	{{#required}}
 	HttpRequest->SetHeader(TEXT("{{baseName}}"), {{paramName}});
 	{{/required}}
@@ -119,8 +59,8 @@ void F{{classname}}::F{{operationIdCamelCase}}Request::SetupHttpRequest(const FH
 	{{/required}}
 	{{/headerParams}}
 	{{/headerParams.0}}
-
 	{{#isBodyAllowed}}
+
 	// Default to Json Body request
 	if (Consumes.Num() == 0 || Consumes.Contains(TEXT("application/json")))
 	{
@@ -266,6 +206,69 @@ void F{{classname}}::F{{operationIdCamelCase}}Request::SetupHttpRequest(const FH
 	{{/isBodyAllowed}}
 }
 
+FString F{{classname}}::F{{operationIdCamelCase}}Request::ComputePath() const
+{
+	{{^pathParams.0}}
+	FString Path(TEXT("{{{path}}}"));
+	{{/pathParams.0}}
+	{{#pathParams.0}}
+	TMap<FString, FStringFormatArg> PathParams = { {{#pathParams}}
+	{ TEXT("{{baseName}}"), FStringFormatArg(ToUrlString({{paramName}})) }{{^-last}},{{/-last}}{{/pathParams}} };
+
+	FString Path = FString::Format(TEXT("{{{path}}}"), PathParams);
+
+	{{/pathParams.0}}
+	{{#queryParams.0}}
+	TArray<FString> QueryParams;
+	{{#queryParams}}
+	{{#required}}
+	{{^collectionFormat}}
+	QueryParams.Add(FString(TEXT("{{baseName}}=")) + ToUrlString({{paramName}}));
+	{{/collectionFormat}}
+	{{#collectionFormat}}
+	{{#isCollectionFormatMulti}}
+	QueryParams.Add(CollectionToUrlString_{{collectionFormat}}({{paramName}}, TEXT("{{baseName}}")));
+	{{/isCollectionFormatMulti}}
+	{{^isCollectionFormatMulti}}
+	QueryParams.Add(FString(TEXT("{{baseName}}=")) + CollectionToUrlString_{{collectionFormat}}({{paramName}}, TEXT("{{baseName}}")));
+	{{/isCollectionFormatMulti}}
+	{{/collectionFormat}}
+	{{/required}}
+	{{^required}}
+	{{^collectionFormat}}
+	{{#isEnum}}
+	if({{paramName}}.IsSet())
+	{
+		QueryParams.Add(FString(TEXT("{{baseName}}=")) + StaticEnum<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>()->GetNameStringByValue(static_cast<int64>({{paramName}}.GetValue())));
+	}
+	{{/isEnum}}
+	{{^isEnum}}
+	if({{paramName}}.IsSet())
+	{
+		QueryParams.Add(FString(TEXT("{{baseName}}=")) + ToUrlString({{paramName}}.GetValue()));
+	}
+	{{/isEnum}}
+	{{/collectionFormat}}
+	{{#collectionFormat}}
+	if({{paramName}}.IsSet())
+	{
+		{{#isCollectionFormatMulti}}
+		QueryParams.Add(CollectionToUrlString_{{collectionFormat}}({{paramName}}.GetValue(), TEXT("{{baseName}}")));
+		{{/isCollectionFormatMulti}}
+		{{^isCollectionFormatMulti}}
+		QueryParams.Add(FString(TEXT("{{baseName}}=")) + CollectionToUrlString_{{collectionFormat}}({{paramName}}.GetValue(), TEXT("{{baseName}}")));
+		{{/isCollectionFormatMulti}}
+	}
+	{{/collectionFormat}}
+	{{/required}}
+	{{/queryParams}}
+	Path += TCHAR('?');
+	Path += FString::Join(QueryParams, TEXT("&"));
+
+	{{/queryParams.0}}
+	return Path;
+}
+
 F{{classname}}::F{{operationIdCamelCase}}Response::~F{{operationIdCamelCase}}Response()
 {
 }
@@ -297,4 +300,5 @@ bool F{{classname}}::F{{operationIdCamelCase}}Response::FromJson(const TSharedPt
 	return true;
 	{{/returnType}}
 }
-{{/operation}}{{/operations}}
+{{/operation}}
+{{/operations}}
