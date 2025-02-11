@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Misc/EnumRange.h"
 #include "UObject/ObjectMacros.h"
 
 #include "{{modelNamePrefix}}BaseModel.h"
@@ -19,9 +20,12 @@ UENUM(BlueprintType)
 enum class E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} : uint8
 {
 	{{#enumVars}}
-	{{name}} UMETA(DisplayName = "{{value}}"){{^-last}},{{/-last}}
+	{{name}} UMETA(DisplayName = "{{value}}"),
 	{{/enumVars}}
+	MAX
 };
+
+ENUM_RANGE_BY_COUNT(E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}::MAX);
 {{/allowableValues}}
 {{/isEnum}}
 {{/allParams}}

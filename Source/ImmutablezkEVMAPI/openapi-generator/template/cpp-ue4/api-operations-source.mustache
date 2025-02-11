@@ -14,13 +14,23 @@
 {{#allParams}}
 {{#isEnum}}
 
-inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} Value)
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}& Value)
 {
 	{{#allowableValues}}
 	FString EnumNameString;
 	if (JsonValue->TryGetString(EnumNameString))
 	{
-		return StaticEnum<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>()->GetIndexByNameString(EnumNameString) != INDEX_NONE;
+		UEnum* Enum = StaticEnum<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>();
+
+		for (E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}} Entry : TEnumRange<E{{classname}}_{{operationIdCamelCase}}Request_{{paramName}}>())
+		{
+			if (Enum->GetNameStringByValue(static_cast<int64>(Entry)) == EnumNameString)
+			{
+				Value = Entry;
+
+				return true;
+			}
+		}
 	}
 
 	{{/allowableValues}}

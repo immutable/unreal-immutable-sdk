@@ -3,10 +3,10 @@
 #include "{{classname}}.h"
 
 #include "Templates/SharedPointer.h"
+#include "UObject/Class.h"
 {{#models}}
 {{#model}}
 {{#hasEnums}}
-#include "UObject/Class.h"
 {{/hasEnums}}{{/model}}
 {{/models}}
 #include "{{modelNamePrefix}}Helpers.h"
@@ -14,13 +14,23 @@
 {{#models}}
 {{#model}}
 {{#isEnum}}
-inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}}_Values Value)
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}}_Values& Value)
 {
 	{{#allowableValues}}
 	FString EnumNameString;
 	if (JsonValue->TryGetString(EnumNameString))
 	{
-		return StaticEnum<E{{classname}}_{{name}}_Values>()->GetIndexByNameString(EnumNameString) != INDEX_NONE;
+		UEnum* Enum = StaticEnum<E{{classname}}_{{name}}_Values>();
+
+		for (E{{classname}}_{{name}}_Values Entry : TEnumRange<E{{classname}}_{{name}}_Values>())
+		{
+			if (Enum->GetNameStringByValue(static_cast<int64>(Entry)) == EnumNameString)
+			{
+				Value = Entry;
+
+				return true;
+			}
+		}
 	}
 
 	{{/allowableValues}}
@@ -36,13 +46,23 @@ inline void WriteJsonValue(JsonWriter& Writer, E{{classname}}_{{name}}_Values Va
 {{#hasEnums}}
 {{#vars}}
 {{#isEnum}}
-inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}} Value)
+inline bool TryGetJsonValue(const TSharedPtr<FJsonValue>& JsonValue, E{{classname}}_{{name}}& Value)
 {
 	{{#allowableValues}}
 	FString EnumNameString;
 	if (JsonValue->TryGetString(EnumNameString))
 	{
-		return StaticEnum<E{{classname}}_{{name}}>()->GetIndexByNameString(EnumNameString) != INDEX_NONE;
+		UEnum* Enum = StaticEnum<E{{classname}}_{{name}}>();
+
+		for (E{{classname}}_{{name}} Entry : TEnumRange<E{{classname}}_{{name}}>())
+		{
+			if (Enum->GetNameStringByValue(static_cast<int64>(Entry)) == EnumNameString)
+			{
+				Value = Entry;
+
+				return true;
+			}
+		}
 	}
 
 	{{/allowableValues}}
