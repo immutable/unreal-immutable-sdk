@@ -81,16 +81,82 @@ F{{classname}}::~F{{classname}}()
 {
 }
 
+bool F{{classname}}::operator ==(const F{{classname}}& Other) const
+{
+	{{#isString}}
+	{{#isEnum}}
+	{{#allowableValues}}
+	if (Value != Other.Value)
+	{
+		return false;
+	}
+	{{^-last}}
+
+	{{/-last}}
+	{{/allowableValues}}
+	{{/isEnum}}
+	{{^isEnum}}
+	if (Value != Other.Value)
+	{
+		return false;
+	}
+	{{^-last}}
+
+	{{/-last}}
+	{{/isEnum}}
+	{{/isString}}
+	{{#vars}}
+	{{#isEnum}}
+	if ({{name}} != Other.{{name}})
+	{
+		return false;
+	}
+	{{^-last}}
+
+	{{/-last}}
+	{{/isEnum}}
+	{{^isEnum}}
+	{{^oneOf}}
+	if ({{name}} != Other.{{name}})
+	{
+		return false;
+	}
+	{{^-last}}
+
+	{{/-last}}
+	{{/oneOf}}
+	{{/isEnum}}
+	{{/vars}}
+	{{#oneOf}}
+	{{#-first}}
+	{{#composedSchemas}}
+	{{#oneOf}}
+	if (OneOf.IsType<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>() && Other.OneOf.IsType<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>())
+	{
+		if (*OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>() != *Other.OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>())
+		{
+			return false;
+		}
+	}
+	{{^-last}}
+
+	{{/-last}}
+	{{/oneOf}}
+	{{/composedSchemas}}
+	{{/-first}}
+	{{/oneOf}}
+
+	return true;
+}
+
+bool F{{classname}}::operator !=(const F{{classname}}& Other) const
+{
+	return !(*this == Other);
+}
+
 bool F{{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 {
-	{{#isString}}return TryGetJsonValue(JsonValue, Value);{{/isString}}{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}} {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value;
-	if (const bool bIs{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}} = TryGetJsonValue(JsonValue, {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value))
-	{
-		OneOf.Set<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>({{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value);
-		return true;
-	}
-
-	{{/oneOf}}{{/composedSchemas}}{{#oneOf}}{{#-last}}return false;{{/-last}}{{/oneOf}}{{^oneOf}}{{^isString}}const TSharedPtr<FJsonObject>* Object;
+	{{#isString}}return TryGetJsonValue(JsonValue, Value);{{/isString}}{{^isString}}const TSharedPtr<FJsonObject>* Object;
 	if (!JsonValue->TryGetObject(Object))
 	{
 		return false;
@@ -99,26 +165,61 @@ bool F{{classname}}::FromJson(const TSharedPtr<FJsonValue>& JsonValue)
 	bool ParseSuccess = true;
 
 	{{#vars}}
+	{{#isEnum}}
 	{{#required}}
-	{{^isWriteOnly}}ParseSuccess &= {{/isWriteOnly}}TryGetJsonValue(*Object, TEXT("{{baseName}}"), {{name}});
+	{{^isWriteOnly}}
+	ParseSuccess &= {{/isWriteOnly}}TryGetJsonValue(*Object, TEXT("{{baseName}}"), {{name}});
 	{{/required}}
 	{{^required}}
 	ParseSuccess &= TryGetJsonValue(*Object, TEXT("{{baseName}}"), {{name}});
 	{{/required}}
+	{{/isEnum}}
 	{{/vars}}
+	{{^oneOf}}
+	{{#vars}}
+	{{^isEnum}}
+	{{#required}}
+	{{^isWriteOnly}}
+	ParseSuccess &= {{/isWriteOnly}}TryGetJsonValue(*Object, TEXT("{{baseName}}"), {{name}});
+	{{/required}}
+	{{^required}}
+	ParseSuccess &= TryGetJsonValue(*Object, TEXT("{{baseName}}"), {{name}});
+	{{/required}}
+	{{/isEnum}}
+	{{/vars}}
+	{{/oneOf}}
+	{{/isString}}
+	{{#composedSchemas}}
+	{{#oneOf}}
+	const TSharedPtr<FJsonValue> {{name}} = (*Object)->TryGetField(TEXT("{{name}}"));
+	if ({{name}}.IsValid() && !{{name}}->IsNull())
+	{
+		{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}} {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value;
+		if (const bool bIs{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}} = TryGetJsonValue({{name}}, {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value))
+		{
+			OneOf.Set<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>({{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value);
+			ParseSuccess &= bIs{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}};
+		}
+	}
+	{{^-last}}
 
-	return ParseSuccess;{{/isString}}{{/oneOf}}
+	{{/-last}}
+	{{/oneOf}}
+	{{/composedSchemas}}
+
+	{{^isString}}
+	return ParseSuccess;
+	{{/isString}}
 }
 
 void F{{classname}}::WriteJson(JsonWriter& Writer) const
 {
-	{{#isString}}WriteJsonValue(Writer, Value);{{/isString}}{{#composedSchemas}}{{#oneOf}}{{^-first}}
-	else {{/-first}}if (const {{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}* {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value = OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>())
-	{
-		WriteJsonValue(Writer, *{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value);
-	}{{/oneOf}}{{/composedSchemas}}{{^oneOf}}{{^isString}}Writer->WriteObjectStart();
+	{{#isString}}WriteJsonValue(Writer, Value);
+	{{/isString}}{{^isString}}Writer->WriteObjectStart();
+	{{/isString}}
 
 	{{#vars}}
+	{{#isEnum}}
 	{{#required}}
 	Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}});
 	{{/required}}
@@ -129,7 +230,104 @@ void F{{classname}}::WriteJson(JsonWriter& Writer) const
 		Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}}.GetValue());
 	}
 	{{/required}}
+	{{/isEnum}}
 	{{/vars}}
+	{{^oneOf}}
+	{{#vars}}
+	{{^isEnum}}
+	{{#required}}
+	Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}});
+	{{/required}}
+	{{^required}}
 
-	Writer->WriteObjectEnd();{{/isString}}{{/oneOf}}
-}{{/model}}{{/models}}
+	if ({{name}}.IsSet())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("{{baseName}}")); WriteJsonValue(Writer, {{name}}.GetValue());
+	}
+	{{/required}}
+	{{/isEnum}}
+	{{/vars}}
+	{{/oneOf}}
+	{{#composedSchemas}}{{#oneOf}}{{^-first}}
+	else {{/-first}}if (const {{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}* {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value = OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>())
+	{
+		Writer->WriteIdentifierPrefix(TEXT("{{name}}")); WriteJsonValue(Writer, *{{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}Value);
+	}{{/oneOf}}
+	{{/composedSchemas}}
+
+	{{^isString}}
+	Writer->WriteObjectEnd();
+	{{/isString}}
+}
+
+#include "Misc/AutomationTest.h"
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTest{{classname}}, "ImmutablezkEVMAPI.Mock.Model.{{classname}}", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FTest{{classname}}::RunTest(const FString& Parameters)
+{
+	auto TestMock = [this](const F{{classname}}& {{classname}}_Mock)
+	{
+		FString JsonString;
+		TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> JsonWriter = TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&JsonString);
+
+		{{#isString}}
+		JsonWriter->WriteObjectStart();
+
+		JsonWriter->WriteIdentifierPrefix(TEXT("value"));
+		{{/isString}}
+		{{classname}}_Mock.WriteJson(JsonWriter);
+		{{#isString}}
+
+		JsonWriter->WriteObjectEnd();
+		{{/isString}}
+
+		TestTrue(TEXT("Successfully closed the json writer after serializing the mock model"), JsonWriter->Close());
+
+		TestTrue(TEXT("Successfully generated json string from the mock model"), !JsonString.IsEmpty());
+
+		TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<>::Create(JsonString);
+
+		TSharedPtr<FJsonValue> JsonValue;
+		if (TestTrue(TEXT("Successfully deserialized the json string into a valid json value"), FJsonSerializer::Deserialize(JsonReader, JsonValue) && JsonValue.IsValid()))
+		{
+			F{{classname}} {{classname}}_ReconstructedMock = {};
+
+			{{#isString}}
+			const TSharedPtr<FJsonObject>* Object;
+			if (TestTrue(TEXT("TryGetObject"), JsonValue->TryGetObject(Object)))
+			{
+				TestTrue(TEXT("TryGetJsonValue"), TryGetJsonValue(*Object, TEXT("value"), {{classname}}_ReconstructedMock.Value));
+			}
+			{{/isString}}
+			{{^isString}}
+			TestTrue(TEXT("Successfully reconstructed the mock model from the json value"), {{classname}}_ReconstructedMock.FromJson(JsonValue));
+
+			{{#composedSchemas}}
+			{{#oneOf}}
+			TestEqual(TEXT("IsType {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}"), {{classname}}_ReconstructedMock.OneOf.IsType<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>(), {{classname}}_Mock.OneOf.IsType<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>());
+			if ({{classname}}_ReconstructedMock.OneOf.IsType<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>() && {{classname}}_Mock.OneOf.IsType<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>())
+			{
+				TestEqual(TEXT("TryGet {{#lambda.pascalcase}}{{dataType}}{{/lambda.pascalcase}}"), *{{classname}}_ReconstructedMock.OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>(), *{{classname}}_Mock.OneOf.TryGet<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>());
+			}
+			{{/oneOf}}
+			{{/composedSchemas}}
+
+			{{^oneOf}}
+			{{#vars}}
+			TestEqual(TEXT("{{name}}"), {{classname}}_ReconstructedMock.{{Name}}, {{classname}}_Mock.{{name}});
+			{{/vars}}
+			{{/oneOf}}
+			{{/isString}}
+		}
+	};
+
+	TArray<F{{classname}}> {{classname}}_Mocks = GenerateMocks<F{{classname}}>();
+	for (const F{{classname}}& {{classname}}_Mock : {{classname}}_Mocks)
+	{
+		TestMock({{classname}}_Mock);
+	}
+
+	return true;
+}
+{{/model}}{{/models}}

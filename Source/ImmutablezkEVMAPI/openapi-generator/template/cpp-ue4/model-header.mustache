@@ -15,6 +15,7 @@
 {{/models}}
 
 #include "{{modelNamePrefix}}BaseModel.h"
+#include "{{modelNamePrefix}}Helpers.h"
 {{#imports}}
 {{{import}}}
 {{/imports}}
@@ -65,6 +66,9 @@ class {{dllapi}} F{{classname}} : public F{{unrealModuleName}}Model
 public:
 	virtual ~F{{classname}}() override;
 
+	bool operator ==(const F{{classname}}& Other) const;
+	bool operator !=(const F{{classname}}& Other) const;
+
 	virtual bool FromJson(const TSharedPtr<FJsonValue>& JsonValue) override final;
 	virtual void WriteJson(JsonWriter& Writer) const override final;
 
@@ -99,11 +103,97 @@ public:
 	{{/isEnum}}
 	{{/vars}}
 	{{#oneOf}}
-	{{/oneOf}}
-	{{#oneOf}}
 	{{#-first}}
 	{{#description}}/* {{{.}}} */
 	{{/description}}TVariant<{{#composedSchemas}}{{#oneOf}}{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}{{^-last}}, {{/-last}}{{/oneOf}}{{/composedSchemas}}> OneOf;
 	{{/-first}}
 	{{/oneOf}}
-};{{/model}}{{/models}}
+};
+
+template <>
+inline TArray<F{{classname}}> GenerateMocks(int32 Count)
+{
+	TArray<F{{classname}}> Results;
+
+	F{{classname}} Mock = {};
+
+	{{#isString}}
+	{{#isEnum}}
+	{{#allowableValues}}
+	for (E{{classname}}_{{name}}_Values Value : TEnumRange<E{{classname}}_{{name}}_Values>())
+	{
+		Mock.Value = Value;
+		Results.Add(Mock);
+	}
+	{{/allowableValues}}
+	{{/isEnum}}
+	{{/isString}}
+	{{#vars}}
+	{{#isEnum}}
+	{{^required}}
+	Results.Add(Mock);
+	{{/required}}
+	{{#allowableValues}}
+	for (E{{classname}}_{{name}} Value : TEnumRange<E{{classname}}_{{name}}>())
+	{
+		Mock.{{name}} = Value;
+		Results.Add(Mock);
+	}
+	{{/allowableValues}}
+	{{/isEnum}}
+	{{^isEnum}}
+	{{^oneOf}}
+	{{#isPrimitiveType}}
+	{{#isString}}
+	TArray<{{datatype}}> {{name}}Mocks = GenerateMocks<{{datatype}}>();
+	for (const {{datatype}}& {{name}}Mock : {{name}}Mocks)
+	{
+		{{#isUuid}}Mock.{{name}} = {{name}}Mock;{{/isUuid}}{{^isUuid}}Mock.{{name}} = FString::Printf(TEXT("%s_%s"), TEXT("{{name}}"), *{{name}}Mock);{{/isUuid}}
+		Results.Add(Mock);
+	}
+	{{/isString}}
+	{{^isString}}
+	TArray<{{{datatype}}}> {{name}}Mocks = GenerateMocks<{{{datatype}}}>();
+	for (const {{{datatype}}}& {{name}}Mock : {{name}}Mocks)
+	{
+		Mock.{{name}} = {{name}}Mock;
+		Results.Add(Mock);
+	}
+	{{/isString}}
+	{{/isPrimitiveType}}
+	{{^isPrimitiveType}}
+		{{#isContainer}}
+			Mock.{{name}} = GenerateMocks<F{{complexType}}>();
+			Results.Add(Mock);
+		{{/isContainer}}
+		{{^isContainer}}
+			TArray<F{{datatype}}> {{name}}Mocks = GenerateMocks<F{{datatype}}>();
+			for (const F{{datatype}}& {{name}}Mock : {{name}}Mocks)
+			{
+				Mock.{{name}} = {{name}}Mock;
+				Results.Add(Mock);
+			}
+		{{/isContainer}}
+	{{/isPrimitiveType}}
+	{{/oneOf}}
+	{{/isEnum}}
+	{{^-last}}
+
+	{{/-last}}
+	{{/vars}}
+	{{#composedSchemas}}
+	{{#oneOf}}
+	TArray<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}> {{dataType}}Mocks = GenerateMocks<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>();
+	for (const {{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}& {{dataType}}Mock : {{dataType}}Mocks)
+	{
+		Mock.OneOf.Set<{{^isPrimitiveType}}F{{/isPrimitiveType}}{{dataType}}>({{dataType}}Mock);
+		Results.Add(Mock);
+	}
+	{{^-last}}
+
+	{{/-last}}
+	{{/oneOf}}
+	{{/composedSchemas}}
+
+	return Results;
+}{{/model}}{{/models}}

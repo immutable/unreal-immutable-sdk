@@ -492,3 +492,352 @@ inline void WriteJsonValue(JsonWriter& Writer, const TMap<FString, T>& Value)
 	}
 	Writer->WriteObjectEnd();
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+inline bool operator ==(const TSharedPtr<FJsonObject>& Left, const TSharedPtr<FJsonObject>& Right)
+{
+	if (Left->Values.Num() != Right->Values.Num())
+	{
+		return false;
+	}
+
+	TArray<FString> LeftKeys;
+	Left->Values.GetKeys(LeftKeys);
+
+	TArray<FString> RightKeys;
+	Right->Values.GetKeys(RightKeys);
+
+	if (LeftKeys.Num() != RightKeys.Num())
+	{
+		return false;
+	}
+
+	if (LeftKeys != RightKeys)
+	{
+		return false;
+	}
+
+	TArray<TSharedPtr<FJsonValue>> LeftValues;
+	Left->Values.GenerateValueArray(LeftValues);
+
+	TArray<TSharedPtr<FJsonValue>> RightValues;
+	Right->Values.GenerateValueArray(RightValues);
+
+	if (LeftValues.Num() != RightValues.Num())
+	{
+		return false;
+	}
+
+	if (LeftValues != RightValues)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+inline bool operator !=(const TSharedPtr<FJsonObject>& Left, const TSharedPtr<FJsonObject>& Right)
+{
+	return !(Left == Right);
+}
+
+inline bool operator ==(const TSet<FGuid>& Left, const TSet<FGuid>& Right)
+{
+	// ToDo: Test
+
+	if (Left.Num() != Right.Num())
+	{
+		return false;
+	}
+
+	return Left.Array() == Right.Array();
+}
+
+inline bool operator !=(const TSet<FGuid>& Left, const TSet<FGuid>& Right)
+{
+	return !(Left == Right);
+}
+
+inline bool operator ==(const TMap<FString, FString>& Left, const TMap<FString, FString>& Right)
+{
+	// ToDo: Test
+
+	if (Left.Num() != Right.Num())
+	{
+		return false;
+	}
+
+	TArray<FString> LeftKeys;
+	Left.GetKeys(LeftKeys);
+
+	TArray<FString> RightKeys;
+	Right.GetKeys(RightKeys);
+
+	if (LeftKeys.Num() != RightKeys.Num())
+	{
+		return false;
+	}
+
+	if (LeftKeys != RightKeys)
+	{
+		return false;
+	}
+
+	TArray<FString> LeftValues;
+	Left.GenerateValueArray(LeftValues);
+
+	TArray<FString> RightValues;
+	Right.GenerateValueArray(RightValues);
+
+	if (LeftValues.Num() != RightValues.Num())
+	{
+		return false;
+	}
+
+	if (LeftValues != RightValues)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+inline bool operator !=(const TMap<FString, FString>& Left, const TMap<FString, FString>& Right)
+{
+	return !(Left == Right);
+}
+
+inline bool operator ==(const TMap<FString, TSharedPtr<FJsonValue>>& Left, const TMap<FString, TSharedPtr<FJsonValue>>& Right)
+{
+	// ToDo: Test
+
+	if (Left.Num() != Right.Num())
+	{
+		return false;
+	}
+
+	TArray<FString> LeftKeys;
+	Left.GetKeys(LeftKeys);
+
+	TArray<FString> RightKeys;
+	Right.GetKeys(RightKeys);
+
+	if (LeftKeys.Num() != RightKeys.Num())
+	{
+		return false;
+	}
+
+	if (LeftKeys != RightKeys)
+	{
+		return false;
+	}
+
+	TArray<TSharedPtr<FJsonValue>> LeftValues;
+	Left.GenerateValueArray(LeftValues);
+
+	TArray<TSharedPtr<FJsonValue>> RightValues;
+	Right.GenerateValueArray(RightValues);
+
+	if (LeftValues.Num() != RightValues.Num())
+	{
+		return false;
+	}
+
+	for (int32 Index = 0; Index < LeftValues.Num(); ++Index)
+	{
+		if (*LeftValues[Index] != *RightValues[Index])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+inline bool operator !=(const TMap<FString, TSharedPtr<FJsonValue>>& Left, const TMap<FString, TSharedPtr<FJsonValue>>& Right)
+{
+	return !(Left == Right);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+TArray<T> GenerateMocks(int32 Count = 10)
+{
+	static_assert(false);
+	return {};
+}
+
+template <>
+inline TArray<bool> GenerateMocks(int32 Count)
+{
+	TArray<bool> Result;
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(FMath::RandBool());
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<int32> GenerateMocks(int32 Count)
+{
+	TArray<int32> Result;
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(FMath::RandRange(0, 1000));
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<double> GenerateMocks(int32 Count)
+{
+	TArray<double> Result;
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(FMath::FRandRange(0, 1000));
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<FGuid> GenerateMocks(int32 Count)
+{
+	TArray<FGuid> Result;
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(FGuid::NewGuid());
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<FString> GenerateMocks(int32 Count)
+{
+	TArray<FString> Result;
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(FString::Printf(TEXT("Entry_%d_Mock"), Index));
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<FDateTime> GenerateMocks(int32 Count)
+{
+	TArray<FDateTime> Result;
+
+	const FDateTime Now = FDateTime::Now();
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(Now);
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<TArray<FString>> GenerateMocks(int32 Count)
+{
+	TArray<TArray<FString>> Result;
+
+	for (int32 ArrayIndex = 0; ArrayIndex < Count; ++ArrayIndex)
+	{
+		TArray<FString> Array;
+
+		for (int32 Index = 0; Index < Count; ++Index)
+		{
+			Array.Add(FString::Printf(TEXT("Array_%d_Entry_%d_Mock"), ArrayIndex));
+		}
+
+		Result.Add(Array);
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<TSharedPtr<FJsonObject>> GenerateMocks(int32 Count)
+{
+	TArray<TSharedPtr<FJsonObject>> Result;
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(MakeShared<FJsonObject>());
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<TSet<FGuid>> GenerateMocks(int32 Count)
+{
+	TArray<TSet<FGuid>> Result;
+
+	for (int32 SetIndex = 0; SetIndex < Count; ++SetIndex)
+	{
+		TSet<FGuid> Set;
+
+		for (int32 Index = 0; Index < Count; ++Index)
+		{
+			Set.Add(FGuid::NewGuid());
+		}
+
+		Result.Add(Set);
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<TMap<FString, FString>> GenerateMocks(int32 Count)
+{
+	TArray<TMap<FString, FString>> Result;
+
+	for (int32 MapIndex = 0; MapIndex < Count; ++MapIndex)
+	{
+		TMap<FString, FString> Map;
+
+		for (int32 Index = 0; Index < Count; ++Index)
+		{
+			Map.Add(FString::Printf(TEXT("Map_%d_Key_%d_Mock"), MapIndex, Index), FString::Printf(TEXT("Map_%d_Value_%d_Mock"), MapIndex, Index));
+		}
+
+		Result.Add(Map);
+	}
+
+	return Result;
+}
+
+template <>
+inline TArray<TMap<FString, TSharedPtr<FJsonValue>>> GenerateMocks(int32 Count)
+{
+	TArray<TMap<FString, TSharedPtr<FJsonValue>>> Result;
+
+	for (int32 MapIndex = 0; MapIndex < Count; ++MapIndex)
+	{
+		TMap<FString, TSharedPtr<FJsonValue>> Map;
+
+		for (int32 Index = 0; Index < Count; ++Index)
+		{
+			Map.Add(FString::Printf(TEXT("Map_%d_Key_%d_Mock"), MapIndex, Index), MakeShareable(new FJsonValueString(FString::Printf(TEXT("Map_%d_Value_%d_Mock"), MapIndex, Index))));
+		}
+
+		Result.Add(Map);
+	}
+
+	return Result;
+}
