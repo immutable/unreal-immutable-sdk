@@ -15,6 +15,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Extract version from ImmutableDataTypes.h
+        id: extract_version
+        run: |
+          version=$(grep -oP '#define ENGINE_SDK_VERSION TEXT\("\K[0-9]+\.[0-9]+\.[0-9]+' Source/Immutable/Public/Immutable/ImmutableDataTypes.h)
+          if [[ -z "$version" ]]; then
+            echo "Error: Version not found in ImmutableDataTypes.h" >&2
+            exit 1
+          fi
+          version=$(echo "$version" | tr -d '\r\n')
+          
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
+
       - name: Extract TS SDK version from index.js
         id: extract_ts_sdk_version
         run: |
@@ -27,7 +39,7 @@ jobs:
 
           version=$(echo "$version" | tr -d '\r\n')
 
-          echo "VERSION=${version}" >> "$GITHUB_ENV"
+          echo "TS_SDK_VERSION=${version}" >> "$GITHUB_ENV"
 
       - name: Build Changelog
         id: github_release
@@ -56,4 +68,4 @@ jobs:
             body: |
               ${{steps.github_release.outputs.changelog}}
 
-              Game bridge built from Immutable Typescript SDK version ${{ env.VERSION }}
+              Game bridge built from Immutable Typescript SDK version ${{ env.TS_SDK_VERSION }}
