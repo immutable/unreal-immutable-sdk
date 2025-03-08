@@ -32,11 +32,6 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "ImmutablePluginManager",
-			"Type": "Runtime",
-			"LoadingPhase": "EarliestPossible"
-		},
-		{
 			"Name": "ImmutableOrderbook",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
