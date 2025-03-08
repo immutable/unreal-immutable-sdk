@@ -55,11 +55,11 @@
 	"Plugins": [
 		{
 			"Name": "BLUI",
-			"Enabled": true
+			"Enabled": false
 		},
 		{
 			"Name": "WebBrowserWidget",
-			"Enabled": false
+			"Enabled": true
 		}
 	]
 }
