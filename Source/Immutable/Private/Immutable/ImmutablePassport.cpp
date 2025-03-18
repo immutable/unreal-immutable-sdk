@@ -657,11 +657,12 @@ void UImmutablePassport::SavePassportSettings()
 
 void UImmutablePassport::LoadPassportSettings()
 {
-	UImmutableSaveGame* SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::LoadGameFromSlot(PASSPORT_SAVE_GAME_SLOT_NAME, 0));
-	
-	if (SaveGameInstance)
+	if (UGameplayStatics::DoesSaveGameExist(PASSPORT_SAVE_GAME_SLOT_NAME, 0))
 	{
-		SaveGameInstance->bWasConnectedViaPKCEFlow ? SetStateFlags(IPS_PKCE) : ResetStateFlags(IPS_PKCE);
+		if (const UImmutableSaveGame* SaveGameInstance = Cast<UImmutableSaveGame>(UGameplayStatics::LoadGameFromSlot(PASSPORT_SAVE_GAME_SLOT_NAME, 0)))
+		{
+			SaveGameInstance->bWasConnectedViaPKCEFlow ? SetStateFlags(IPS_PKCE) : ResetStateFlags(IPS_PKCE);
+		}
 	}
 }
 
