@@ -43,6 +43,25 @@ To set up Chromium remote debugging, edit project build/launch configurations in
 
 Next, launch the game and then open a separate Chrome/Chromium browser and navigate to `chrome://inspect` where your app should be listed, sometimes intermittently or after a delay, under the `Remote Target #localhost` section.  Click `inspect` to launch the remote debugging session.
 
+### Testing & Reports
+
+<details>
+<summary>Windows (coming soon)</summary>
+</details>
+
+<details>
+<summary>Mac</summary>
+
+### UE 5.3
+![5.3-Mac](https://raw.githubusercontent.com/immutable/unreal-automation-bin/refs/heads/main/AutomationTestReports/Screenshots/5.3-Mac.png)
+
+### UE 5.4
+![5.4-Mac](https://raw.githubusercontent.com/immutable/unreal-automation-bin/refs/heads/main/AutomationTestReports/Screenshots/5.4-Mac.png)
+
+### UE 5.5
+![5.5-Mac](https://raw.githubusercontent.com/immutable/unreal-automation-bin/refs/heads/main/AutomationTestReports/Screenshots/5.5-Mac.png)
+</details>
+
 ## Release Unreal Immutable SDK Plugin
 
 1. Release the plugin using GitHub releases. See https://github.com/immutable/unreal-immutable-sdk/releases
