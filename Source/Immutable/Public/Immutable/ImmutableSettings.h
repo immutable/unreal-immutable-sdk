@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Engine/DeveloperSettings.h"
 #include "ApplicationConfig.h"
+#include "Engine/DeveloperSettings.h"
+#include "Templates/SubclassOf.h"
 
 #include "ImmutableSettings.generated.h"
-
 
 /**
  * Immutable developer settings is a configuration class for the Immutable plugin.
@@ -22,5 +22,4 @@ public:
 	/// which will be used as the default configuration for the application.
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
 	TSubclassOf<UApplicationConfig> DefaultApplicationConfig;
-
 };

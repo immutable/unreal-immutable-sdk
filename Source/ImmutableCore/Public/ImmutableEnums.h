@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Misc/EnumRange.h"
+
 #include "ImmutableEnums.generated.h"
 
 UENUM(BlueprintType)

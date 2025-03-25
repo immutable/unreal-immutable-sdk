@@ -1,6 +1,8 @@
 #pragma once
 
 #include "JsonObjectConverter.h"
+#include "Misc/EngineVersion.h"
+
 #include "Immutable/ImtblJSMessages.h"
 #include "Immutable/ImmutableNames.h"
 
@@ -94,13 +96,13 @@ struct FImmutablePassportInitDeviceFlowData
 
 	UPROPERTY()
 	FString code;
-	
+
 	UPROPERTY()
 	FString deviceCode;
-	
+
 	UPROPERTY()
 	FString url;
-	
+
 	UPROPERTY()
 	float interval = 0;
 
@@ -111,13 +113,13 @@ USTRUCT()
 struct FImtblUserProfile
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY()
 	FString email;
-	
+
 	UPROPERTY()
 	FString nickname;
-	
+
 	UPROPERTY()
 	FString sub;
 };
@@ -156,7 +158,7 @@ struct FImmutablePassportCodeConfirmRequestData
 
 	UPROPERTY()
 	FString deviceCode;
-	
+
 	UPROPERTY()
 	float interval = 5;
 
@@ -219,7 +221,6 @@ struct FNftTransferDetails
 	UPROPERTY(BlueprintReadWrite)
 	FString tokenAddress;
 };
-
 
 USTRUCT(BlueprintType, meta = (HasNativeBreak = "/Script/Immutable.ImmutableBlueprintLibrary.BreakFZkEvmTransactionReceiptLog"))
 struct IMMUTABLE_API FZkEvmTransactionReceiptLog

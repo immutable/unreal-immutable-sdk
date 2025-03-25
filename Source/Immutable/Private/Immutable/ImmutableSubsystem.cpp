@@ -3,12 +3,13 @@
 #include "Immutable/ImmutableSubsystem.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Engine/GameViewportClient.h"
+
 #include "Immutable/ImmutablePassport.h"
+#include "Immutable/ImtblJSConnector.h"
 #include "Immutable/Misc/ImtblLogging.h"
 #include "ImtblBlui.h"
 #include "ImtblBrowserUserWidget.h"
-#include "Immutable/ImtblJSConnector.h"
-
 
 void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -35,16 +36,16 @@ void UImmutableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 void UImmutableSubsystem::Deinitialize()
 {
 	IMTBL_LOG_FUNCSIG
-	
+
 	BrowserWidget = nullptr;
-	
+
 #if USING_BLUI_CEF
 	ImtblBlui->ConditionalBeginDestroy();
 	ImtblBlui = nullptr;
 #endif
-	
+
 	Passport = nullptr;
-	
+
 #if PLATFORM_ANDROID | PLATFORM_IOS
   UGameViewportClient::OnViewportCreated().Remove(EngineInitCompleteHandle);
 #else

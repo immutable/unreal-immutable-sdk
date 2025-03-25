@@ -2,8 +2,11 @@
 
 #pragma once
 
-#include "ImmutablePassport.h"
+#include "Engine/EngineBaseTypes.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+
+#include "ImmutablePassport.h"
 // clang-format off
 #include "ImmutableSubsystem.generated.h"
 // clang-format on
@@ -67,6 +70,4 @@ private:
 #if PLATFORM_ANDROID | PLATFORM_IOS
 	FDelegateHandle EngineInitCompleteHandle;
 #endif
-
-
 };

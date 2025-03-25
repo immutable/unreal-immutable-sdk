@@ -2,14 +2,16 @@
 
 #include "ImtblBrowserWidget.h"
 
+#include "Misc/FileHelper.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Text/STextBlock.h"
+
 #include "Immutable/Misc/ImtblLogging.h"
 #include "Immutable/ImtblJSConnector.h"
 #include "Immutable/ImmutableUtilities.h"
-#include "Misc/FileHelper.h"
 #if USING_BUNDLED_CEF
 #include "SWebBrowser.h"
 #endif
-
 
 UImtblBrowserWidget::UImtblBrowserWidget()
 {
@@ -71,14 +73,14 @@ void UImtblBrowserWidget::SetBrowserContent()
 		IMTBL_ERR("Browser widget is not valid")
 		return;
 	}
-	
+
 	FString JavaScript;
-	
+
 	if (FImmutableUtilities::LoadGameBridge(JavaScript))
 	{
 		FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta " "charset='utf-8'><title>GameSDK Bridge</title><script>") + JavaScript + FString("</script></head><body><h1>Bridge Running</h1></body></html>");
-		
-		WebBrowserWidget->LoadString(IndexHtml, TEXT("file:///immutable/index.html"));	
+
+		WebBrowserWidget->LoadString(IndexHtml, TEXT("file:///immutable/index.html"));
 	}
 #endif
 }

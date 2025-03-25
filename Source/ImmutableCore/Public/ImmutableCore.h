@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Modules/ModuleManager.h"
+
 class FImmutableCoreModule : public IModuleInterface
 {
 public:

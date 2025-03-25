@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Runtime/Launch/Resources/Version.h"
+
 #if USING_BUNDLED_CEF
 #include "IWebBrowserWindow.h"
 #endif
