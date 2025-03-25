@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Components/Widget.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #include "ImmutableEnums.h"
 #include "OnRamp/ImmutableOnRampQueryParams.h"

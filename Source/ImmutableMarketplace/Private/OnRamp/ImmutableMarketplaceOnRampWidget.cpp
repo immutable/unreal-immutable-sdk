@@ -1,6 +1,8 @@
 ﻿#include "OnRamp/ImmutableMarketplaceOnRampWidget.h"
 
 #include "PlatformHttp.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Text/STextBlock.h"
 
 #include "ImmutableMarketplaceLinkFactory.h"
 

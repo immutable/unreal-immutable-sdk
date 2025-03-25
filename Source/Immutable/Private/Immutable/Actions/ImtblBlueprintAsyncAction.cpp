@@ -2,6 +2,9 @@
 
 #include "Immutable/Actions/ImtblBlueprintAsyncAction.h"
 
+#include "Engine/GameInstance.h"
+#include "Engine/World.h"
+
 UImmutableSubsystem* UImtblBlueprintAsyncAction::GetSubsystem() const
 {
 	if (!WorldContextObject || !WorldContextObject->GetWorld())
