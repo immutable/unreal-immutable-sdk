@@ -72,10 +72,15 @@ void UImmutableSubsystem::ManageBridgeDelegateQueue()
 #if USING_BLUI_CEF
 		OnReady.Broadcast(ImtblBlui->GetJSConnector());
 #else
-		OnReady.Broadcast(BrowserWidget->GetJSConnector());
+		MulticastDelegate_OnReady.Broadcast(BrowserWidget->GetJSConnector());
 #endif
-		OnReady.Clear();
+		MulticastDelegate_OnReady.Clear();
 	}
+}
+
+FImmutableSubsystemReadyDelegate* UImmutableSubsystem::OnReady()
+{
+	return &MulticastDelegate_OnReady;
 }
 
 void UImmutableSubsystem::SetupGameBridge()

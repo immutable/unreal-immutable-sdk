@@ -31,6 +31,7 @@ public:
 	}
 
 	bool IsReady() const { return bIsReady; }
+	FImmutableSubsystemReadyDelegate* OnReady();
 
 	// Execute a delegate when the subsystem is ready (i.e.: when the browser is
 	// running and the Immutable SDK game bridge has loaded).
@@ -41,7 +42,7 @@ public:
   void WhenReady(UserClass* Object, typename FImmutableSubsystemReadyDelegate::FDelegate::TUObjectMethodDelegate<UserClass>::FMethodPtr Func)
 #endif
 	{
-		OnReady.AddUObject(Object, Func);
+		MulticastDelegate_OnReady.AddUObject(Object, Func);
 	}
 
 private:
@@ -63,7 +64,7 @@ private:
 
 	bool bHasSetupGameBridge = false;
 	bool bIsReady = false;
-	FImmutableSubsystemReadyDelegate OnReady;
+	FImmutableSubsystemReadyDelegate MulticastDelegate_OnReady;
 
 	FDelegateHandle WorldTickHandle;
 	FDelegateHandle ViewportCreatedHandle;
