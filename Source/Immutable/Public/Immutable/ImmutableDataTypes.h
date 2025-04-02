@@ -1,12 +1,14 @@
 #pragma once
 
-#include "JsonObjectConverter.h"
 #include "Misc/EngineVersion.h"
 
 #include "Immutable/ImtblJSMessages.h"
 #include "Immutable/ImmutableNames.h"
 
 #include "ImmutableDataTypes.generated.h"
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkMulticastDelegate, const FString& /** DeepLink */);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkDynamicMulticastDelegate, const FString&, DeepLink);
 
 // This is the version of the Unreal Immutable SDK that is being used. This is not the version of the engine.
 // This hardcoded value will be updated by a workflow during the release process.
@@ -43,7 +45,7 @@ struct FImmutableEngineVersionData
 /**
  * Structure to hold initialisation data for the Immutable Passport.
  */
-USTRUCT()
+USTRUCT(BlueprintType)
 struct IMMUTABLE_API FImmutablePassportInitData
 {
 	GENERATED_BODY()
@@ -302,4 +304,42 @@ struct IMMUTABLE_API FZkEvmTransactionReceipt
 
 	UPROPERTY()
 	FString type;
+};
+
+/**
+ * Data for PKCE deep linking
+ */
+UCLASS(BlueprintType, DisplayName = "Immutable PKCE Data")
+class IMMUTABLE_API UImmutablePKCEData : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	/** UObject: @Interface @Begin */
+	virtual void BeginDestroy() override;
+	/** UObject: @Interface @End */
+
+	/**
+	 * Reset and clean up PKCE operation footprint
+	 * Automatically called during object destruction
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Immutable|Passport")
+	void Reset();
+
+public:
+	/** Passport initialization data */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FImmutablePassportInitData PassportInitData;
+
+	/** 
+	 * Delegate triggered when a deep link callback is received from the browser
+	 * Contains the complete URI with authorization code and state parameters
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, BlueprintAssignable, DisplayName = "Deep Link Callback")
+	FImmutableDeepLinkDynamicMulticastDelegate DynamicMulticastDelegate_DeepLinkCallback;
+
+	/** 
+	 * Handle for the ticker delegate that periodically checks for incoming deep links
+	 */
+	FTSTicker::FDelegateHandle TickDelegateHandle;
 };
