@@ -503,6 +503,20 @@ void UImmutablePKCEWindows::HandleDeepLink(UImmutablePKCEData* PKCEData, const F
 	if (CleanDeepLink.StartsWith(PKCEData->PassportInitData.redirectUri) || CleanDeepLink.StartsWith(PKCEData->PassportInitData.logoutRedirectUri))
 	{
 		PKCEData->DynamicMulticastDelegate_DeepLinkCallback.Broadcast(CleanDeepLink);
+
+		// After PKCE authentication completes, return focus to the game window
+		if (GEngine && GEngine->GameViewport && GEngine->GameViewport->GetWindow().IsValid())
+		{
+			TSharedPtr<SWindow> GameWindow = GEngine->GameViewport->GetWindow();
+			GameWindow->BringToFront();
+			GameWindow->HACK_ForceToFront();
+
+			IMTBL_LOG("Game window brought to foreground after authentication completed");
+		}
+		else
+		{
+			IMTBL_WARN("Could not bring game window to foreground: window is not valid");
+		}
 	}
 	else
 	{
