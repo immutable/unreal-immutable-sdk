@@ -51,15 +51,15 @@ void UImmutablePassport::Initialize(const FImtblPassportResponseDelegate& Respon
 {
 	check(JSConnector.IsValid());
 
-	auto Settings = GetDefault<UImmutableSettings>();
+	const UImmutableSettings* Settings = GetDefault<UImmutableSettings>();
 
-	if (Settings)
+	if (!Settings)
 	{
 		ResponseDelegate.ExecuteIfBound(FImmutablePassportResult{false, "Failed to find Immutable Settings"});
-		
+
 		return;
 	}
-	
+
 	UApplicationConfig* ApplicationConfig = Settings->DefaultApplicationConfig.GetDefaultObject();
 
 	if (!ApplicationConfig)
