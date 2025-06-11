@@ -7,29 +7,7 @@
 #include "Immutable/Misc/ImtblLogging.h"
 
 
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* WorldContextObject, bool UseCachedSession)
-{
-	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
-
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	PassportInitBlueprintNode->bUseCachedSession = UseCachedSession;
-	PassportInitBlueprintNode->bIsConnectImx = false;
-
-	return PassportInitBlueprintNode;
-}
-
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* WorldContextObject, bool UseCachedSession)
-{
-	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
-
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	PassportInitBlueprintNode->bUseCachedSession = UseCachedSession;
-	PassportInitBlueprintNode->bIsConnectImx = true;
-
-	return PassportInitBlueprintNode;
-}
-
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::LoginPKCE(UObject* WorldContextObject)
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* WorldContextObject)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
@@ -40,7 +18,7 @@ UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::LoginPKCE(UObject* W
 	return PassportInitBlueprintNode;
 }
 
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImxPKCE(UObject* WorldContextObject)
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* WorldContextObject)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
@@ -74,12 +52,8 @@ void UImtblConnectionAsyncActions::DoConnect(TWeakObjectPtr<UImtblJSConnector> J
 		if (bIsPKCE)
 		{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
-			Passport->ConnectPKCE(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect));
+			Passport->Connect(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect));
 #endif
-		}
-		else
-		{
-			Passport->Connect(bIsConnectImx, bUseCachedSession, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect));
 		}
 	}
 	else

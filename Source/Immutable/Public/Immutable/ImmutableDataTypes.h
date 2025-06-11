@@ -92,26 +92,6 @@ struct IMMUTABLE_API FImmutablePassportInitData
 };
 
 USTRUCT()
-struct FImmutablePassportInitDeviceFlowData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString code;
-
-	UPROPERTY()
-	FString deviceCode;
-
-	UPROPERTY()
-	FString url;
-
-	UPROPERTY()
-	float interval = 0;
-
-	static TOptional<FImmutablePassportInitDeviceFlowData> FromJsonString(const FString& JsonObjectString);
-};
-
-USTRUCT()
 struct FImtblUserProfile
 {
 	GENERATED_BODY()
@@ -153,23 +133,10 @@ struct IMMUTABLE_API FImmutablePassportZkEvmGetBalanceData
 	FString ToJsonString() const;
 };
 
-USTRUCT()
-struct FImmutablePassportCodeConfirmRequestData
-{
-	GENERATED_BODY()
 
-	UPROPERTY()
-	FString deviceCode;
-
-	UPROPERTY()
-	float interval = 5;
-
-	UPROPERTY()
-	float timeoutMs = 15 * 60 * 1000;
-};
 
 USTRUCT()
-struct FImmutablePassportConnectPKCEData
+struct FImmutablePassportConnectData
 {
 	GENERATED_BODY()
 
