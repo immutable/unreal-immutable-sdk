@@ -29,18 +29,7 @@ FString FImmutablePassportInitData::ToJsonString() const
 	return OutString;
 }
 
-TOptional<FImmutablePassportInitDeviceFlowData> FImmutablePassportInitDeviceFlowData::FromJsonString(const FString& JsonObjectString)
-{
-	FImmutablePassportInitDeviceFlowData PassportConnect;
 
-	if (!FJsonObjectConverter::JsonObjectStringToUStruct(JsonObjectString, &PassportConnect, 0, 0))
-	{
-		IMTBL_WARN("Could not parse response from JavaScript into the expected " "Passport connect format")
-		return TOptional<FImmutablePassportInitDeviceFlowData>();
-	}
-
-	return PassportConnect;
-}
 
 FString FImmutablePassportZkEvmRequestAccountsData::ToJsonString() const
 {

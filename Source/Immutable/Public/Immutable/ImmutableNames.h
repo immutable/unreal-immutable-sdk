@@ -3,11 +3,6 @@
 namespace ImmutablePassportAction
 {
 	const FString INIT = TEXT("init");
-	const FString INIT_DEVICE_FLOW = TEXT("initDeviceFlow");
-	const FString RELOGIN = TEXT("relogin");
-	const FString LOGIN_CONFIRM_CODE = TEXT("loginConfirmCode");
-	const FString CONNECT_CONFIRM_CODE = TEXT("connectConfirmCode");
-	const FString RECONNECT = TEXT("reconnect");
 	const FString Logout = TEXT("logout");
 	const FString Connect = TEXT("connect");
 	const FString ConnectEvm = TEXT("connectEvm");
