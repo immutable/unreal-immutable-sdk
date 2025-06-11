@@ -19,52 +19,29 @@ class IMMUTABLE_API UImtblConnectionAsyncActions : public UImtblBlueprintAsyncAc
 
 public:
 	/**
-	 * Log into Passport using Device Code Authorisation.
+	 * Log into Passport
 	 *
 	 * @param	WorldContextObject	World context
-	 * @param	UseCachedSession	Whether to use stored credentials for relogin
 	 *
 	 * @return	A reference to the object represented by this node
 	 */
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject, bool UseCachedSession = false);
+	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject);
 
 	/**
-	 * Log into Passport using Device Code Authorisation, initialise the gamer's wallet and instantiate the IMX provider.
-	 *
-	 * @param	WorldContextObject	World context
-	 * @param	UseCachedSession	Whether to use stored credentials for relogin
-	 *
-	 * @return	A reference to the object represented by this node
-	 */
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* ConnectImx(UObject* WorldContextObject, bool UseCachedSession = false);
-
-	/**
-	 * Log into Passport using PKCE
+	 * Log into Passport, initialise the gamer's wallet and instantiate the IMX provider.
 	 *
 	 * @param	WorldContextObject	World context
 	 *
 	 * @return	A reference to the object represented by this node
 	 */
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* LoginPKCE(UObject* WorldContextObject);
-
-	/**
-	 * Log into Passport using PKCE, initialise the gamer's wallet and instantiate the IMX provider.
-	 *
-	 * @param	WorldContextObject	World context
-	 *
-	 * @return	A reference to the object represented by this node
-	 */
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* ConnectImxPKCE(UObject* WorldContextObject);
+	static UImtblConnectionAsyncActions* ConnectImx(UObject* WorldContextObject);
 
 
 	virtual void Activate() override;
 
 private:
-	FImmutablePassportInitDeviceFlowData InitDeviceFlowData;
 
 	void DoConnect(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
 	void OnConnect(FImmutablePassportResult Result);

@@ -96,25 +96,15 @@ public:
 	 */
 	void Initialize(const FImtblPassportResponseDelegate& ResponseDelegate);
 
-	/**
-	 * Logs the user into Passport via device code auth and sets up the Immutable X provider.
-	 *
-	 * This will open the user's default browser and take them through Passport login. 
-	 * @param IsConnectImx 		If true, the "re-connect" method is used to authenticate into Passport with Immutable X.
-	 * 							Else, "re-login" is used for authentication. To access a wallet with Immutable X or zkEVM later, you must call "Connect" again with this value set to true, or use "ConnectEvm."
-	 * @param TryToRelogin 		If true, the game bridge will use a cached session to re-connect or re-login the user, avoiding the need to open a web browser. If this attempt fails, it will fall back to device code authentication.
-	 * @param ResponseDelegate 	Callback delegate.
-	 */
-	void Connect(bool IsConnectImx, bool TryToRelogin, const FImtblPassportResponseDelegate& ResponseDelegate);
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
 	/**
 	 * Logs into Passport using Authorisation Code Flow with Proof Key for Code Exchange (PKCE)
 	 *
-	 * @param IsConnectImx 		If true, player will go through the device code auth login flow and connect to Immutable X.
-	 * 							Else, initiate only the device auth login flow.
+	 * @param IsConnectImx 		If true, player will connect to Immutable X after logging in.
+	 * 							Else, just perform the login without connecting to Immutable X.
 	 * @param ResponseDelegate 	Callback delegate.
 	 */
-	void ConnectPKCE(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
+	void Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
 #endif
 
 	/**
@@ -355,12 +345,7 @@ protected:
 	 */
 	void Setup(TWeakObjectPtr<class UImtblJSConnector> Connector);
 
-	/**
-	 * Reinstate the connection based on the provided JavaScript response.
-	 *
-	 * @param Response The JavaScript response object to reinstate the connection.
-	 */
-	void ReinstateConnection(FImtblJSResponse Response);
+
 
 	/**
 	 * Checks if Passport has been initialised before allowing an action to proceed.
@@ -381,14 +366,7 @@ protected:
 	 */
 	TOptional<FImtblPassportResponseDelegate> GetResponseDelegate(const FImtblJSResponse& Response);
 
-	/**
-	 * Confirms the device code by calling the appropriate JavaScript action.
-	 *
-	 * @param DeviceCode 		The device code to be confirmed.
-	 * @param Interval 			The time interval to wait between attempts.
-	 * @param ResponseDelegate 	A delegate to handle the response from the confirmation request.
-	 */
-	void ConfirmCode(const FString& DeviceCode, const float Interval, const FImtblPassportResponseDelegate& ResponseDelegate);
+
 
 	/**
 	 * Common callback that handles the responses from game bridge
@@ -404,12 +382,7 @@ protected:
 	 */
 	void OnInitializeResponse(FImtblJSResponse Response);
 
-	/**
-	 * Callback from init device flow (device code auth login flow).
-	 *
-	 * @param Response The JavaScript response object containing the result of the callback.
-	 */
-	void OnInitDeviceFlowResponse(FImtblJSResponse Response);
+
 
 	/**
 	 * Callback from logout.
@@ -418,12 +391,7 @@ protected:
 	 */
 	void OnLogoutResponse(FImtblJSResponse Response);
 
-	/**
-	 * Callback from confirm code.
-	 *
-	 * @param Response The JavaScript response object containing the result of the callback.
-	 */
-	void OnConfirmCodeResponse(FImtblJSResponse Response);
+
 
 	// mobile platform callbacks
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
@@ -432,21 +400,21 @@ protected:
 	 *
 	 * @param Response The JavaScript response object containing the result of the callback.
 	 */
-	void OnGetPKCEAuthUrlResponse(FImtblJSResponse Response);
+	void OnGetAuthUrlResponse(FImtblJSResponse Response);
 
 	/*
 	 * Callback from Connect PKCE.
 	 *
 	 * @param Response The JavaScript response object containing the result of the callback.
 	 */
-	void OnConnectPKCEResponse(FImtblJSResponse Response);
+	void OnConnectResponse(FImtblJSResponse Response);
 
 	/*
 	 * Completes the PKCE login flow using the provided URL.
 	 * 
 	 * @param Url The URL containing the authorisation code and state.
 	 */
-	void CompleteLoginPKCEFlow(FString Url);
+	void CompleteLoginFlow(FString Url);
 #endif
 
 	/*
