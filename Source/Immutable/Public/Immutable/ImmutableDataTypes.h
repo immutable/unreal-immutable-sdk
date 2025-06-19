@@ -224,86 +224,98 @@ struct FNftTransferDetails
 	FString tokenAddress;
 };
 
-USTRUCT(BlueprintType, meta = (HasNativeBreak = "/Script/Immutable.ImmutableBlueprintLibrary.BreakFZkEvmTransactionReceiptLog"))
+USTRUCT(BlueprintType)
 struct IMMUTABLE_API FZkEvmTransactionReceiptLog
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString _type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString address;
 
-	UPROPERTY()
-	TArray<FString> topics;
-
-	UPROPERTY()
-	FString data;
-
-	UPROPERTY()
-	FString blockNumber;
-
-	UPROPERTY()
-	FString transactionHash;
-
-	UPROPERTY()
-	FString transactionIndex;
-
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString blockHash;
 
-	UPROPERTY()
-	FString logIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString blockNumber;
 
-	UPROPERTY()
-	bool removed = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString data;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString index;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FString> topics;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString transactionHash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString transactionIndex;
 };
 
-USTRUCT(BlueprintType, meta = (HasNativeBreak = "/Script/Immutable.ImmutableBlueprintLibrary.BreakZkEvmTransactionReceipt"))
+USTRUCT(BlueprintType)
 struct IMMUTABLE_API FZkEvmTransactionReceipt
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString responseFor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString requestId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool success;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString blockHash;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString blockNumber;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString contractAddress;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString cumulativeGasUsed;
 
-	UPROPERTY()
-	FString effectiveGasPrice;
-
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString from;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString gasPrice;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString blobGasUsed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString blobGasPrice;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString gasUsed;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString hash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString index;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FZkEvmTransactionReceiptLog> logs;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString logsBloom;
 
 	// Either 1 (success) or 0 (failure) encoded as a hexadecimal.
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString status;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString to;
-
-	UPROPERTY()
-	FString transactionHash;
-
-	UPROPERTY()
-	FString transactionIndex;
-
-	UPROPERTY()
-	FString type;
 };
 
 /**
