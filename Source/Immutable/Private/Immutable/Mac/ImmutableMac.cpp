@@ -28,17 +28,24 @@ ASWebAuthenticationSession *_authSession;
 }
 
 + (UImmutablePassport*) getPassport {
-    UWorld* World = nullptr;
-
 #if WITH_EDITOR
 	if (GEditor)
 	{
 		for (const auto& Context : GEditor->GetWorldContexts())
 		{
-			if (Context.WorldType == EWorldType::PIE && Context.World())
+			if (auto* World = Context.World())
 			{
-				World = Context.World();
-				break;
+				if (auto GameInstance = World->GetGameInstance())
+				{
+					if (auto ImmutableSubsystem = GameInstance->GetSubsystem<UImmutableSubsystem>())
+					{
+						auto WeakPassport = ImmutableSubsystem->GetPassport();
+						if (auto Passport = WeakPassport.Get())
+						{
+							return Passport;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -49,23 +56,7 @@ ASWebAuthenticationSession *_authSession;
 	}
 #endif
 
-	if (!World) {
-		return nil;
-	}
-
-	auto ImmutableSubsystem = World->GetGameInstance()->GetSubsystem<UImmutableSubsystem>();
-
-	if (!ImmutableSubsystem) {
-		return nil;
-	}
-
-	auto Passport = ImmutableSubsystem->GetPassport();
-
-	if (!Passport.IsValid()) {
-		return nil;
-	}
-
-	return Passport.Get();
+	return nil;
 }
 
 - (void)launchUrl:(const char *)url forRedirectUri:(const char *)redirectUri {
