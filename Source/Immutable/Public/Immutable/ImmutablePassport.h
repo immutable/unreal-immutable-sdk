@@ -103,8 +103,9 @@ public:
 	 * @param IsConnectImx 		If true, player will connect to Immutable X after logging in.
 	 * 							Else, just perform the login without connecting to Immutable X.
 	 * @param ResponseDelegate 	Callback delegate.
+	 * @param DirectLoginMethod	Direct login method to use for authentication (defaults to None for standard login page).
 	 */
-	void Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate);
+	void Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate, EImmutableDirectLoginMethod DirectLoginMethod = EImmutableDirectLoginMethod::None);
 #endif
 
 	/**

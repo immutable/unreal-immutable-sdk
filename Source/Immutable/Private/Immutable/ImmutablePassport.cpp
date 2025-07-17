@@ -87,7 +87,7 @@ void UImmutablePassport::Initialize(const FImtblPassportResponseDelegate& Respon
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
-void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate)
+void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate, EImmutableDirectLoginMethod DirectLoginMethod)
 {
 	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
 
@@ -108,7 +108,34 @@ void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponse
 	}
 	PKCEResponseDelegate = ResponseDelegate;
 	Analytics->Track(IsConnectImx ? UImmutableAnalytics::EEventName::START_CONNECT_IMX_PKCE : UImmutableAnalytics::EEventName::START_LOGIN_PKCE);
-	CallJS(ImmutablePassportAction::GetPKCEAuthUrl, TEXT(""), PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetAuthUrlResponse));
+
+	FImmutableGetPKCEAuthUrlRequest PKCERequest;
+	PKCERequest.isConnectImx = IsConnectImx;
+	PKCERequest.directLoginMethod = DirectLoginMethod;
+
+	// Custom export callback to handle all enums to use lowercase
+	FJsonObjectConverter::CustomExportCallback CustomCallback;
+	CustomCallback.BindLambda([](FProperty* Property, const void* Value) -> TSharedPtr<FJsonValue>
+	{
+		if (FEnumProperty* EnumProperty = CastField<FEnumProperty>(Property))
+		{
+			int64 EnumValue = EnumProperty->GetUnderlyingProperty()->GetSignedIntPropertyValue(Value);
+
+			if (UEnum* Enum = EnumProperty->GetEnum())
+			{
+				FString EnumNameString = Enum->GetNameStringByValue(EnumValue);
+				return MakeShareable(new FJsonValueString(EnumNameString.ToLower()));
+			}
+		}
+
+		// Return null to use default serialization for non-enum properties
+		return TSharedPtr<FJsonValue>();
+	});
+
+	FString PKCERequestJson;
+	FJsonObjectConverter::UStructToJsonObjectString(PKCERequest, PKCERequestJson, 0, 0, 0, &CustomCallback);
+
+	CallJS(ImmutablePassportAction::GetPKCEAuthUrl, PKCERequestJson, PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetAuthUrlResponse));
 }
 #endif
 
