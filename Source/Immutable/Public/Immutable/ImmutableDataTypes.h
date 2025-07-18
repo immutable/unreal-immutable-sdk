@@ -14,6 +14,18 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkDynamicMulticastDe
 // This hardcoded value will be updated by a workflow during the release process.
 #define ENGINE_SDK_VERSION TEXT("1.11.0")
 
+/**
+ * Enum representing direct login methods for authentication providers
+ */
+UENUM(BlueprintType)
+enum class EImmutableDirectLoginMethod : uint8
+{
+	None,
+	Google,
+	Apple,
+	Facebook
+};
+
 USTRUCT()
 struct FImmutableEngineVersionData
 {
@@ -145,6 +157,23 @@ struct FImmutablePassportConnectData
 
 	UPROPERTY()
 	FString state;
+};
+
+/**
+ * Structure to hold PKCE authentication URL request data
+ */
+USTRUCT()
+struct IMMUTABLE_API FImmutableGetPKCEAuthUrlRequest
+{
+	GENERATED_BODY()
+
+	/** Whether this is a ConnectImx operation (true) or just Login (false) */
+	UPROPERTY()
+	bool isConnectImx = false;
+
+	/** Direct login method to use for authentication */
+	UPROPERTY()
+	EImmutableDirectLoginMethod directLoginMethod = EImmutableDirectLoginMethod::None;
 };
 
 USTRUCT()
