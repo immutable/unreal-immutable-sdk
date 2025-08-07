@@ -87,7 +87,7 @@ void UImmutablePassport::Initialize(const FImtblPassportResponseDelegate& Respon
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
-void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate, EImmutableDirectLoginMethod DirectLoginMethod)
+void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate, const FImmutableDirectLoginOptions& DirectLoginOptions)
 {
 	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
 
@@ -109,31 +109,27 @@ void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponse
 	PKCEResponseDelegate = ResponseDelegate;
 	Analytics->Track(IsConnectImx ? UImmutableAnalytics::EEventName::START_CONNECT_IMX_PKCE : UImmutableAnalytics::EEventName::START_LOGIN_PKCE);
 
-	FImmutableGetPKCEAuthUrlRequest PKCERequest;
-	PKCERequest.isConnectImx = IsConnectImx;
-	PKCERequest.directLoginMethod = DirectLoginMethod;
+	TSharedPtr<FJsonObject> RequestObject = MakeShareable(new FJsonObject);
+	RequestObject->SetBoolField(TEXT("isConnectImx"), IsConnectImx);
 
-	// Custom export callback to handle all enums to use lowercase
-	FJsonObjectConverter::CustomExportCallback CustomCallback;
-	CustomCallback.BindLambda([](FProperty* Property, const void* Value) -> TSharedPtr<FJsonValue>
+	TSharedPtr<FJsonObject> DirectLoginOptionsObject = DirectLoginOptions.ToJsonObject();
+	if (DirectLoginOptionsObject.IsValid())
 	{
-		if (FEnumProperty* EnumProperty = CastField<FEnumProperty>(Property))
-		{
-			int64 EnumValue = EnumProperty->GetUnderlyingProperty()->GetSignedIntPropertyValue(Value);
+		RequestObject->SetObjectField(TEXT("directLoginOptions"), DirectLoginOptionsObject);
+	}
 
-			if (UEnum* Enum = EnumProperty->GetEnum())
-			{
-				FString EnumNameString = Enum->GetNameStringByValue(EnumValue);
-				return MakeShareable(new FJsonValueString(EnumNameString.ToLower()));
-			}
-		}
-
-		// Return null to use default serialization for non-enum properties
-		return TSharedPtr<FJsonValue>();
-	});
-
+	// Convert to JSON string
 	FString PKCERequestJson;
-	FJsonObjectConverter::UStructToJsonObjectString(PKCERequest, PKCERequestJson, 0, 0, 0, &CustomCallback);
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&PKCERequestJson);
+	if (!FJsonSerializer::Serialize(RequestObject.ToSharedRef(), Writer))
+	{
+		IMTBL_ERR("Failed to serialize PKCE request to JSON");
+		FImmutablePassportResult Result;
+		Result.Success = false;
+		Result.Error = TEXT("Failed to serialize authentication request");
+		ResponseDelegate.ExecuteIfBound(Result);
+		return;
+	}
 
 	CallJS(ImmutablePassportAction::GetPKCEAuthUrl, PKCERequestJson, PKCEResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnGetAuthUrlResponse));
 }

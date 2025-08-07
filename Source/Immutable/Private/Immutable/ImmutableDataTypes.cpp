@@ -29,8 +29,6 @@ FString FImmutablePassportInitData::ToJsonString() const
 	return OutString;
 }
 
-
-
 FString FImmutablePassportZkEvmRequestAccountsData::ToJsonString() const
 {
 	FString OutString;
@@ -97,4 +95,22 @@ void UImmutablePKCEData::Reset()
 #if PLATFORM_WINDOWS
 	UImmutablePKCEWindows::Reset(this);
 #endif
+}
+
+bool FImmutableDirectLoginOptions::IsEmailValid() const
+{
+	return DirectLoginMethod == EImmutableDirectLoginMethod::Email && !Email.IsEmpty();
+}
+
+TSharedPtr<FJsonObject> FImmutableDirectLoginOptions::ToJsonObject() const
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	JsonObject->SetStringField(TEXT("directLoginMethod"), StaticEnum<EImmutableDirectLoginMethod>()->GetNameStringByValue(static_cast<int64>(DirectLoginMethod)).ToLower());
+
+	if (IsEmailValid())
+	{
+		JsonObject->SetStringField(TEXT("email"), Email);
+	}
+
+	return JsonObject;
 }
