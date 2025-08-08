@@ -22,24 +22,23 @@ public:
 	 * Log into Passport
 	 *
 	 * @param	WorldContextObject	World context
-	 * @param	DirectLoginMethod	Direct login method to use for authentication (defaults to None for standard login page)
+	 * @param	DirectLoginOptions	Direct login options for authentication (email, google, apple, facebook)
 	 *
 	 * @return	A reference to the object represented by this node
 	 */
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject, EImmutableDirectLoginMethod DirectLoginMethod = EImmutableDirectLoginMethod::None);
+	static UImtblConnectionAsyncActions* Login(UObject* WorldContextObject, const FImmutableDirectLoginOptions& DirectLoginOptions);
 
 	/**
 	 * Log into Passport, initialise the gamer's wallet and instantiate the IMX provider.
 	 *
 	 * @param	WorldContextObject	World context
-	 * @param	DirectLoginMethod	Direct login method to use for authentication (defaults to None for standard login page)
+	 * @param	DirectLoginOptions	Direct login options for authentication (email, google, apple, facebook)
 	 *
 	 * @return	A reference to the object represented by this node
 	 */
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"), Category = "Immutable")
-	static UImtblConnectionAsyncActions* ConnectImx(UObject* WorldContextObject, EImmutableDirectLoginMethod DirectLoginMethod = EImmutableDirectLoginMethod::None);
-
+	static UImtblConnectionAsyncActions* ConnectImx(UObject* WorldContextObject, const FImmutableDirectLoginOptions& DirectLoginOptions);
 
 	virtual void Activate() override;
 
@@ -56,5 +55,5 @@ private:
 	bool bUseCachedSession = false;
 	bool bIsConnectImx = false;
 	bool bIsPKCE = false;
-	EImmutableDirectLoginMethod DirectLoginMethod = EImmutableDirectLoginMethod::None;
+	FImmutableDirectLoginOptions DirectLoginOptions;
 };

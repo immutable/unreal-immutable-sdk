@@ -7,26 +7,26 @@
 #include "Immutable/Misc/ImtblLogging.h"
 
 
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* WorldContextObject, EImmutableDirectLoginMethod DirectLoginMethod)
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* WorldContextObject, const FImmutableDirectLoginOptions& DirectLoginOptions)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bIsConnectImx = false;
 	PassportInitBlueprintNode->bIsPKCE = true;
-	PassportInitBlueprintNode->DirectLoginMethod = DirectLoginMethod;
+	PassportInitBlueprintNode->DirectLoginOptions = DirectLoginOptions;
 
 	return PassportInitBlueprintNode;
 }
 
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* WorldContextObject, EImmutableDirectLoginMethod DirectLoginMethod)
+UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* WorldContextObject, const FImmutableDirectLoginOptions& DirectLoginOptions)
 {
 	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
 
 	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
 	PassportInitBlueprintNode->bIsConnectImx = true;
 	PassportInitBlueprintNode->bIsPKCE = true;
-	PassportInitBlueprintNode->DirectLoginMethod = DirectLoginMethod;
+	PassportInitBlueprintNode->DirectLoginOptions = DirectLoginOptions;
 
 	return PassportInitBlueprintNode;
 }
@@ -54,7 +54,7 @@ void UImtblConnectionAsyncActions::DoConnect(TWeakObjectPtr<UImtblJSConnector> J
 		if (bIsPKCE)
 		{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
-			Passport->Connect(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect), DirectLoginMethod);
+			Passport->Connect(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect), DirectLoginOptions);
 #endif
 		}
 	}

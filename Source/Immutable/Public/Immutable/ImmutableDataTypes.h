@@ -20,10 +20,32 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkDynamicMulticastDe
 UENUM(BlueprintType)
 enum class EImmutableDirectLoginMethod : uint8
 {
-	None,
+	Email,
 	Google,
 	Apple,
 	Facebook
+};
+
+/**
+ * Structure representing direct login options for authentication
+ * Can be used for social login (google, apple, facebook) or email login
+ */
+USTRUCT(BlueprintType)
+struct IMMUTABLE_API FImmutableDirectLoginOptions
+{
+	GENERATED_BODY()
+
+	bool IsEmailValid() const;
+
+	TSharedPtr<FJsonObject> ToJsonObject() const;
+
+	/** Direct login method for authentication */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EImmutableDirectLoginMethod DirectLoginMethod = EImmutableDirectLoginMethod::Email;
+
+	/** Email address for email-based authentication (only used when DirectLoginMethod is Email) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Email;
 };
 
 USTRUCT()
@@ -145,8 +167,6 @@ struct IMMUTABLE_API FImmutablePassportZkEvmGetBalanceData
 	FString ToJsonString() const;
 };
 
-
-
 USTRUCT()
 struct FImmutablePassportConnectData
 {
@@ -171,9 +191,9 @@ struct IMMUTABLE_API FImmutableGetPKCEAuthUrlRequest
 	UPROPERTY()
 	bool isConnectImx = false;
 
-	/** Direct login method to use for authentication */
+	/** Direct login options for authentication */
 	UPROPERTY()
-	EImmutableDirectLoginMethod directLoginMethod = EImmutableDirectLoginMethod::None;
+	FImmutableDirectLoginOptions directLoginOptions;
 };
 
 USTRUCT()
