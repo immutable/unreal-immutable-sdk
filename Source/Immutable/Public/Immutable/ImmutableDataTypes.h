@@ -15,6 +15,16 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkDynamicMulticastDe
 #define ENGINE_SDK_VERSION TEXT("1.11.0")
 
 /**
+ * Enum representing marketing consent status for authentication
+ */
+UENUM(BlueprintType)
+enum class EImmutableMarketingConsentStatus : uint8
+{
+	Opted_In,
+	Unsubscribed
+};
+
+/**
  * Enum representing direct login methods for authentication providers
  */
 UENUM(BlueprintType)
@@ -46,6 +56,10 @@ struct IMMUTABLE_API FImmutableDirectLoginOptions
 	/** Email address for email-based authentication (only used when DirectLoginMethod is Email) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Email;
+
+	/** Marketing consent status for authentication (defaults to opted in) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EImmutableMarketingConsentStatus MarketingConsentStatus = EImmutableMarketingConsentStatus::Opted_In;
 };
 
 USTRUCT()
