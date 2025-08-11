@@ -112,5 +112,7 @@ TSharedPtr<FJsonObject> FImmutableDirectLoginOptions::ToJsonObject() const
 		JsonObject->SetStringField(TEXT("email"), Email);
 	}
 
+	JsonObject->SetStringField(TEXT("marketingConsentStatus"), StaticEnum<EImmutableMarketingConsentStatus>()->GetNameStringByValue(static_cast<int64>(MarketingConsentStatus)).ToLower());
+
 	return JsonObject;
 }
