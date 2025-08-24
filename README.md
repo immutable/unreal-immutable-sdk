@@ -12,7 +12,7 @@
 
 # Documentation
 
-* [Immutable X](https://docs.immutable.com/sdks/unreal)
+* [Immutable X](https://docs.immutable.com/x/sdks/unreal)
 * [Immutable zkEVM](https://docs.immutable.com/docs/zkEVM/sdks/unreal)
 
 ## Plugin Maintainers' Guide
