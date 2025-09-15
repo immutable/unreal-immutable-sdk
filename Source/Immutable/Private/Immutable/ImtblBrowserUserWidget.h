@@ -1,10 +1,10 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "CoreMinimal.h"
+
 #include "ImtblBrowserUserWidget.generated.h"
+
+class UImmutableJSConnectorBrowserWidget;
 
 UCLASS()
 class IMMUTABLE_API UImtblBrowserUserWidget : public UUserWidget
@@ -17,11 +17,12 @@ public:
 	virtual void RemoveFromParent() override;
 	virtual void OnWidgetRebuilt() override;
 
+	UImmutableJSConnectorBrowserWidget* GetBrowser() const;
 	TWeakObjectPtr<class UImtblJSConnector> GetJSConnector() const;
 
 private:
 	UPROPERTY()
-	class UImtblBrowserWidget* Browser = nullptr;
+	TObjectPtr<UImmutableJSConnectorBrowserWidget> W_Browser;
 
 	bool bIsBrowserAppInitialized = false;
 

@@ -64,7 +64,7 @@ struct IMMUTABLE_API FImtblJSRequest
 	}
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct IMMUTABLE_API FImtblJSResponse
 {
 	GENERATED_BODY()

@@ -2,10 +2,6 @@
 
 #include "Immutable/ImtblJSConnector.h"
 
-#include "Immutable/Misc/ImtblLogging.h"
-#include "ImtblBrowserWidget.h"
-#include "Immutable/ImtblJSMessages.h"
-
 void UImtblJSConnector::Init(bool bPageLoaded)
 {
 	IMTBL_LOG("JSConnect::Init called, bPageloaded %d", bPageLoaded);
@@ -42,6 +38,52 @@ void UImtblJSConnector::AddCallbackWhenBridgeReady(const FOnBridgeReadyDelegate:
 	{
 		OnBridgeReady.Add(Delegate);
 	}
+}
+
+void UImtblJSConnector::SendToGame(const FString& Message)
+{
+	SendEventToGame(TEXT(""), Message);
+}
+
+void UImtblJSConnector::SendEventToGame(const FString& Event, const FString& Message)
+{
+	IMTBL_LOG_FUNC("Received message from JS: %s", *Message);
+
+	const TOptional<FImtblJSResponse> Response = FImtblJSResponse::FromJsonString(Message);
+
+	Internal_MulticastDelegate_OnEventToGame.Broadcast(Event, Message, Response);
+	Internal_DynamicMulticastDelegate_OnEventToGame.Broadcast(Event, Message, Response.IsSet(), Response.Get({}));
+
+	if (!Response.IsSet())
+	{
+		IMTBL_WARN("Received unexpected response from browser: %s", *Message);
+		return;
+	}
+
+	// Handle response
+
+	if (!RequestResponseDelegates.Contains(Response->requestId))
+	{
+		IMTBL_WARN("No delegate found for response with id %s", *Response->requestId);
+		return;
+	}
+
+	if (!RequestResponseDelegates[Response->requestId].ExecuteIfBound(Response.GetValue()))
+	{
+		IMTBL_WARN("Delegate for response with id %s failed to execute", *Response->requestId);
+	}
+
+	RequestResponseDelegates.Remove(Response->requestId);
+}
+
+FImmutableEventToGameMulticastDelegate* UImtblJSConnector::MulticastDelegate_OnEventToGame()
+{
+	return &Internal_MulticastDelegate_OnEventToGame;
+}
+
+FImmutableEventToGameDynamicMulticastDelegate* UImtblJSConnector::DynamicMulticastDelegate_OnEventToGame()
+{
+	return &Internal_DynamicMulticastDelegate_OnEventToGame;
 }
 
 FString UImtblJSConnector::CallJS(const FString& Function, const FString& Data, const FImtblJSResponseDelegate& HandleResponse, const float ResponseTimeout)
@@ -93,40 +135,12 @@ void UImtblJSConnector::HandleInitResponse(FImtblJSResponse Response)
 	OnBridgeReady.Clear();
 }
 
-void UImtblJSConnector::SendToGame(FString Message)
-{
-	IMTBL_LOG_FUNC("Received message from JS: %s", *Message);
-
-	// Parse response
-
-	const TOptional<FImtblJSResponse> Response = FImtblJSResponse::FromJsonString(Message);
-	if (!Response.IsSet())
-	{
-		IMTBL_WARN("Received unexpected response from browser: %s", *Message);
-		return;
-	}
-
-	// Handle response
-
-	if (!RequestResponseDelegates.Contains(Response->requestId))
-	{
-		IMTBL_WARN("No delegate found for response with id %s", *Response->requestId);
-		return;
-	}
-
-	if (!RequestResponseDelegates[Response->requestId].ExecuteIfBound(Response.GetValue()))
-	{
-		IMTBL_WARN("Delegate for response with id %s failed to execute", *Response->requestId);
-	}
-
-	RequestResponseDelegates.Remove(Response->requestId);
-}
-
 #if PLATFORM_ANDROID | PLATFORM_IOS
-void UImtblJSConnector::SetMobileBridgeReady() {
-  IMTBL_LOG_FUNCSIG
-  bIsBridgeReady = true;
-  OnBridgeReady.Broadcast();
-  OnBridgeReady.Clear();
+void UImtblJSConnector::SetMobileBridgeReady()
+{
+	IMTBL_LOG_FUNCSIG
+	bIsBridgeReady = true;
+	OnBridgeReady.Broadcast();
+	OnBridgeReady.Clear();
 }
 #endif

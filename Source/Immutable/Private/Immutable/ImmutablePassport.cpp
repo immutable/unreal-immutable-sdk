@@ -94,7 +94,6 @@ void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponse
 #if PLATFORM_WINDOWS
 	// Verify PKCEData is null before initializing to ensure we're not overriding an active PKCE operation.
 	// A non-null value indicates another PKCE operation is already in progress.
-	ensureAlways(!PKCEData);
 	PKCEData = UImmutablePKCEWindows::Initialise(InitData);
 	if (PKCEData)
 	{

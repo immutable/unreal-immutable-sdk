@@ -41,16 +41,19 @@ public:
 	static UImtblConnectionAsyncActions* ConnectImx(UObject* WorldContextObject, const FImmutableDirectLoginOptions& DirectLoginOptions);
 
 	virtual void Activate() override;
+	
+	FPassportConnectOutputPin* DynamicMulticastDelegate_OnSuccess();
+	FPassportConnectOutputPin* DynamicMulticastDelegate_OnFailed();
 
 private:
 
 	void DoConnect(TWeakObjectPtr<class UImtblJSConnector> JSConnector);
 	void OnConnect(FImmutablePassportResult Result);
 
-	UPROPERTY(BlueprintAssignable)
-	FPassportConnectOutputPin Success;
-	UPROPERTY(BlueprintAssignable)
-	FPassportConnectOutputPin Failed;
+	UPROPERTY(BlueprintAssignable, Meta = (DisplayName = "OnSuccess"))
+	FPassportConnectOutputPin Internal_DynamicMulticastDelegate_OnSuccess;
+	UPROPERTY(BlueprintAssignable, Meta = (DisplayName = "OnFailed"))
+	FPassportConnectOutputPin Internal_DynamicMulticastDelegate_OnFailed;
 
 	bool bUseCachedSession = false;
 	bool bIsConnectImx = false;

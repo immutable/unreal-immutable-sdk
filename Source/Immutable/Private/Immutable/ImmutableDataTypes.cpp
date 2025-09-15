@@ -2,6 +2,8 @@
 
 #include "Immutable/ImmutableDataTypes.h"
 
+#include "Immutable/Actions/ImtblConnectImxAsyncAction.h"
+
 #if PLATFORM_WINDOWS
 #include "Immutable/Windows/ImmutablePKCEWindows.h"
 #endif
@@ -115,4 +117,9 @@ TSharedPtr<FJsonObject> FImmutableDirectLoginOptions::ToJsonObject() const
 	JsonObject->SetStringField(TEXT("marketingConsentStatus"), StaticEnum<EImmutableMarketingConsentStatus>()->GetNameStringByValue(static_cast<int64>(MarketingConsentStatus)).ToLower());
 
 	return JsonObject;
+}
+
+bool UImmutableDirectLoginOptionsStatics::FromJSResponse(const FImtblJSResponse& Response, FImmutableDirectLoginOptions& DirectLoginOptions)
+{
+	return FJsonObjectConverter::JsonObjectToUStruct(Response.JsonObject.ToSharedRef(), &DirectLoginOptions);
 }
