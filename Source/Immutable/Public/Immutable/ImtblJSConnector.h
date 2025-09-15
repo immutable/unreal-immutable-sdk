@@ -10,6 +10,8 @@
 // clang-format on
 
 DECLARE_DELEGATE_OneParam(FImtblJSResponseDelegate, struct FImtblJSResponse);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FImmutableEventToGameMulticastDelegate, const FString& /* Event */, const FString& /* Message */, const TOptional<FImtblJSResponse>& /* Response */);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FImmutableEventToGameDynamicMulticastDelegate, const FString&, Event, const FString&, Message, bool, bResponseIsSet, const FImtblJSResponse&, Response); 
 
 /**
  * JSConnector UObject to bind with a browser widget.
@@ -21,7 +23,7 @@ DECLARE_DELEGATE_OneParam(FImtblJSResponseDelegate, struct FImtblJSResponse);
  * of the base classes in the UObject hierarchy have any UFUNCTIONs we can be
  * sure that the only UFUNCTIONs exposed to the browser are defined here.
  */
-UCLASS()
+UCLASS(BlueprintType)
 class IMMUTABLE_API UImtblJSConnector : public UObject
 {
 	GENERATED_BODY()
@@ -47,19 +49,30 @@ public:
 
 	// Callback for JavaScript to send responses back to Unreal
 	UFUNCTION()
-	void SendToGame(FString Message);
+	void SendToGame(const FString& Message);
+
+	UFUNCTION()
+	void SendEventToGame(const FString& Event, const FString& Message);
+
+	FImmutableEventToGameMulticastDelegate* MulticastDelegate_OnEventToGame();
+	FImmutableEventToGameDynamicMulticastDelegate* DynamicMulticastDelegate_OnEventToGame();
 
 	// Bind the func to be called for executing JS. Typically by the BrowserWidget
 	// (UE5) or Blui for UE4
 	FOnExecuteJsDelegate ExecuteJs;
 
 #if PLATFORM_ANDROID | PLATFORM_IOS
-  void SetMobileBridgeReady();
+	void SetMobileBridgeReady();
 #endif
 
-protected:
 	// Call a JavaScript function in the connected browser
 	FString CallJS(const FString& Function, const FString& Data, const FImtblJSResponseDelegate& HandleResponse, float ResponseTimeout = 0.0f);
+
+protected:
+	FImmutableEventToGameMulticastDelegate Internal_MulticastDelegate_OnEventToGame;
+
+	UPROPERTY(BlueprintAssignable, Meta = (DisplayName = "OnEventToGame"))
+	FImmutableEventToGameDynamicMulticastDelegate Internal_DynamicMulticastDelegate_OnEventToGame;
 
 private:
 	FOnBridgeReadyDelegate OnBridgeReady;

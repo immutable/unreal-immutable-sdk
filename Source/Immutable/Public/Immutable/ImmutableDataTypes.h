@@ -7,6 +7,11 @@
 
 #include "ImmutableDataTypes.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FImmutableSimpleDynamicMulticastDelegate);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FImmutableMessageMulticastDelegate, const FString& /* Message */);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmutableMessageDynamicMulticastDelegate, const FString&, Message);
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkMulticastDelegate, const FString& /** DeepLink */);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkDynamicMulticastDelegate, const FString&, DeepLink);
 
@@ -60,6 +65,16 @@ struct IMMUTABLE_API FImmutableDirectLoginOptions
 	/** Marketing consent status for authentication (defaults to opted in) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EImmutableMarketingConsentStatus MarketingConsentStatus = EImmutableMarketingConsentStatus::Opted_In;
+};
+
+UCLASS()
+class UImmutableDirectLoginOptionsStatics : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable)
+	static bool FromJSResponse(const FImtblJSResponse& Response, FImmutableDirectLoginOptions& DirectLoginOptions);
 };
 
 USTRUCT()

@@ -37,12 +37,22 @@ void UImtblConnectionAsyncActions::Activate()
 	{
 		FString Error = "Connect failed due to missing world or world context object.";
 		IMTBL_WARN("%s", *Error)
-		Failed.Broadcast(Error);
+		Internal_DynamicMulticastDelegate_OnFailed.Broadcast(Error);
 
 		return;
 	}
 
 	GetSubsystem()->WhenReady(this, &UImtblConnectionAsyncActions::DoConnect);
+}
+
+UImtblConnectionAsyncActions::FPassportConnectOutputPin* UImtblConnectionAsyncActions::DynamicMulticastDelegate_OnSuccess()
+{
+	return &Internal_DynamicMulticastDelegate_OnSuccess;
+}
+
+UImtblConnectionAsyncActions::FPassportConnectOutputPin* UImtblConnectionAsyncActions::DynamicMulticastDelegate_OnFailed()
+{
+	return &Internal_DynamicMulticastDelegate_OnFailed;
 }
 
 void UImtblConnectionAsyncActions::DoConnect(TWeakObjectPtr<UImtblJSConnector> JSConnector)
@@ -68,10 +78,10 @@ void UImtblConnectionAsyncActions::OnConnect(FImmutablePassportResult Result)
 {
 	if (Result.Success)
 	{
-		Success.Broadcast(TEXT(""));
+		Internal_DynamicMulticastDelegate_OnSuccess.Broadcast(TEXT(""));
 	}
 	else
 	{
-		Failed.Broadcast(Result.Error);
+		Internal_DynamicMulticastDelegate_OnFailed.Broadcast(Result.Error);
 	}
 }

@@ -5,12 +5,12 @@
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
-#include "Components/PanelWidget.h"
 #include "Components/ScaleBox.h"
 #include "Components/ScaleBoxSlot.h"
+
+#include "Immutable/Browser/ImmutableJSConnectorBrowserWidget.h"
+#include "Immutable/ImmutableUtilities.h"
 #include "Immutable/Misc/ImtblLogging.h"
-#include "ImtblBrowserWidget.h"
-#include "Immutable/ImtblJSConnector.h"
 
 TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 {
@@ -35,21 +35,47 @@ TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 		RootWidget->AddChild(ScaleBox);
 		if (ScaleBox)
 		{
-			Browser = WidgetTree->ConstructWidget<UImtblBrowserWidget>(UImtblBrowserWidget::StaticClass(), TEXT("ImmutableBrowserWidget"));
-			ScaleBox->AddChild(Browser);
+			W_Browser = WidgetTree->ConstructWidget<UImmutableJSConnectorBrowserWidget>(UImmutableJSConnectorBrowserWidget::StaticClass(), TEXT("GameBridgeWidget"));
+			W_Browser->MulticastDelegate_OnLoadCompleted().AddWeakLambda(this, []()
+			{
+#if PLATFORM_ANDROID | PLATFORM_IOS
+				FString IndexURL = "file:///immutable/index.html";
+
+#if USING_BUNDLED_CEF
+				if (WebBrowserWidget->GetUrl() == IndexURL)
+				{
+					JSConnector->SetMobileBridgeReady();
+				}
+				else
+				{
+					UE_LOG(LogImmutable, Error, TEXT("Immutable Browser Widget Url don't match: (loaded : %s, required: %s)"), *WebBrowserWidget->GetUrl(), *IndexURL);
+				}
+#endif
+#endif
+			});
+			W_Browser->MulticastDelegate_OnBrowserCreated()->AddWeakLambda(this, [this]()
+			{
+				FString JavaScript;
+				if (FImmutableUtilities::LoadGameBridge(JavaScript))
+				{
+					FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta " "charset='utf-8'><title>GameSDK Bridge</title><script>") + JavaScript + FString("</script></head><body><h1>Bridge Running</h1></body></html>");
+					W_Browser->LoadString(IndexHtml, TEXT("file:///immutable/index.html"));
+				}
+			});
+			ScaleBox->AddChild(W_Browser);
 			if (UCanvasPanelSlot* RootWidgetSlot = Cast<UCanvasPanelSlot>(ScaleBox->Slot))
 			{
 #if PLATFORM_ANDROID | PLATFORM_IOS
-        // Android webview needs to be at least 1px to 1px big to work
-        // but it can be off screen
-        RootWidgetSlot->SetAnchors(FAnchors(0, 0, 0, 0));
-        RootWidgetSlot->SetOffsets(FMargin(-1, -1, 1, 1));
+				// Android webview needs to be at least 1px to 1px big to work
+				// but it can be off screen
+				RootWidgetSlot->SetAnchors(FAnchors(0, 0, 0, 0));
+				RootWidgetSlot->SetOffsets(FMargin(-1, -1, 1, 1));
 #else
 				RootWidgetSlot->SetAnchors(FAnchors(0, 0, 1, 1));
 				RootWidgetSlot->SetOffsets(DefaultOffsets);
 #endif
 			}
-			if (UScaleBoxSlot* ScaleBoxSlot = Cast<UScaleBoxSlot>(Browser->Slot))
+			if (UScaleBoxSlot* ScaleBoxSlot = Cast<UScaleBoxSlot>(W_Browser->Slot))
 			{
 				ScaleBoxSlot->SetHorizontalAlignment(HAlign_Fill);
 				ScaleBoxSlot->SetVerticalAlignment(VAlign_Fill);
@@ -85,13 +111,18 @@ void UImtblBrowserUserWidget::OnWidgetRebuilt()
 	Super::OnWidgetRebuilt();
 }
 
+UImmutableJSConnectorBrowserWidget* UImtblBrowserUserWidget::GetBrowser() const
+{
+	return W_Browser;
+}
+
 TWeakObjectPtr<class UImtblJSConnector> UImtblBrowserUserWidget::GetJSConnector() const
 {
-	if (!Browser)
+	if (!W_Browser)
 	{
 		IMTBL_WARN("JSConnector requested before Browser was initialized");
 		return nullptr;
 	}
 
-	return Browser->GetJSConnector();
+	return W_Browser->GetJSConnector();
 }
