@@ -65,6 +65,9 @@ struct IMMUTABLE_API FImmutableDirectLoginOptions
 	/** Marketing consent status for authentication (defaults to opted in) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EImmutableMarketingConsentStatus MarketingConsentStatus = EImmutableMarketingConsentStatus::Opted_In;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ImPassportTraceId;
 };
 
 UCLASS()

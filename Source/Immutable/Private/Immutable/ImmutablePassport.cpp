@@ -117,6 +117,8 @@ void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponse
 		RequestObject->SetObjectField(TEXT("directLoginOptions"), DirectLoginOptionsObject);
 	}
 
+	RequestObject->SetStringField(TEXT("imPassportTraceId"), DirectLoginOptions.ImPassportTraceId);
+
 	// Convert to JSON string
 	FString PKCERequestJson;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&PKCERequestJson);
