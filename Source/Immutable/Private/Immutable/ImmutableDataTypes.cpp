@@ -85,6 +85,13 @@ FString FImmutablePassportZkEvmGetBalanceData::ToJsonString() const
 	return OutString;
 }
 
+FString FImmutablePassportResult::ToJsonString() const
+{
+	FString Result;
+	FJsonObjectConverter::UStructToJsonObjectString<FImmutablePassportResult>(*this, Result);
+	return Result;
+}
+
 void UImmutablePKCEData::BeginDestroy()
 {
 	Reset();
