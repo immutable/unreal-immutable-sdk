@@ -233,6 +233,8 @@ struct IMMUTABLE_API FImmutablePassportResult
 {
 	GENERATED_BODY()
 
+	FString ToJsonString() const;
+
 	/** Whether the response was successful. */
 	UPROPERTY()
 	bool Success = false;
@@ -242,6 +244,7 @@ struct IMMUTABLE_API FImmutablePassportResult
 	FString Error;
 
 	/** Response payload. */
+	UPROPERTY()
 	FImtblJSResponse Response;
 };
 

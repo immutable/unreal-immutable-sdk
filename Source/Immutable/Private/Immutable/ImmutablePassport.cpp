@@ -540,7 +540,7 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
 			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
 		Analytics->Track(IsStateFlagsSet(IPS_IMX) ? UImmutableAnalytics::EEventName::COMPLETE_CONNECT_IMX_PKCE : UImmutableAnalytics::EEventName::COMPLETE_LOGIN_PKCE, Response.success);
-		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{Response.success, Msg});
+		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
 		PKCEResponseDelegate = nullptr;
 
 		// we save passport state for PKCE flow in case if we decide to close a game

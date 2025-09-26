@@ -78,7 +78,7 @@ void UImtblConnectionAsyncActions::OnConnect(FImmutablePassportResult Result)
 {
 	if (Result.Success)
 	{
-		Internal_DynamicMulticastDelegate_OnSuccess.Broadcast(TEXT(""));
+		Internal_DynamicMulticastDelegate_OnSuccess.Broadcast(Result.ToJsonString());
 	}
 	else
 	{
