@@ -26,7 +26,8 @@ UENUM(BlueprintType)
 enum class EImmutableMarketingConsentStatus : uint8
 {
 	Opted_In,
-	Unsubscribed
+	Unsubscribed,
+	Subscribed
 };
 
 /**
@@ -103,7 +104,7 @@ struct FImmutableEngineVersionData
 	UPROPERTY()
 	FString platformVersion = FPlatformMisc::GetOSVersion().Replace(TEXT(" "), TEXT("_"));
 
-	// Information on device. Examples of expected results: Apple|Apple M3 Max, GenuineIntel|13th Gen Intel(R) Core(TM) i7-13700H, Apple|iPhone15&#44;4. 
+	// Information on device. Examples of expected results: Apple|Apple M3 Max, GenuineIntel|13th Gen Intel(R) Core(TM) i7-13700H, Apple|iPhone15&#44;4.
 	UPROPERTY()
 	FString deviceModel = FGenericPlatformMisc::GetDeviceMakeAndModel();
 };
@@ -137,7 +138,7 @@ struct IMMUTABLE_API FImmutablePassportInitData
 	UPROPERTY()
 	FString environment = ImmutablePassportEnvironmentConstants::EnvironmentSandbox;
 
-	/** 
+	/**
 	 * Whether silent logout is enabled.
 	 * If true, logout silently (without popping up a new browser tab)
 	 */
@@ -149,7 +150,7 @@ struct IMMUTABLE_API FImmutablePassportInitData
 	FImmutableEngineVersionData engineVersion;
 
 	/**
-	 * Converts the FImmutablePassportInitData structure to a JSON string representation. 
+	 * Converts the FImmutablePassportInitData structure to a JSON string representation.
 	 *
 	 * @return 	A JSON string representation of the FImmutablePassportInitData structure.
 	 * 			Returns an empty string if the conversion fails.
@@ -394,14 +395,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FImmutablePassportInitData PassportInitData;
 
-	/** 
+	/**
 	 * Delegate triggered when a deep link callback is received from the browser
 	 * Contains the complete URI with authorization code and state parameters
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, BlueprintAssignable, DisplayName = "Deep Link Callback")
 	FImmutableDeepLinkDynamicMulticastDelegate DynamicMulticastDelegate_DeepLinkCallback;
 
-	/** 
+	/**
 	 * Handle for the ticker delegate that periodically checks for incoming deep links
 	 */
 	FTSTicker::FDelegateHandle TickDelegateHandle;
