@@ -49,15 +49,5 @@ void UImtblPassportImxRegisterOffchainAsyncAction::OnImxRegisterOffchainResponse
 		}
 	}
 
-	// Handle 409 Conflict error - user already registered
-	// This is a normal case and should be treated as success
-	if (Result.Error.Contains(TEXT("409")) || Result.Error.Contains(TEXT("conflict"), ESearchCase::IgnoreCase) ||
-	    Result.Error.Contains(TEXT("already registered"), ESearchCase::IgnoreCase))
-	{
-		IMTBL_LOG("User is already registered offchain (409 response treated as success)");
-		OnSuccess.Broadcast(TEXT(""), TEXT(""));
-		return;
-	}
-
 	OnFailure.Broadcast(TEXT(""), Result.Error);
 }
