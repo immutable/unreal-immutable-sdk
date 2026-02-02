@@ -59,7 +59,7 @@ TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 				if (FImmutableUtilities::LoadGameBridge(JavaScript))
 				{
 					FString IndexHtml = FString("<!doctype html><html lang='en'><head><meta " "charset='utf-8'><title>GameSDK Bridge</title><script>") + JavaScript + FString("</script></head><body><h1>Bridge Running</h1></body></html>");
-					W_Browser->LoadString(IndexHtml, TEXT("file:///immutable/index.html"));
+					W_Browser->LoadString(IndexHtml, TEXT("http://localhost/"));
 				}
 			});
 			ScaleBox->AddChild(W_Browser);
