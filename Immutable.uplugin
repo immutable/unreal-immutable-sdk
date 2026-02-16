@@ -32,17 +32,7 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "ImmutableOrderbook",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
 			"Name": "ImmutablezkEVMAPI",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "ImmutableMarketplace",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
