@@ -21,40 +21,6 @@ struct IMMUTABLE_API FImtblTransactionRequest
 };
 
 USTRUCT(BlueprintType)
-struct IMMUTABLE_API FImxTransferRequest
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString receiver;
-
-	UPROPERTY()
-	FString type;
-
-	UPROPERTY()
-	FString amount;
-
-	UPROPERTY()
-	FString tokenId;
-
-	UPROPERTY()
-	FString tokenAddress;
-
-	FString ToJsonString() const;
-};
-
-USTRUCT(BlueprintType)
-struct IMMUTABLE_API FImxBatchNftTransferRequest
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	TArray<struct FNftTransferDetails> nftTransferDetails;
-
-	FString ToJsonString() const;
-};
-
-USTRUCT(BlueprintType)
 struct IMMUTABLE_API FZkEvmTransactionReceiptRequest
 {
 	GENERATED_BODY()

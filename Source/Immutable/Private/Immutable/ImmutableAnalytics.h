@@ -39,11 +39,6 @@ CONVERT(COMPLETE_LOGIN, "performedLogin") \
 CONVERT(START_LOGIN_PKCE, "startedLoginPkce") \
 CONVERT(COMPLETE_LOGIN_PKCE, "performedLoginPkce") \
 CONVERT(COMPLETE_RELOGIN, "performedRelogin") \
-CONVERT(START_CONNECT_IMX, "startedConnectImx") \
-CONVERT(COMPLETE_CONNECT_IMX, "performedConnectImx") \
-CONVERT(START_CONNECT_IMX_PKCE, "startedConnectImxPkce") \
-CONVERT(COMPLETE_CONNECT_IMX_PKCE, "performedConnectImxPkce") \
-CONVERT(COMPLETE_RECONNECT, "performedReconnect") \
 CONVERT(COMPLETE_LOGOUT, "performedLogout") \
 CONVERT(COMPLETE_LOGOUT_PKCE, "performedLogoutPkce")
 

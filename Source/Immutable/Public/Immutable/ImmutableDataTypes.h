@@ -220,10 +220,6 @@ struct IMMUTABLE_API FImmutableGetPKCEAuthUrlRequest
 {
 	GENERATED_BODY()
 
-	/** Whether this is a ConnectImx operation (true) or just Login (false) */
-	UPROPERTY()
-	bool isConnectImx = false;
-
 	/** Direct login options for authentication */
 	UPROPERTY()
 	FImmutableDirectLoginOptions directLoginOptions;
@@ -259,21 +255,6 @@ struct FImtblAccessListItem
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FString> storageKeys;
-};
-
-USTRUCT(BlueprintType)
-struct FNftTransferDetails
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	FString receiver;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString tokenId;
-
-	UPROPERTY(BlueprintReadWrite)
-	FString tokenAddress;
 };
 
 USTRUCT(BlueprintType)

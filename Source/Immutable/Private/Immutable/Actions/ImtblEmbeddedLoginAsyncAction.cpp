@@ -1,6 +1,5 @@
-﻿#include "Immutable/Actions/ImtblEmbeddedLoginAsyncAction.h"
+#include "Immutable/Actions/ImtblEmbeddedLoginAsyncAction.h"
 
-#include "Immutable/Actions/ImtblConnectImxAsyncAction.h"
 #include "Immutable/Browser/ImmutableJSConnectorBrowserWidget.h"
 
 UImtblEmbeddedLoginAsyncAction* UImtblEmbeddedLoginAsyncAction::Login(UObject* WorldContextObject, UImmutableJSConnectorBrowserWidget* JSConnectorBrowserWidget)

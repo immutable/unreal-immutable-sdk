@@ -100,12 +100,10 @@ public:
 	/**
 	 * Logs into Passport using Authorisation Code Flow with Proof Key for Code Exchange (PKCE)
 	 *
-	 * @param IsConnectImx 		If true, player will connect to Immutable X after logging in.
-	 * 							Else, just perform the login without connecting to Immutable X.
 	 * @param ResponseDelegate 	Callback delegate.
 	 * @param DirectLoginOptions	Direct login options for authentication (email, google, apple, facebook).
 	 */
-	void Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate, const FImmutableDirectLoginOptions& DirectLoginOptions);
+	void Connect(const FImtblPassportResponseDelegate& ResponseDelegate, const FImmutableDirectLoginOptions& DirectLoginOptions);
 #endif
 
 	/**
@@ -196,13 +194,6 @@ public:
 	void GetAccessToken(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
-	 * Gets the wallet address of the logged in user. 
-	 *
-	 * @param ResponseDelegate Callback delegate.
-	 */
-	void GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate);
-
-	/**
 	 * Retrieves the email address of the user whose credentials are currently stored. 
 	 *
 	 * @param ResponseDelegate Callback delegate.
@@ -215,40 +206,6 @@ public:
 	 * @param ResponseDelegate Callback delegate.
 	 */
 	void GetLinkedAddresses(const FImtblPassportResponseDelegate& ResponseDelegate);
-
-	/**
-	 * Create a new imx transfer request.
-	 * @param RequestData The transfer details structure of type
-	 * FImxTransferRequest
-	 * @param ResponseDelegate The response delegate of type
-	 * FImtblPassportResponseDelegate to call on response from JS.
-	 */
-	void ImxTransfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
-
-	/**
-	 * Creates a new imx batch nft transfer request with the given transfer
-	 * details.
-	 * @param RequestData The transfer details structure of type
-	 * FImxBatchNftTransferRequest
-	 * @param ResponseDelegate The response delegate of type
-	 * FImtblPassportResponseDelegate to call on response from JS.
-	 */
-	void ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate);
-
-	/**
-	 *
-	 * Checks if the user is registered off-chain.
-	 * @param ResponseDelegate The response delegate of type
-	 * FImtblPassportResponseDelegate to call on response from JS.
-	 */
-	void ImxIsRegisteredOffchain(const FImtblPassportResponseDelegate& ResponseDelegate);
-
-	/**
-	 * Register the user to Immutable X if they are not already registered
-	 * @param ResponseDelegate The response delegate of type
-	 * FImtblPassportResponseDelegate to call on response from JS.
-	 */
-	void ImxRegisterOffchain(const FImtblPassportResponseDelegate& ResponseDelegate);
 
 	/**
 	 * Checks if the user's credentials have been stored
@@ -497,7 +454,6 @@ private:
 		IPS_NONE = 0,
 		IPS_CONNECTING = 1 << 0,
 		IPS_CONNECTED = 1 << 1,
-		IPS_IMX = 1 << 2, // if set player used "connect" instead of "login"
 		IPS_PKCE = 1 << 3,
 		IPS_COMPLETING_PKCE = 1 << 4,
 		IPS_INITIALIZED = 1 << 5,
