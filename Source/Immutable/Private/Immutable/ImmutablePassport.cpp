@@ -87,7 +87,7 @@ void UImmutablePassport::Initialize(const FImtblPassportResponseDelegate& Respon
 }
 
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
-void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponseDelegate& ResponseDelegate, const FImmutableDirectLoginOptions& DirectLoginOptions)
+void UImmutablePassport::Connect(const FImtblPassportResponseDelegate& ResponseDelegate, const FImmutableDirectLoginOptions& DirectLoginOptions)
 {
 	SetStateFlags(IPS_CONNECTING | IPS_PKCE);
 
@@ -101,15 +101,10 @@ void UImmutablePassport::Connect(bool IsConnectImx, const FImtblPassportResponse
 	}
 #endif
 
-	if (IsConnectImx)
-	{
-		SetStateFlags(IPS_IMX);
-	}
 	PKCEResponseDelegate = ResponseDelegate;
-	Analytics->Track(IsConnectImx ? UImmutableAnalytics::EEventName::START_CONNECT_IMX_PKCE : UImmutableAnalytics::EEventName::START_LOGIN_PKCE);
+	Analytics->Track(UImmutableAnalytics::EEventName::START_LOGIN_PKCE);
 
 	TSharedPtr<FJsonObject> RequestObject = MakeShareable(new FJsonObject);
-	RequestObject->SetBoolField(TEXT("isConnectImx"), IsConnectImx);
 
 	TSharedPtr<FJsonObject> DirectLoginOptionsObject = DirectLoginOptions.ToJsonObject();
 	if (DirectLoginOptionsObject.IsValid())
@@ -216,11 +211,6 @@ void UImmutablePassport::GetAccessToken(const FImtblPassportResponseDelegate& Re
 	CallJS(ImmutablePassportAction::GetAccessToken, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
-void UImmutablePassport::GetAddress(const FImtblPassportResponseDelegate& ResponseDelegate)
-{
-	CallJS(ImmutablePassportAction::GetAddress, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
-}
-
 void UImmutablePassport::GetEmail(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	CallJS(ImmutablePassportAction::GetEmail, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
@@ -229,27 +219,6 @@ void UImmutablePassport::GetEmail(const FImtblPassportResponseDelegate& Response
 void UImmutablePassport::GetLinkedAddresses(const FImtblPassportResponseDelegate& ResponseDelegate)
 {
 	CallJS(ImmutablePassportAction::GetLinkedAddresses, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
-}
-
-void UImmutablePassport::ImxTransfer(const FImxTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
-{
-	IMTBL_LOG("Tranfer Request: %s", *UStructToJsonString(RequestData))
-	CallJS(ImmutablePassportAction::ImxTransfer, UStructToJsonString(RequestData), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
-}
-
-void UImmutablePassport::ImxBatchNftTransfer(const FImxBatchNftTransferRequest& RequestData, const FImtblPassportResponseDelegate& ResponseDelegate)
-{
-	CallJS(ImmutablePassportAction::ImxBatchNftTransfer, RequestData.ToJsonString(), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
-}
-
-void UImmutablePassport::ImxIsRegisteredOffchain(const FImtblPassportResponseDelegate& ResponseDelegate)
-{
-	CallJS(ImmutablePassportAction::ImxIsRegisteredOffchain, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
-}
-
-void UImmutablePassport::ImxRegisterOffchain(const FImtblPassportResponseDelegate& ResponseDelegate)
-{
-	CallJS(ImmutablePassportAction::ImxRegisterOffchain, TEXT(""), ResponseDelegate, FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnBridgeCallbackResponse));
 }
 
 void UImmutablePassport::HasStoredCredentials(const FImtblPassportResponseDelegate& ResponseDelegate)
@@ -539,7 +508,7 @@ void UImmutablePassport::OnConnectResponse(FImtblJSResponse Response)
 			ResetStateFlags(IPS_PKCE);
 			Response.Error.IsSet() ? Msg = Response.Error->ToString() : Msg = Response.JsonObject->GetStringField(TEXT("error"));
 		}
-		Analytics->Track(IsStateFlagsSet(IPS_IMX) ? UImmutableAnalytics::EEventName::COMPLETE_CONNECT_IMX_PKCE : UImmutableAnalytics::EEventName::COMPLETE_LOGIN_PKCE, Response.success);
+		Analytics->Track(UImmutableAnalytics::EEventName::COMPLETE_LOGIN_PKCE, Response.success);
 		PKCEResponseDelegate.ExecuteIfBound(FImmutablePassportResult{Response.success, Msg, Response});
 		PKCEResponseDelegate = nullptr;
 
@@ -628,7 +597,7 @@ void UImmutablePassport::OnDeepLinkActivated(const FString& DeepLink)
 				IMTBL_LOG("Complete Logout PKCE")
 				PKCELogoutResponseDelegate.ExecuteIfBound(FImmutablePassportResult{true, "Logged out"});
 				PKCELogoutResponseDelegate = nullptr;
-				ResetStateFlags(IPS_CONNECTED | IPS_PKCE | IPS_IMX);
+				ResetStateFlags(IPS_CONNECTED | IPS_PKCE);
 				SavePassportSettings();
 			}, TStatId(), nullptr, ENamedThreads::GameThread);
 		}
@@ -684,7 +653,7 @@ void UImmutablePassport::CompleteLoginFlow(FString Url)
 	{
 		FImmutablePassportConnectData Data = FImmutablePassportConnectData{Code.GetValue(), State.GetValue()};
 
-		CallJS(IsStateFlagsSet(IPS_IMX) ? ImmutablePassportAction::CONNECT_PKCE : ImmutablePassportAction::LOGIN_PKCE, UStructToJsonString(Data), PKCEResponseDelegate,
+		CallJS(ImmutablePassportAction::LOGIN_PKCE, UStructToJsonString(Data), PKCEResponseDelegate,
 		       FImtblJSResponseDelegate::CreateUObject(this, &UImmutablePassport::OnConnectResponse));
 	}
 }

@@ -1,34 +1,17 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "Immutable/Actions/ImtblConnectImxAsyncAction.h"
+#include "Immutable/Actions/ImtblConnectionAsyncAction.h"
 
 #include "Immutable/ImmutablePassport.h"
 #include "Immutable/ImmutableSubsystem.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
-
 UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::Login(UObject* WorldContextObject, const FImmutableDirectLoginOptions& DirectLoginOptions)
 {
-	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
+	UImtblConnectionAsyncActions* Node = NewObject<UImtblConnectionAsyncActions>();
 
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	PassportInitBlueprintNode->bIsConnectImx = false;
-	PassportInitBlueprintNode->bIsPKCE = true;
-	PassportInitBlueprintNode->DirectLoginOptions = DirectLoginOptions;
+	Node->WorldContextObject = WorldContextObject;
+	Node->DirectLoginOptions = DirectLoginOptions;
 
-	return PassportInitBlueprintNode;
-}
-
-UImtblConnectionAsyncActions* UImtblConnectionAsyncActions::ConnectImx(UObject* WorldContextObject, const FImmutableDirectLoginOptions& DirectLoginOptions)
-{
-	UImtblConnectionAsyncActions* PassportInitBlueprintNode = NewObject<UImtblConnectionAsyncActions>();
-
-	PassportInitBlueprintNode->WorldContextObject = WorldContextObject;
-	PassportInitBlueprintNode->bIsConnectImx = true;
-	PassportInitBlueprintNode->bIsPKCE = true;
-	PassportInitBlueprintNode->DirectLoginOptions = DirectLoginOptions;
-
-	return PassportInitBlueprintNode;
+	return Node;
 }
 
 void UImtblConnectionAsyncActions::Activate()
@@ -61,12 +44,9 @@ void UImtblConnectionAsyncActions::DoConnect(TWeakObjectPtr<UImtblJSConnector> J
 
 	if (Passport.IsValid())
 	{
-		if (bIsPKCE)
-		{
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
-			Passport->Connect(bIsConnectImx, UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect), DirectLoginOptions);
+		Passport->Connect(UImmutablePassport::FImtblPassportResponseDelegate::CreateUObject(this, &UImtblConnectionAsyncActions::OnConnect), DirectLoginOptions);
 #endif
-		}
 	}
 	else
 	{
