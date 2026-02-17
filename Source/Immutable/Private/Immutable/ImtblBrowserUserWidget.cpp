@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ImtblBrowserUserWidget.h"
 
@@ -36,19 +36,18 @@ TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 		if (ScaleBox)
 		{
 			W_Browser = WidgetTree->ConstructWidget<UImmutableJSConnectorBrowserWidget>(UImmutableJSConnectorBrowserWidget::StaticClass(), TEXT("GameBridgeWidget"));
-			W_Browser->MulticastDelegate_OnLoadCompleted().AddWeakLambda(this, []()
+			W_Browser->MulticastDelegate_OnLoadCompleted().AddWeakLambda(this, [this]()
 			{
 #if PLATFORM_ANDROID | PLATFORM_IOS
 				FString IndexURL = "file:///immutable/index.html";
-
 #if USING_BUNDLED_CEF
-				if (WebBrowserWidget->GetUrl() == IndexURL)
+				if (W_Browser->GetUrl() == IndexURL)
 				{
-					JSConnector->SetMobileBridgeReady();
+					W_Browser->GetJSConnector()->SetMobileBridgeReady();
 				}
 				else
 				{
-					UE_LOG(LogImmutable, Error, TEXT("Immutable Browser Widget Url don't match: (loaded : %s, required: %s)"), *WebBrowserWidget->GetUrl(), *IndexURL);
+					UE_LOG(LogImmutable, Error, TEXT("Immutable Browser Widget Url don't match: (loaded : %s, required: %s)"), *W_Browser->GetUrl(), *IndexURL);
 				}
 #endif
 #endif

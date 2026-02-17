@@ -28,12 +28,13 @@ ASWebAuthenticationSession *_authSession;
 }
 
 + (UImmutablePassport*) getPassport {
+	UWorld* World;
 #if WITH_EDITOR
 	if (GEditor)
 	{
 		for (const auto& Context : GEditor->GetWorldContexts())
 		{
-			if (auto* World = Context.World())
+			if ((World = Context.World()))
 			{
 				if (auto GameInstance = World->GetGameInstance())
 				{
