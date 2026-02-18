@@ -46,7 +46,7 @@ public:
 	virtual void LoadString(FString Contents, FString DummyURL);
 
 	FImmutableBrowserConsoleMessageDynamicMulticastDelegate* DynamicMulticastDelegate_OnConsoleMessage();
-	FSimpleMulticastDelegate MulticastDelegate_OnLoadCompleted();
+	FSimpleMulticastDelegate* MulticastDelegate_OnLoadCompleted();
 	FSimpleMulticastDelegate* MulticastDelegate_OnBrowserCreated();
 
 protected:

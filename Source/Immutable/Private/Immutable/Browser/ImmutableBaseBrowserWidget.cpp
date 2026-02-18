@@ -57,9 +57,9 @@ FImmutableBrowserConsoleMessageDynamicMulticastDelegate* UImmutableBaseBrowserWi
 	return &Internal_DynamicMulticastDelegate_OnConsoleMessage;
 }
 
-FSimpleMulticastDelegate UImmutableBaseBrowserWidget::MulticastDelegate_OnLoadCompleted()
+FSimpleMulticastDelegate* UImmutableBaseBrowserWidget::MulticastDelegate_OnLoadCompleted()
 {
-	return Internal_MulticastDelegate_OnLoadCompleted;
+	return &Internal_MulticastDelegate_OnLoadCompleted;
 }
 
 FSimpleMulticastDelegate* UImmutableBaseBrowserWidget::MulticastDelegate_OnBrowserCreated()

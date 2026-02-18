@@ -36,7 +36,7 @@ TSharedRef<SWidget> UImtblBrowserUserWidget::RebuildWidget()
 		if (ScaleBox)
 		{
 			W_Browser = WidgetTree->ConstructWidget<UImmutableJSConnectorBrowserWidget>(UImmutableJSConnectorBrowserWidget::StaticClass(), TEXT("GameBridgeWidget"));
-			W_Browser->MulticastDelegate_OnLoadCompleted().AddWeakLambda(this, [this]()
+			W_Browser->MulticastDelegate_OnLoadCompleted()->AddWeakLambda(this, [this]()
 			{
 #if PLATFORM_ANDROID | PLATFORM_IOS
 				FString IndexURL = "file:///immutable/index.html";
