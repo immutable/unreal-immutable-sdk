@@ -31,6 +31,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual bool IsPageLoaded() const;
 
+	/**
+	 * Gets the currently loaded URL.
+	 *
+	 * @return The URL, or empty string if no document is loaded.
+	 */
+	UFUNCTION(BlueprintPure)
+	FString GetUrl() const;
+
 	UFUNCTION(BlueprintCallable)
 	void LoadURL(FString NewURL) const;
 
