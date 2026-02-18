@@ -21,6 +21,17 @@ bool UImmutableBaseBrowserWidget::IsPageLoaded() const
 	return false;
 }
 
+FString UImmutableBaseBrowserWidget::GetUrl() const
+{
+#if USING_BUNDLED_CEF
+	if (WebBrowserWidget.IsValid())
+	{
+		return WebBrowserWidget->GetUrl();
+	}
+#endif
+	return FString();
+}
+
 void UImmutableBaseBrowserWidget::LoadURL(FString NewURL) const
 {
 #if USING_BUNDLED_CEF

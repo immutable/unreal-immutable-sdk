@@ -1,6 +1,7 @@
-﻿#pragma once
+#pragma once
 
 #include "Immutable/Actions/ImtblBlueprintAsyncAction.h"
+#include "Immutable/Actions/ImtblConnectImxAsyncAction.h"
 
 #include "ImtblEmbeddedLoginAsyncAction.generated.h"
 
