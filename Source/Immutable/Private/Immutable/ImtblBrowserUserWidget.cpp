@@ -9,6 +9,7 @@
 #include "Components/ScaleBoxSlot.h"
 
 #include "Immutable/Browser/ImmutableJSConnectorBrowserWidget.h"
+#include "Immutable/ImtblJSConnector.h"
 #include "Immutable/ImmutableUtilities.h"
 #include "Immutable/Misc/ImtblLogging.h"
 
