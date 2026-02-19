@@ -496,7 +496,7 @@ void UImmutablePassport::OnGetAuthUrlResponse(FImtblJSResponse Response)
 
 			Msg = Response.JsonObject->GetStringField(TEXT("result")).Replace(TEXT(" "), TEXT("+"));
 #if PLATFORM_ANDROID
-			OnPKCEDismissed = FImtblPassportOnPKCEDismissedDelegate::CreateUObject(this, &UImmutablePassport::HandleOnLoginDismissed);
+			OnPKCEDismissed = FImtblPassportOnPKCEDismissedDelegate::CreateUObject(this, &UImmutablePassport::HandleOnLoginPKCEDismissed);
 			LaunchAndroidUrl(Msg);
 #elif PLATFORM_IOS
 			[[ImmutableIOS instance] launchUrl:TCHAR_TO_ANSI(*Msg)];
@@ -714,7 +714,7 @@ void UImmutablePassport::HandleDeepLink(NSString* sDeepLink) const
 }
 
 #if PLATFORM_ANDROID
-void UImmutablePassport::HandleOnLoginDismissed()
+void UImmutablePassport::HandleOnLoginPKCEDismissed()
 {
 	IMTBL_LOG("Handle On Login PKCE Dismissed");
 	OnPKCEDismissed = nullptr;
