@@ -321,7 +321,7 @@ struct IMMUTABLE_API FZkEvmTransactionReceipt
 	FString requestId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool success;
+	bool success = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString blockHash;

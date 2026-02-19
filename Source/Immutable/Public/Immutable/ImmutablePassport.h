@@ -311,13 +311,6 @@ public:
 #endif
 
 protected:
-#if PLATFORM_ANDROID
-	/*
-	 * Delegate used for handling the dismissal of the PKCE flow on Android.
-	 */
-	DECLARE_DELEGATE(FImtblPassportOnPKCEDismissedDelegate);
-#endif
-
 #if PLATFORM_ANDROID | PLATFORM_IOS | PLATFORM_MAC | PLATFORM_WINDOWS
 	/** Delegate for handling deep link activation. */
 	FImmutableDeepLinkMulticastDelegate OnHandleDeepLink;
