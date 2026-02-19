@@ -4,12 +4,16 @@
 
 #include "Immutable/ImmutablePassport.h"
 #include "Immutable/ImmutableSubsystem.h"
+#include "Immutable/Misc/ImtblLogging.h"
 
 #if WITH_EDITOR
 #include "Editor.h"
 #endif
 
-ASWebAuthenticationSession *_authSession;
+@interface ImmutableMac () {
+	ASWebAuthenticationSession* _authSession;
+}
+@end
 
 @implementation ImmutableMac
 
@@ -28,42 +32,40 @@ ASWebAuthenticationSession *_authSession;
 }
 
 + (UImmutablePassport*) getPassport {
-	UWorld* World;
+	auto PassportFromWorld = [](UWorld* World) -> UImmutablePassport* {
+		if (!World) return nullptr;
+		UGameInstance* GameInstance = World->GetGameInstance();
+		if (!GameInstance) return nullptr;
+		UImmutableSubsystem* Subsystem = GameInstance->GetSubsystem<UImmutableSubsystem>();
+		if (!Subsystem) return nullptr;
+		return Subsystem->GetPassport().Get();
+	};
 #if WITH_EDITOR
 	if (GEditor)
 	{
-		for (const auto& Context : GEditor->GetWorldContexts())
+		for (const FWorldContext& Context : GEditor->GetWorldContexts())
 		{
-			if ((World = Context.World()))
+			if (UImmutablePassport* Passport = PassportFromWorld(Context.World()))
 			{
-				if (auto GameInstance = World->GetGameInstance())
-				{
-					if (auto ImmutableSubsystem = GameInstance->GetSubsystem<UImmutableSubsystem>())
-					{
-						auto WeakPassport = ImmutableSubsystem->GetPassport();
-						if (auto Passport = WeakPassport.Get())
-						{
-							return Passport;
-						}
-					}
-				}
+				return Passport;
 			}
 		}
 	}
+	return nullptr;
 #else
+	UWorld* World = nullptr;
 	if (UGameEngine* GameEngine = Cast<UGameEngine>(GEngine))
 	{
 		World = GameEngine->GetGameWorld();
 	}
+	return PassportFromWorld(World);
 #endif
-
-	return nil;
 }
 
 - (void)launchUrl:(const char *)url forRedirectUri:(const char *)redirectUri {
   // For automation, use the browser-based method
   if (GIsAutomationTesting) {
-    NSLog(@"Using automation mode for authentication (GIsAutomationTesting is true)");
+    IMTBL_LOG("Using automation mode for authentication (GIsAutomationTesting is true)");
     [self launchUrlInBrowser:url];
     return;
   }
@@ -116,7 +118,7 @@ ASWebAuthenticationSession *_authSession;
     
     // Open URL in default browser
     [[NSWorkspace sharedWorkspace] openURL:URL];
-    NSLog(@"Opened URL in browser for automation: %@", URL);
+    IMTBL_LOG("Opened URL in browser for automation: %s", URL.absoluteString.UTF8String);
 }
 
 - (ASPresentationAnchor)presentationAnchorForWebAuthenticationSession:
