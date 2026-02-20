@@ -62,7 +62,6 @@ void UImmutableSubsystem::OnBridgeReady()
 	// Set the bIsReady flag and broadcast the OnReady event for any waiting
 	// delegates.
 	bIsReady = true;
-	ManageBridgeDelegateQueue();
 }
 
 void UImmutableSubsystem::ManageBridgeDelegateQueue()
