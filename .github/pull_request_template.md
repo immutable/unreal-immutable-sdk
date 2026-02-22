@@ -42,5 +42,5 @@
 
 - [ ] Prefix your PR title with `feat: `, `fix: `, `chore: `, `docs: `, `refactor: ` or `test: `.
 - [ ] Sample blueprints are updated with new SDK changes
-- [ ] Updated [public documentation](https://github.com/immutable/documentation/) with new SDK changes
+- [ ] Updated public documentation with new SDK changes
 - [ ] Replied to GitHub issues
