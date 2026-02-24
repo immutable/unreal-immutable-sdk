@@ -12,7 +12,7 @@
 
 # Documentation
 
-For setup instructions and API references, see the [official documentation](https://docs.immutable.com/docs/zkEVM/sdks/unreal).
+For setup instructions and API references, see the [official documentation](https://docs.immutable.com/docs/sdks/unreal/overview).
 
 ## Plugin Maintainers' Guide
 
