@@ -8,8 +8,7 @@
 /**
  * @class UApplicationConfig
  * @brief Configuration settings for Passport and various APIs.
- * @details This class stores configuration settings such as URLs, chain names, contract addresses, 
- * client IDs, and environment settings for the zkEVM API, Orderbook API, and Passport.
+ * @details This class stores configuration settings such as client IDs and environment settings for Passport.
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = Immutable)
 class IMMUTABLE_API UApplicationConfig : public UObject
@@ -17,66 +16,6 @@ class IMMUTABLE_API UApplicationConfig : public UObject
 	GENERATED_BODY()
 
 public:
-	/**
-	 * Retrieves URL for the zkEVM API.
-	 *
-	 * @return A constant reference to an FString containing the name of the chain.
-	 */
-	const FString& GetzkEVMAPIURL()
-	{
-		return zkEVMAPIURL;
-	}
-	
-	/**
-	 * Retrieves the name of the chain used to pass to the zkEVM API.
-	 *
-	 * @return A constant reference to an FString containing the name of the chain.
-	 */
-	const FString& GetzkEVMAPIChainName()
-	{
-		return zkEVMAPIChainName;
-	}
-
-	/**
-	 * Retrieves URL for the Orderbook API.
-	 *
-	 * @return A constant reference to an FString containing the name of the chain.
-	 */
-	const FString& GetOrderbookAPIURL()
-	{
-		return OrederbookAPIURL;
-	}
-	
-	/**
-	 * Retrieves the name of the chain used to pass to the Orderbook API.
-	 *
-	 * @return A constant reference to an FString containing the name of the chain.
-	 */
-	const FString& GetOrderbookAPIChainName()
-	{
-		return OrderbookAPIChainName;
-	}
-
-	/**
-	 * @brief Retrieves the cryptocurrency contract address associated with the user's wallet balance.
-	 *
-	 * @return A string representing the contract address.
-	 */
-	const FString& GetTokenBalanceContractAddress()
-	{
-		return TokenBalanceContractAddress;
-	} 
-
-	/**
-	 * Retrieves the list of NFT contracts used in the APIs' queries.
-	 *
-	 * @return A constant reference to an array of strings representing the contracts.
-	 */
-	const TArray<FString>& GetNFTContractAddresses()
-	{
-		return NFTContractAddress;
-	}
-
 	/**
 	 * Retrieves the Client ID used for Passport initialization.
 	 *
@@ -126,30 +65,6 @@ public:
 	}
 
 protected:
-	/** The URL for the zkEVM API. */
-	UPROPERTY(EditDefaultsOnly, Category = "zkEVM API")
-	FString zkEVMAPIURL;
-
-	/** The name of the API chain used by the zkEVM API. */
-	UPROPERTY(EditDefaultsOnly, Category = "zkEVM API")
-	FString zkEVMAPIChainName;
-
-	/** The URL for the Orderbook API. */
-	UPROPERTY(EditDefaultsOnly, Category = "Orderbook API")
-	FString OrederbookAPIURL;
-
-	/** The name of the API chain used by Orderbook API. */
-	UPROPERTY(EditDefaultsOnly, Category = "Orderbook API")
-	FString OrderbookAPIChainName;
-	
-	/** The address of the cryptocurrency contract in the blockchain. */
-	UPROPERTY(EditDefaultsOnly, Category = "Contracts")
-	FString TokenBalanceContractAddress;
-
-	/** An array of NFT contract addresses used for searching NFTs in the marketplace or displaying them in the player's inventory. */
-	UPROPERTY(EditDefaultsOnly, Category = "Contracts")
-	TArray<FString> NFTContractAddress;
-
 	/** Passport Client ID. */
 	UPROPERTY(EditDefaultsOnly, Category = "Passport")
 	FString ClientID;
