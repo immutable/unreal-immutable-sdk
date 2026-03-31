@@ -14,6 +14,68 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FImmutableDeepLinkDynamicMulticastDe
 // This hardcoded value will be updated by a workflow during the release process.
 #define ENGINE_SDK_VERSION TEXT("1.12.0")
 
+/**
+ * Enum representing marketing consent status for authentication
+ */
+UENUM(BlueprintType)
+enum class EImmutableMarketingConsentStatus : uint8
+{
+	Opted_In,
+	Unsubscribed,
+	Subscribed
+};
+
+/**
+ * Enum representing direct login methods for authentication providers
+ */
+UENUM(BlueprintType)
+enum class EImmutableDirectLoginMethod : uint8
+{
+	Email,
+	Google,
+	Apple,
+	Facebook
+};
+
+/**
+ * Structure representing direct login options for authentication
+ * Can be used for social login (google, apple, facebook) or email login
+ */
+USTRUCT(BlueprintType)
+struct IMMUTABLE_API FImmutableDirectLoginOptions
+{
+	GENERATED_BODY()
+
+	bool IsEmailValid() const;
+
+	TSharedPtr<FJsonObject> ToJsonObject() const;
+
+	/** Direct login method for authentication */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EImmutableDirectLoginMethod DirectLoginMethod = EImmutableDirectLoginMethod::Email;
+
+	/** Email address for email-based authentication (only used when DirectLoginMethod is Email) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Email;
+
+	/** Marketing consent status for authentication (defaults to opted in) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EImmutableMarketingConsentStatus MarketingConsentStatus = EImmutableMarketingConsentStatus::Opted_In;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ImPassportTraceId;
+};
+
+UCLASS()
+class UImmutableDirectLoginOptionsStatics : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable)
+	static bool FromJSResponse(const FImtblJSResponse& Response, FImmutableDirectLoginOptions& DirectLoginOptions);
+};
+
 USTRUCT()
 struct FImmutableEngineVersionData
 {
